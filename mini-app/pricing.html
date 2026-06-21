@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="color-scheme" content="light dark">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Цены — TeleBoost</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="header animate-in">
+        <a href="index.html" style="color: inherit; text-decoration: none;"><i class="fas fa-arrow-left"></i></a>
+        <h2>Цены</h2>
+        <div style="width:24px;"></div>
+    </div>
+
+    <!-- Tab Navigation -->
+    <div class="animate-in" style="animation-delay:0.03s;padding:0 16px;margin-bottom:12px;">
+        <div style="display:flex;background:var(--bg-card);border-radius:10px;padding:3px;gap:3px;">
+            <button id="tab-packs" class="tab-btn active" onclick="switchTab('packs')">
+                <i class="fas fa-box"></i> Пакеты
+            </button>
+            <button id="tab-modules" class="tab-btn" onclick="switchTab('modules')">
+                <i class="fas fa-th-large"></i> Модули
+            </button>
+        </div>
+    </div>
+
+    <!-- Trial Banner -->
+    <div class="card animate-in" style="animation-delay:0.05s;background:rgba(0,229,255,0.04);border:1px solid rgba(0,229,255,0.15);padding:12px 14px;">
+        <div style="display:flex;align-items:center;gap:10px;">
+            <i class="fas fa-gift" style="font-size:20px;color:var(--primary);"></i>
+            <div style="flex:1;">
+                <div style="font-size:13px;font-weight:600;">2 дня бесплатно</div>
+                <div style="font-size:10px;color:var(--text-secondary);">Любой пакет или модуль можно попробовать бесплатно</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Packs Tab -->
+    <div id="packs-content" class="animate-in" style="animation-delay:0.07s;">
+        <div id="bundles-scroll" style="display:flex;gap:10px;overflow-x:auto;padding:4px 16px 12px;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;">
+            <div id="bundles-skeleton" style="display:flex;gap:10px;flex-shrink:0;">
+                <div class="skeleton-card" style="min-width:200px;height:200px;"></div>
+                <div class="skeleton-card" style="min-width:200px;height:200px;"></div>
+                <div class="skeleton-card" style="min-width:200px;height:200px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modules Tab -->
+    <div id="modules-content" style="display:none;" class="animate-in" style="animation-delay:0.07s;">
+        <div style="padding:0 16px;margin-bottom:8px;">
+            <div style="font-size:13px;font-weight:600;color:var(--text-secondary);">Категории модулей</div>
+        </div>
+        <div id="categories-container" style="padding:0 16px 80px;"></div>
+    </div>
+
+    <!-- Module Info Modal -->
+    <div class="modal-overlay" id="info-modal" onclick="if(event.target===this)closeInfoModal()">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title" id="info-title">Модуль</div>
+                <div class="modal-close" onclick="closeInfoModal()"><i class="fas fa-times"></i></div>
+            </div>
+            <div style="padding:16px;">
+                <p id="info-desc" style="font-size:13px;color:var(--text-secondary);margin-bottom:16px;"></p>
+                <div id="info-trial" style="font-size:12px;color:var(--success);margin-bottom:16px;display:none;">
+                    <i class="fas fa-check-circle"></i> <span id="info-trial-end"></span>
+                </div>
+                <button class="btn" style="width:100%;" id="info-action-btn" onclick="actionFromInfo()">
+                    <i class="fas fa-shopping-cart"></i> <span id="info-action-label">Купить</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="nav-bar animate-in" style="animation-delay:0.25s">
+        <a href="index.html" class="nav-item"><i class="fas fa-home"></i></a>
+        <a href="campaigns.html" class="nav-item"><i class="fas fa-tasks"></i></a>
+        <a href="pricing.html" class="nav-item active"><i class="fas fa-gem"></i></a>
+        <a href="dashboard.html" class="nav-item"><i class="fas fa-chart-pie"></i></a>
+        <a href="settings.html" class="nav-item"><i class="fas fa-cog"></i></a>
+    </div>
+
+    <script src="main.js"></script>
+    <script>
+    const CATEGORIES = {
+        traffic: { name: "Сбор трафика", icon: "fa-crosshairs", color: "var(--primary)",
+            modules: ["parsing", "channels", "inviter", "cloner", "chat_cloner", "mass_subscribe", "channel_creator"] },
+        engage: { name: "Взаимодействие", icon: "fa-comments", color: "var(--accent)",
+            modules: ["commenting", "chatting", "neuro_dialogs", "mass_reactions"] },
+        accounts: { name: "Аккаунты и защита", icon: "fa-shield-halved", color: "var(--success)",
+            modules: ["warmup", "antiban", "unspam", "converter", "proxy", "2fa_bypass", "mass_unsubscribe"] },
+        analytics: { name: "Аналитика", icon: "fa-chart-line", color: "var(--warning)",
+            modules: ["analytics"] },
+        marketing: { name: "Маркетинг", icon: "fa-bullhorn", color: "var(--accent)",
+            modules: ["crm", "view_booster", "reporter"] },
+    };
+
+    const MODULE_META = {
+        parsing: {icon:"fa-crosshairs",color:"var(--primary)",desc:"Сбор аудитории из Telegram каналов с AI-обогащением"},
+        antiban: {icon:"fa-shield-halved",color:"var(--success)",desc:"Human Emulation + Device Fingerprint + предиктивная защита"},
+        commenting: {icon:"fa-comments",color:"var(--accent)",desc:"AI-комментарии с разными стратегиями через Cerebras"},
+        analytics: {icon:"fa-chart-line",color:"var(--warning)",desc:"Дашборды ROI, CPL, конверсия, прогнозы 7/30 дней"},
+        chatting: {icon:"fa-message",color:"var(--primary)",desc:"AI-переписка в ЛС по CRM-воронке"},
+        channels: {icon:"fa-tv",color:"var(--primary)",desc:"Ведение каналов на автопилоте: AI-контент, постинг"},
+        crm: {icon:"fa-users",color:"var(--accent)",desc:"Управление лидами, pipeline, история, LTV"},
+        warmup: {icon:"fa-sun",color:"var(--warning)",desc:"Автопрогрев: сториз, просмотры, скролл, мимикрия"},
+        inviter: {icon:"fa-user-plus",color:"var(--primary)",desc:"Приглашение в группы/чаты в один клик"},
+        cloner: {icon:"fa-clone",color:"var(--success)",desc:"Автокопирование контента в каналы"},
+        chat_cloner: {icon:"fa-copy",color:"var(--accent)",desc:"Копирование контента из чатов"},
+        view_booster: {icon:"fa-eye",color:"var(--primary)",desc:"Увеличение просмотров постов"},
+        unspam: {icon:"fa-unlock",color:"var(--success)",desc:"Снятие спам-блока с аккаунта"},
+        proxy: {icon:"fa-network-wired",color:"var(--warning)",desc:"Ротация + проверка прокси"},
+        converter: {icon:"fa-exchange-alt",color:"var(--accent)",desc:"TData ↔ JSON+Session конвертер"},
+        neuro_dialogs: {icon:"fa-robot",color:"var(--primary)",desc:"AI-диалоги с автоподстройкой"},
+        "2fa_bypass": {icon:"fa-key",color:"var(--success)",desc:"Создание сессии без пароля 2FA"},
+        mass_reactions: {icon:"fa-heart",color:"var(--accent)",desc:"Автоматическая накрутка реакций"},
+        mass_subscribe: {icon:"fa-inbox",color:"var(--primary)",desc:"Автоподписка на каналы и группы"},
+        mass_unsubscribe: {icon:"fa-right-from-bracket",color:"var(--warning)",desc:"Массовая отписка от каналов"},
+        reporter: {icon:"fa-flag",color:"var(--danger)",desc:"Массовые жалобы на целевой контент"},
+        channel_creator: {icon:"fa-plus-circle",color:"var(--success)",desc:"Массовое создание каналов и групп"},
+    };
+
+    const BUNDLE_COLORS = {
+        telestart: {bg:"rgba(0,229,255,0.08)",border:"rgba(0,229,255,0.3)",badge:"var(--primary)"},
+        teleboost: {bg:"rgba(180,74,255,0.08)",border:"rgba(180,74,255,0.3)",badge:"var(--accent)"},
+        teleflex: {bg:"rgba(255,193,7,0.08)",border:"rgba(255,193,7,0.4)",badge:"var(--warning)"},
+        telepower: {bg:"rgba(0,229,255,0.06)",border:"rgba(0,229,255,0.2)",badge:"var(--primary)"},
+        telemax: {bg:"rgba(255,77,77,0.08)",border:"rgba(255,77,77,0.3)",badge:"var(--danger)"},
+    };
+
+    let modules = {};
+    let bundles = {};
+    let currentTab = 'packs';
+
+    function switchTab(tab) {
+        currentTab = tab;
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('tab-' + tab).classList.add('active');
+        document.getElementById('packs-content').style.display = tab === 'packs' ? 'block' : 'none';
+        document.getElementById('modules-content').style.display = tab === 'modules' ? 'block' : 'none';
+    }
+
+    async function loadData() {
+        try {
+            const res = await api.get('/subscriptions/modules');
+            if (!res.success) throw new Error('API error');
+            modules = res.data.modules;
+            bundles = res.data.bundles;
+            renderBundles();
+            renderCategories();
+        } catch (e) {
+            document.getElementById('bundles-skeleton').innerHTML = '<div style="padding:20px;text-align:center;color:var(--danger);"><i class="fas fa-exclamation-triangle"></i><p>Ошибка загрузки</p></div>';
+        }
+    }
+
+    function renderBundles() {
+        const container = document.getElementById('bundles-scroll');
+        container.innerHTML = '';
+        const order = ['telestart', 'teleboost', 'teleflex', 'telepower', 'telemax'];
+        order.forEach((id) => {
+            const b = bundles[id];
+            if (!b) return;
+            const colors = BUNDLE_COLORS[id] || BUNDLE_COLORS.telestart;
+            const isPopular = id === 'teleflex';
+            const modules_count = b.modules ? b.modules.length : 0;
+            const card = document.createElement('div');
+            card.style.cssText = `min-width:180px;flex-shrink:0;scroll-snap-align:start;border-radius:14px;border:1px solid ${colors.border};background:${colors.bg};padding:14px;position:relative;overflow:hidden;`;
+            if (isPopular) {
+                card.style.border = '2px solid var(--warning)';
+                card.innerHTML = `<div style="position:absolute;top:8px;right:-24px;background:var(--warning);color:#000;font-size:8px;font-weight:800;padding:3px 28px;transform:rotate(45deg);">ХИТ</div>`;
+            }
+            const items = b.modules && b.modules.length > 0
+                ? b.modules.slice(0, 4).map(m => {
+                    const mn = modules[m];
+                    return `<span style="font-size:10px;color:var(--text-secondary);"><i class="fas fa-check" style="color:var(--success);font-size:8px;margin-right:3px;"></i>${mn ? mn.name : m}</span>`;
+                  }).join('') + (b.modules.length > 4 ? `<span style="font-size:10px;color:var(--text-secondary);">+${b.modules.length - 4} ещё</span>` : '')
+                : '';
+            card.innerHTML += `
+                <div style="font-size:16px;font-weight:700;margin-bottom:2px;">${b.name}</div>
+                <div style="font-size:10px;color:var(--text-secondary);margin-bottom:8px;">${b.description || ''}</div>
+                <div style="font-size:22px;font-weight:800;color:var(--primary);margin-bottom:8px;">$${b.price}<span style="font-size:10px;color:var(--text-secondary);font-weight:400;">/мес</span></div>
+                <div style="display:flex;flex-direction:column;gap:3px;margin-bottom:10px;">${items}</div>
+                <button class="btn" style="width:100%;padding:8px;font-size:12px;" onclick="buyBundle('${id}')">
+                    <i class="fas fa-shopping-cart"></i> ${isPopular ? 'Выбрать' : 'Подключить'}
+                </button>
+            `;
+            container.appendChild(card);
+        });
+    }
+
+    function renderCategories() {
+        const container = document.getElementById('categories-container');
+        container.innerHTML = '';
+        Object.entries(CATEGORIES).forEach(([catId, cat]) => {
+            const section = document.createElement('div');
+            section.style.marginBottom = '20px';
+            section.innerHTML = `
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+                    <i class="fas ${cat.icon}" style="color:${cat.color};font-size:16px;"></i>
+                    <span style="font-size:14px;font-weight:600;">${cat.name}</span>
+                    <div style="height:1px;flex:1;background:var(--border);"></div>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:4px;">
+            `;
+            const listDiv = section.querySelector('div:last-child') || section.lastElementChild;
+            cat.modules.forEach(mid => {
+                const mod = modules[mid];
+                if (!mod) return;
+                const meta = MODULE_META[mid] || {icon:"fa-cube",color:"var(--primary)",desc:mod.description};
+                const item = document.createElement('div');
+                item.className = 'card';
+                item.style.cssText = 'padding:10px 12px;margin-bottom:0;cursor:pointer;display:flex;align-items:center;gap:8px;';
+                item.onclick = () => showModuleInfo(mid);
+                item.innerHTML = `
+                    <i class="fas ${meta.icon}" style="font-size:16px;width:18px;text-align:center;color:${meta.color};"></i>
+                    <div style="flex:1;min-width:0;">
+                        <div style="font-size:12px;font-weight:600;">${mod.name}</div>
+                        <div style="font-size:9px;color:var(--text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${mod.description}</div>
+                    </div>
+                    <div style="text-align:right;">
+                        <div style="font-size:14px;font-weight:700;color:var(--primary);">$${mod.price}</div>
+                    </div>
+                    <i class="fas fa-chevron-right" style="font-size:10px;color:var(--text-muted);"></i>
+                `;
+                section.appendChild(item);
+            });
+            container.appendChild(section);
+        });
+    }
+
+    async function buyBundle(id) {
+        const token = localStorage.getItem("tba_token");
+        if (!token) { toast('error', 'Сначала войдите в систему'); return; }
+        try {
+            const res = await api.post('/payments/create-checkout-session', { bundle_id: id });
+            if (res?.data?.url) {
+                window.Telegram?.WebApp?.openLink(res.data.url);
+            } else {
+                await api.post('/subscriptions/bundles/activate', { module_id: id, enabled: true });
+                toast('success', 'Пакет активирован на 2 дня бесплатно');
+            }
+        } catch (e) {
+            toast('error', e.data?.detail || e.message || 'Ошибка');
+        }
+    }
+
+    let infoModuleId = null;
+
+    function showModuleInfo(id) {
+        infoModuleId = id;
+        const mod = modules[id];
+        const meta = MODULE_META[id] || {icon:"fa-cube",color:"var(--primary)",desc:""};
+        document.getElementById('info-title').innerHTML = `<i class="fas ${meta.icon}" style="color:${meta.color};margin-right:6px;"></i> ${mod?.name || id}`;
+        document.getElementById('info-desc').textContent = meta.desc;
+        document.getElementById('info-trial').style.display = 'none';
+        const btn = document.getElementById('info-action-btn');
+        const label = document.getElementById('info-action-label');
+        btn.style.background = '';
+        btn.innerHTML = `<i class="fas fa-shopping-cart"></i> Купить за $${mod?.price || 0}/мес`;
+        document.getElementById('info-modal').style.display = 'flex';
+    }
+
+    async function actionFromInfo() {
+        if (!infoModuleId) return;
+        const token = localStorage.getItem("tba_token");
+        if (!token) { toast('error', 'Сначала войдите в систему'); closeInfoModal(); return; }
+        try {
+            await api.post('/subscriptions/modules/toggle', { module_id: infoModuleId, enabled: true });
+            toast('success', 'Модуль активирован на 2 дня бесплатно');
+            closeInfoModal();
+        } catch (e) {
+            toast('error', e.data?.detail || e.message || 'Ошибка');
+        }
+    }
+
+    function closeInfoModal() {
+        document.getElementById('info-modal').style.display = 'none';
+        infoModuleId = null;
+    }
+
+    document.addEventListener('DOMContentLoaded', loadData);
+    </script>
+
+    <style>
+    .tab-btn {
+        flex:1;padding:8px 12px;border:none;border-radius:8px;font-size:13px;font-weight:600;
+        background:transparent;color:var(--text-secondary);cursor:pointer;transition:all 0.2s;
+        display:flex;align-items:center;justify-content:center;gap:5px;
+    }
+    .tab-btn.active {
+        background:var(--primary);color:#000;box-shadow:0 2px 8px rgba(0,229,255,0.3);
+    }
+    .tab-btn i { font-size:12px; }
+    #bundles-scroll::-webkit-scrollbar { display:none; }
+    .card { animation:cardIn 0.3s ease; }
+    @keyframes cardIn { from { opacity:0;transform:translateY(8px); } to { opacity:1;transform:translateY(0); } }
+    </style>
+</body>
+</html>

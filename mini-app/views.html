@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="color-scheme" content="light dark">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>GRAMGPT — Накрутка</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="header animate-in">
+        <h2><i class="fas fa-eye" style="color: var(--primary)"></i> Накрутка просмотров</h2>
+        <a href="index.html" class="text-secondary" style="text-decoration: none; font-size: 14px;">
+            <i class="fas fa-arrow-left"></i> Назад
+        </a>
+    </div>
+
+    <!-- Stats -->
+    <div class="stat-row animate-in" style="animation-delay: 0.05s">
+        <div class="stat-flex">
+            <div class="stat-item"><h4>Задач</h4><div id="vw-count" style="color: var(--primary)">0</div></div>
+            <div class="stat-item text-center"><h4>Отправлено</h4><div id="vw-sent" style="color: var(--success)">0</div></div>
+            <div class="stat-item text-right"><h4>Активных</h4><div id="vw-active">0</div></div>
+        </div>
+    </div>
+
+    <!-- Start -->
+    <div class="card animate-in" style="animation-delay: 0.1s">
+        <h4 class="mb-12"><i class="fas fa-play" style="color: var(--primary)"></i> Накрутка</h4>
+        <div class="form-group">
+            <label class="form-label">Канал / Пост (ссылка)</label>
+            <input type="text" class="form-input" id="vw-target" placeholder="@channel или t.me/channel/id">
+        </div>
+        <div class="form-group">
+            <label class="form-label">ID сообщений (через запятую, опционально)</label>
+            <input type="text" class="form-input" id="vw-msg-ids" placeholder="123, 456, 789">
+        </div>
+        <div class="flex gap-8">
+            <div class="flex-1"><label class="form-label">Кол-во просмотров</label><input type="number" class="form-input" id="vw-count-input" value="100"></div>
+            <div class="flex-1"><label class="form-label">На аккаунт</label><input type="number" class="form-input" id="vw-per-account" value="5"></div>
+        </div>
+        <div class="form-group mt-8">
+            <label class="form-label">Задержка (сек)</label>
+            <input type="number" class="form-input" id="vw-delay" value="5">
+        </div>
+        <button class="btn mt-12" onclick="startViews()"><i class="fas fa-play"></i> Запустить накрутку</button>
+    </div>
+
+    <!-- Jobs List -->
+    <div class="card animate-in" style="animation-delay: 0.15s">
+        <div class="card-header"><h4>Задачи</h4><span class="status-badge badge-blue" id="vw-jobs-count">0</span></div>
+        <div id="vw-jobs-list"><div class="empty-state"><i class="fas fa-eye"></i><h4>Нет задач</h4><p>Запустите накрутку просмотров</p></div></div>
+    </div>
+
+    <div class="nav-bar animate-in" style="animation-delay: 0.25s">
+        <a href="index.html" class="nav-item"><i class="fas fa-home"></i></a>
+        <a href="campaigns.html" class="nav-item"><i class="fas fa-tasks"></i></a>
+        <a href="channel.html" class="nav-item"><i class="fas fa-tv"></i></a>
+        <a href="dashboard.html" class="nav-item"><i class="fas fa-chart-pie"></i></a>
+        <a href="settings.html" class="nav-item"><i class="fas fa-cog"></i></a>
+    </div>
+
+    <script src="main.js"></script>
+    <script>
+        async function startViews() {
+            const target = document.getElementById('vw-target').value.trim();
+            if (!target) { toast('warning', 'Укажите цель', 'Введите канал или ссылку на пост'); return; }
+            const msgIdsRaw = document.getElementById('vw-msg-ids').value.trim();
+            const message_ids = msgIdsRaw ? msgIdsRaw.split(',').map(function(s) { var n = parseInt(s.trim()); return isNaN(n) ? null : n; }).filter(Boolean) : null;
+            haptic('medium');
+            try {
+                const r = await api.post('/views/start', {
+                    target: target,
+                    message_ids: message_ids,
+                    count: parseInt(document.getElementById('vw-count-input').value) || 100,
+                    views_per_account: parseInt(document.getElementById('vw-per-account').value) || 5,
+                    delay: parseInt(document.getElementById('vw-delay').value) || 5,
+                });
+                if (r && r.job_id) toast('success', 'Накрутка запущена', 'ID: ' + r.job_id + ', цель: ' + r.target + ' просмотров');
+                await loadJobs();
+            } catch (e) { toast('error', 'Ошибка', e.message); }
+        }
+
+        async function stopViews(id) {
+            try {
+                await api.post('/views/' + id + '/stop');
+                toast('info', 'Стоп', 'Задача остановлена');
+                await loadJobs();
+            } catch (e) { toast('error', 'Ошибка', e.message); }
+        }
+
+        async function loadJobs() {
+            try {
+                const data = await api.get('/views/list');
+                const jobs = data && data.data ? data.data : (Array.isArray(data) ? data : []);
+                document.getElementById('vw-count').textContent = jobs.length;
+                document.getElementById('vw-jobs-count').textContent = jobs.length;
+                let totalSent = 0, active = 0;
+                const list = document.getElementById('vw-jobs-list');
+                if (jobs.length === 0) {
+                    list.innerHTML = '<div class="empty-state"><i class="fas fa-eye"></i><h4>Нет задач</h4><p>Запустите накрутку просмотров</p></div>';
+                    return;
+                }
+                list.innerHTML = jobs.map(function(j) {
+                    var s = j.status || 'unknown';
+                    var badgeClass = s === 'running' ? 'badge-green' : s === 'completed' ? 'badge-blue' : 'badge-red';
+                    if (s === 'running') active++;
+                    var sent = (j.stats && j.stats.views_sent) || 0;
+                    totalSent += sent;
+                    var actions = s === 'running' ? '<button class="btn-sm" onclick="stopViews(' + j.id + ')" style="background:rgba(239,68,68,0.1);color:var(--danger);border:1px solid rgba(239,68,68,0.3);"><i class="fas fa-stop"></i></button>' : '';
+                    return '<div class="job-item"><div class="flex-1"><div style="font-size:13px;font-weight:600;">' + escapeHtml(j.config.target || '—') + '</div><div style="font-size:10px;color:var(--text-secondary);">#' + j.id + ' — отправлено: ' + sent + ' / ' + (j.config.count || '∞') + '</div></div><div class="flex gap-4" style="align-items:center;"><span class="status-badge ' + badgeClass + '">' + s + '</span>' + actions + '</div></div>';
+                }).join('');
+                document.getElementById('vw-sent').textContent = totalSent;
+                document.getElementById('vw-active').textContent = active;
+            } catch (e) { console.warn('Views load error:', e); }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadJobs);
+        function escapeHtml(str) { var d = document.createElement('div'); d.textContent = str; return d.innerHTML; }
+    </script>
+</body>
+</html>

@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="color-scheme" content="light dark">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>GRAMGPT — Аналитика</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .kpi-row { display:grid;grid-template-columns:1fr 1fr;gap:8px; }
+        .kpi-card { padding:14px;border-radius:var(--radius-sm);background:var(--bg-card);border:1px solid var(--border); }
+        .kpi-value { font-size:24px;font-weight:900;margin-bottom:2px;letter-spacing:-0.02em; }
+        .kpi-label { font-size:10px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.5px; }
+        .kpi-trend { font-size:10px;margin-top:4px; }
+        .kpi-trend.up { color:var(--success); }
+        .kpi-trend.down { color:var(--danger); }
+        .chart-bars { display:flex;align-items:flex-end;gap:3px;height:80px;padding:4px 0; }
+        .chart-bar { flex:1;border-radius:2px 2px 0 0;min-height:2px;transition:height 0.6s ease;position:relative; }
+        .chart-bar:hover .chart-tooltip { opacity:1; }
+        .chart-tooltip { position:absolute;bottom:100%;left:50%;transform:translateX(-50%);background:var(--bg-card);border:1px solid var(--border);border-radius:6px;padding:2px 6px;font-size:9px;white-space:nowrap;opacity:0;transition:0.2s;pointer-events:none;z-index:10; }
+        .activity-feed { display:flex;flex-direction:column;gap:4px;max-height:240px;overflow-y:auto; }
+        .activity-item { display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;font-size:12px;animation:slideIn 0.3s ease; }
+        .activity-item.new { background:rgba(0,229,255,0.04); }
+        .activity-icon { width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0; }
+        .activity-time { font-size:9px;color:var(--text-muted);margin-left:auto;white-space:nowrap; }
+        .heatmap-dots { display:flex;gap:4px;flex-wrap:wrap;margin-top:8px; }
+        .heatmap-dot { width:28px;height:28px;border-radius:6px;position:relative;cursor:pointer;transition:0.2s; }
+        .heatmap-dot:hover { transform:scale(1.2);z-index:2; }
+        .heatmap-dot .hm-label { position:absolute;bottom:100%;left:50%;transform:translateX(-50%);background:var(--bg-card);border:1px solid var(--border);border-radius:4px;padding:1px 4px;font-size:8px;white-space:nowrap;opacity:0;pointer-events:none; }
+        .heatmap-dot:hover .hm-label { opacity:1; }
+        @keyframes slideIn { from { opacity:0;transform:translateX(-8px); } to { opacity:1;transform:translateX(0); } }
+        @keyframes countUp { from { opacity:0;transform:translateY(4px); } to { opacity:1;transform:translateY(0); } }
+        .count-anim { animation:countUp 0.4s ease; }
+    </style>
+</head>
+<body>
+    <div class="header animate-in">
+        <div class="flex gap-10" style="align-items:center;">
+            <a href="index.html" style="color:inherit;text-decoration:none;"><i class="fas fa-arrow-left"></i></a>
+            <h2 style="margin:0;"><i class="fas fa-chart-pie" style="color:var(--primary)"></i> Аналитика</h2>
+        </div>
+        <div class="flex gap-8" style="align-items:center;">
+            <a href="speed.html" class="turbo-badge" id="turbo-badge" aria-label="Turbo Mode"><i class="fas fa-bolt"></i><span id="turbo-badge-text">Turbo</span></a>
+            <span class="live-dot" id="live-dot"></span>
+            <span class="text-xs" id="live-label" style="color:var(--success);font-weight:600;">LIVE</span>
+        </div>
+    </div>
+
+    <!-- KPI Row -->
+    <div class="kpi-row animate-in" style="animation-delay:0.03s" id="kpi-row">
+        <div class="kpi-card" style="grid-column:1/-1;background:linear-gradient(135deg,rgba(0,229,255,0.06),rgba(180,74,255,0.04));border-color:rgba(0,229,255,0.1);">
+            <div class="kpi-value" id="kpi-cpl" style="color:var(--primary);">--</div>
+            <div class="kpi-label">Стоимость лида (CPL)</div>
+            <div class="kpi-trend" id="kpi-cpl-trend"><span class="text-muted" style="font-size:10px;">Загрузка...</span></div>
+        </div>
+        <div class="kpi-card"><div class="kpi-value" id="kpi-actions">--</div><div class="kpi-label">Действий сегодня</div><div class="kpi-trend up" id="kpi-actions-trend"></div></div>
+        <div class="kpi-card"><div class="kpi-value" id="kpi-conv">--</div><div class="kpi-label">Конверсия</div><div class="kpi-trend up" id="kpi-conv-trend"></div></div>
+        <div class="kpi-card"><div class="kpi-value" id="kpi-roi">--</div><div class="kpi-label">ROI</div><div class="kpi-trend up" id="kpi-roi-trend"></div></div>
+        <div class="kpi-card"><div class="kpi-value" id="kpi-accounts">--</div><div class="kpi-label">Аккаунтов</div><div class="kpi-trend" id="kpi-accounts-trend"></div></div>
+    </div>
+
+    <!-- 7-Day Chart -->
+    <div class="card animate-in" style="animation-delay:0.06s">
+        <div class="card-header">
+            <h4 style="font-size:13px;"><i class="fas fa-chart-line" style="color:var(--primary)"></i> Активность (7 дней)</h4>
+        </div>
+        <div class="chart-bars" id="chart-container">
+            <div class="empty-state" style="padding:16px;font-size:11px;width:100%;" id="chart-empty">
+                <i class="fas fa-chart-line"></i>
+                <p id="chart-empty-text">Данные появятся после начала работы</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Live Activity Feed -->
+    <div class="card animate-in" style="animation-delay:0.09s">
+        <div class="card-header">
+            <h4 style="font-size:13px;"><i class="fas fa-bolt" style="color:var(--warning)"></i> Live Activity</h4>
+            <span class="text-xs text-secondary" id="activity-count">0</span>
+        </div>
+        <div class="activity-feed" id="activity-feed">
+            <div class="empty-state" id="activity-empty" style="padding:16px;">
+                <i class="fas fa-bolt"></i>
+                <p style="font-size:11px;">Ожидание активности...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Anti-Ban Shield Heatmap -->
+    <div class="card animate-in" style="animation-delay:0.12s">
+        <div class="card-header">
+            <h4 style="font-size:13px;"><i class="fas fa-shield-halved" style="color:var(--success)"></i> Anti-Ban Shield</h4>
+            <span class="status-badge badge-green" id="shield-status"><span class="live-dot"></span> Активен</span>
+        </div>
+        <div class="kpi-row" style="margin-bottom:8px;">
+            <div class="kpi-card" style="padding:10px;"><div style="font-size:18px;font-weight:800;color:var(--success)" id="sec-risk">--</div><div class="kpi-label">Risk Score</div></div>
+            <div class="kpi-card" style="padding:10px;"><div style="font-size:18px;font-weight:800;color:var(--primary)" id="sec-human">--</div><div class="kpi-label">Human-like</div></div>
+            <div class="kpi-card" style="padding:10px;"><div style="font-size:18px;font-weight:800;color:var(--danger)" id="sec-bans">--</div><div class="kpi-label">Банов</div></div>
+            <div class="kpi-card" style="padding:10px;"><div style="font-size:18px;font-weight:800;color:var(--accent)" id="sec-prediction">--</div><div class="kpi-label">Прогноз</div></div>
+        </div>
+        <div class="heatmap-dots" id="heatmap"></div>
+    </div>
+
+    <div class="nav-bar animate-in" style="animation-delay:0.2s">
+        <a href="index.html" class="nav-item"><i class="fas fa-home"></i></a>
+        <a href="campaigns.html" class="nav-item"><i class="fas fa-tasks"></i></a>
+        <a href="pricing.html" class="nav-item"><i class="fas fa-gem"></i></a>
+        <a href="dashboard.html" class="nav-item active"><i class="fas fa-chart-pie"></i></a>
+        <a href="settings.html" class="nav-item"><i class="fas fa-cog"></i></a>
+    </div>
+
+    <button id="back-to-top" class="back-to-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Наверх"><i class="fas fa-arrow-up"></i></button>
+
+    <script src="main.js"></script>
+    <script>
+    let ws = null;
+    let activityItems = [];
+
+    function animateValue(el, target, suffix) {
+        if (!el) return;
+        suffix = suffix || '';
+        var start = parseInt(el.textContent.replace(/[^0-9]/g,'')) || 0;
+        var duration = 600;
+        var startTime = performance.now();
+        function tick(now) {
+            var elapsed = now - startTime;
+            var progress = Math.min(elapsed / duration, 1);
+            var eased = 1 - Math.pow(1 - progress, 3);
+            var current = Math.round(start + (target - start) * eased);
+            el.textContent = current.toLocaleString() + suffix;
+            if (progress < 1) requestAnimationFrame(tick);
+        }
+        requestAnimationFrame(tick);
+    }
+
+    function getHeatmapColor(risk) {
+        if (risk >= 70) return 'var(--danger)';
+        if (risk >= 45) return 'var(--warning)';
+        if (risk >= 25) return '#f39c12';
+        return 'var(--success)';
+    }
+
+    async function loadDashboard() {
+        try {
+            const res = await api.get('/analytics/summary');
+            var d = res.data || res;
+            animateValue(document.getElementById('kpi-actions'), d.actions_today || d.total_actions || 0);
+            animateValue(document.getElementById('kpi-conv'), d.conversion_rate || 0, '%');
+            animateValue(document.getElementById('kpi-roi'), d.roi_average || 0, '%');
+            animateValue(document.getElementById('kpi-accounts'), d.total_accounts || 0);
+            var cpl = d.cpl || 0;
+            var cplEl = document.getElementById('kpi-cpl');
+            if (cplEl) cplEl.textContent = '$' + cpl.toFixed(2);
+            var cplTrend = document.getElementById('kpi-cpl-trend');
+            if (cplTrend) cplTrend.innerHTML = d.cpl_change ? '<span class="' + (d.cpl_change > 0 ? 'down' : 'up') + '"><i class="fas fa-arrow-' + (d.cpl_change > 0 ? 'down' : 'up') + '"></i> ' + Math.abs(d.cpl_change) + '%</span>' : '<span class="text-muted">Рассчитано</span>';
+
+            // Chart
+            var chartData = d.chart || d.daily_actions || [];
+            if (chartData.length > 0) {
+                var container = document.getElementById('chart-container');
+                var maxVal = Math.max.apply(null, chartData) || 1;
+                var html = '';
+                chartData.forEach(function(v) {
+                    var h = Math.max(2, (v / maxVal) * 95);
+                    var color = 'rgba(0,229,255,' + (0.15 + (v / maxVal) * 0.6) + ')';
+                    html += '<div class="chart-bar" style="height:' + h + '%;background:' + color + ';"><div class="chart-tooltip">' + v + '</div></div>';
+                });
+                container.innerHTML = html;
+            }
+
+            // Load accounts for heatmap
+            try {
+                const accRes = await api.get('/accounts');
+                var accounts = (accRes.data || accRes).accounts || [];
+                var heatmap = document.getElementById('heatmap');
+                heatmap.innerHTML = '';
+                accounts.forEach(function(a) {
+                    var risk = (a.error_count || 0) / Math.max((a.success_count || 0) + (a.error_count || 0), 1) * 100;
+                    if (a.status === 'banned') risk = 100;
+                    var dot = document.createElement('div');
+                    dot.className = 'heatmap-dot';
+                    dot.style.background = getHeatmapColor(risk);
+                    dot.innerHTML = '<span class="hm-label">' + (a.phone || '').slice(-6) + ': ' + Math.round(risk) + '%</span>';
+                    dot.title = a.phone + ' — риск ' + Math.round(risk) + '%';
+                    heatmap.appendChild(dot);
+                });
+                var riskAvg = accounts.length > 0 ? accounts.reduce(function(s, a) {
+                    return s + (a.error_count || 0) / Math.max((a.success_count || 0) + (a.error_count || 0), 1);
+                }, 0) / accounts.length * 100 : 0;
+                document.getElementById('sec-risk').textContent = accounts.length > 0 ? Math.round(riskAvg) + '%' : '0%';
+                document.getElementById('sec-risk').style.color = riskAvg >= 45 ? 'var(--danger)' : riskAvg >= 25 ? 'var(--warning)' : 'var(--success)';
+                document.getElementById('sec-human').textContent = accounts.length > 0 ? Math.round(100 - (accounts.filter(function(a) { return a.status === 'banned' || a.status === 'error'; }).length / accounts.length * 100)) + '%' : '--';
+                document.getElementById('sec-bans').textContent = accounts.filter(function(a) { return a.status === 'banned'; }).length;
+                document.getElementById('sec-prediction').textContent = riskAvg >= 45 ? '⚠️ Высокий' : riskAvg >= 25 ? '🟡 Средний' : '🟢 Низкий';
+            } catch (e) {}
+
+        } catch (e) {
+            console.warn('Dashboard load error:', e);
+            document.getElementById('kpi-cpl').textContent = '--';
+            document.getElementById('kpi-cpl-trend').innerHTML = '<span class="text-muted">Ошибка загрузки</span>';
+        }
+    }
+
+    // WebSocket Live Feed
+    function connectWS() {
+        var proto = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        var wsUrl = proto + '//' + window.location.host + '/ws/live';
+        try {
+            ws = new WebSocket(wsUrl);
+            ws.onmessage = function(e) {
+                try {
+                    var msg = JSON.parse(e.data);
+                    if (msg.type === 'connected' || msg.type === 'keepalive' || msg.type === 'pong') return;
+                    addActivity(msg);
+                } catch (err) {}
+            };
+            ws.onclose = function() {
+                setTimeout(connectWS, 3000);
+            };
+            ws.onopen = function() {
+                document.getElementById('live-dot').style.background = 'var(--success)';
+                document.getElementById('live-label').textContent = 'LIVE';
+            };
+        } catch (e) {
+            setTimeout(connectWS, 5000);
+        }
+    }
+
+    function addActivity(msg) {
+        var feed = document.getElementById('activity-feed');
+        var empty = document.getElementById('activity-empty');
+        if (empty) empty.style.display = 'none';
+
+        var colors = {success:'var(--success)',error:'var(--danger)',warning:'var(--warning)',info:'var(--primary)'};
+        var icons = {success:'check-circle',error:'times-circle',warning:'exclamation-triangle',info:'info-circle'};
+        var c = colors[msg.type] || colors.info;
+        var icon = icons[msg.type] || icons.info;
+
+        var item = document.createElement('div');
+        item.className = 'activity-item new';
+        item.innerHTML = '<div class="activity-icon" style="background:' + c + '20;color:' + c + ';"><i class="fas fa-' + icon + '"></i></div><div style="flex:1;min-width:0;"><div style="font-size:12px;font-weight:600;">' + (msg.title || '') + '</div><div style="font-size:10px;color:var(--text-secondary);">' + (msg.module || 'system') + '</div></div><span class="activity-time">только что</span>';
+        feed.insertBefore(item, feed.firstChild);
+        activityItems.push(item);
+
+        var count = document.getElementById('activity-count');
+        count.textContent = activityItems.length;
+
+        // Keep max 50 items
+        while (activityItems.length > 50) {
+            var old = activityItems.shift();
+            if (old.parentNode) old.parentNode.removeChild(old);
+        }
+
+        setTimeout(function() { item.classList.remove('new'); }, 1500);
+    }
+
+    // Back-to-top
+    (function() {
+        var sentinel = document.createElement('div');
+        sentinel.style.cssText = 'height:0;width:0;pointer-events:none';
+        document.body.insertBefore(sentinel, document.body.firstChild);
+        var btn = document.getElementById('back-to-top');
+        var observer = new IntersectionObserver(function(entries) {
+            entries.forEach(function(e) { btn.classList.toggle('visible', !e.isIntersecting); });
+        }, { root: null, threshold: 0 });
+        observer.observe(sentinel);
+    })();
+
+    async function checkTurbo() {
+        try {
+            var res = await api.get('/turbo/status');
+            var d = res.data || res;
+            var badge = document.getElementById('turbo-badge');
+            if (badge && d.turbo_enabled) {
+                badge.classList.add('active');
+                document.getElementById('turbo-badge-text').textContent = 'Turbo';
+            }
+        } catch(e) {}
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        loadDashboard();
+        connectWS();
+        checkTurbo();
+        setInterval(loadDashboard, 30000);
+    });
+    </script>
+</body>
+</html>

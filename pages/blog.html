@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Блог — TeleBoost AI</title>
+    <meta name="description" content="Статьи о Telegram-маркетинге, AI-инструментах и продвижении в мессенджерах.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2300B4D8'/%3E%3Ctext x='16' y='22' text-anchor='middle' fill='white' font-size='18' font-weight='bold' font-family='system-ui'%3ET%3C/text%3E%3C/svg%3E">
+    <style>
+        :root{--primary:#00B4D8;--accent:#7C3AED;--success:#10B981;--bg:#FAFBFC;--bg-white:#FFFFFF;--bg-section:#F1F5F9;--border:#E2E8F0;--text:#0F172A;--text-secondary:#475569;--text-muted:#94A3B8;--radius:16px;--radius-lg:24px;--shadow:0 4px 16px rgba(0,0,0,0.06);--shadow-lg:0 12px 40px rgba(0,0,0,0.08)}
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;-webkit-font-smoothing:antialiased}
+        .container{max-width:1000px;margin:0 auto;padding:0 24px}
+        .navbar{position:fixed;top:0;left:0;right:0;z-index:1000;padding:16px 0;background:rgba(250,251,252,0.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+        .nav-container{display:flex;align-items:center;justify-content:space-between;max-width:1200px;margin:0 auto;padding:0 24px}
+        .logo{font-size:22px;font-weight:800;color:var(--text);text-decoration:none}.logo span{color:var(--primary)}
+        .nav-links{display:flex;gap:24px;align-items:center}
+        .nav-links a{color:var(--text-secondary);text-decoration:none;font-size:14px;font-weight:500;transition:color .2s}.nav-links a:hover{color:var(--primary)}
+        .btn{display:inline-flex;align-items:center;gap:8px;padding:10px 24px;border-radius:10px;font-weight:600;font-size:14px;text-decoration:none;transition:all .25s;cursor:pointer;border:none}
+        .btn-primary{background:var(--primary);color:#fff}.btn-primary:hover{background:#0096B4}
+        .btn-sm{padding:8px 18px;font-size:13px}
+        .page-header{padding:120px 0 60px;text-align:center}
+        .page-header h1{font-size:clamp(32px,4vw,48px);font-weight:900;letter-spacing:-.03em;margin-bottom:16px}
+        .page-header p{font-size:18px;color:var(--text-secondary);max-width:600px;margin:0 auto}
+        .blog-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:24px;padding:0 0 80px}
+        .blog-card{background:var(--bg-white);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;transition:all .3s}
+        .blog-card:hover{box-shadow:var(--shadow-lg);transform:translateY(-2px)}
+        .blog-img{height:200px;background:linear-gradient(135deg,var(--primary),var(--accent));display:flex;align-items:center;justify-content:center;color:#fff;font-size:48px;opacity:.8}
+        .blog-body{padding:24px}
+        .blog-tag{display:inline-block;padding:3px 10px;border-radius:100px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;background:rgba(0,180,216,0.1);color:var(--primary);margin-bottom:12px}
+        .blog-card h3{font-size:18px;font-weight:700;margin-bottom:8px;letter-spacing:-.02em}
+        .blog-card p{font-size:14px;color:var(--text-secondary);line-height:1.6;margin-bottom:16px}
+        .blog-meta{font-size:12px;color:var(--text-muted);display:flex;gap:16px}
+        .cta-box{background:linear-gradient(135deg,var(--primary),var(--accent));border-radius:var(--radius-lg);padding:48px;text-align:center;color:#fff;margin-bottom:80px}
+        .cta-box h2{font-size:28px;font-weight:800;margin-bottom:12px}
+        .cta-box p{font-size:16px;opacity:.9;margin-bottom:24px}
+        .cta-box .btn{background:#fff;color:var(--primary);font-weight:700}
+        .footer{background:var(--bg-white);border-top:1px solid var(--border);padding:32px 0;text-align:center;font-size:13px;color:var(--text-muted)}
+        @media(max-width:768px){.nav-links{display:none}.blog-grid{grid-template-columns:1fr}}
+    </style>
+</head>
+<body>
+<nav class="navbar">
+    <div class="nav-container">
+        <a href="index.html" class="logo">Tele<span>Boost</span></a>
+        <div class="nav-links">
+            <a href="index.html">Главная</a>
+            <a href="blog.html">Блог</a>
+            <a href="training.html">Обучение</a>
+            <a href="about.html">О нас</a>
+            <a href="https://t.me/teleboostai_bot" target="_blank" class="btn btn-primary btn-sm">Начать</a>
+        </div>
+    </div>
+</nav>
+
+<div class="page-header">
+    <div class="container">
+        <div style="display:inline-block;padding:4px 14px;border-radius:100px;background:rgba(0,180,216,0.08);color:var(--primary);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:16px">Блог</div>
+        <h1>Статьи о <span style="color:var(--primary)">Telegram-маркетинге</span></h1>
+        <p>Экспертные материалы, гайды и кейсы от команды TeleBoost AI.</p>
+    </div>
+</div>
+
+<div class="container blog-grid">
+    <a href="#" class="blog-card" style="text-decoration:none;color:inherit">
+        <div class="blog-img"><i class="fas fa-robot"></i></div>
+        <div class="blog-body">
+            <span class="blog-tag">AI-маркетинг</span>
+            <h3>Как AI-комментинг увеличивает охваты канала на 340%</h3>
+            <p>Разбираем механику нейрокомментинга: почему AI-комментарии работают лучше ручных и как это влияет на алгоритмы Telegram.</p>
+            <div class="blog-meta"><span><i class="fas fa-calendar"></i> 21 Июня 2026</span><span><i class="fas fa-clock"></i> 5 мин</span></div>
+        </div>
+    </a>
+
+    <a href="#" class="blog-card" style="text-decoration:none;color:inherit">
+        <div class="blog-img" style="background:linear-gradient(135deg,var(--accent),#5B21B6)"><i class="fas fa-shield-halved"></i></div>
+        <div class="blog-body">
+            <span class="blog-tag" style="background:rgba(124,58,237,0.1);color:var(--accent)">Безопасность</span>
+            <h3>Anti-Ban Shield: как защитить аккаунты от блокировок</h3>
+            <p>Подробный разбор Human Emulation Engine: Biological Rhythm Sync, Device Fingerprinting, Gaussian Delays.</p>
+            <div class="blog-meta"><span><i class="fas fa-calendar"></i> 15 Июня 2026</span><span><i class="fas fa-clock"></i> 7 мин</span></div>
+        </div>
+    </a>
+
+    <a href="#" class="blog-card" style="text-decoration:none;color:inherit">
+        <div class="blog-img" style="background:linear-gradient(135deg,var(--success),#059669)"><i class="fas fa-chart-line"></i></div>
+        <div class="blog-body">
+            <span class="blog-tag" style="background:rgba(16,185,129,0.1);color:var(--success)">Кейсы</span>
+            <h3>Криптостартап: +340% подписчиков за 2 месяца</h3>
+            <p>Как один криптопроект использовал нейрокомментинг и масс-реакции для масштабирования аудитории.</p>
+            <div class="blog-meta"><span><i class="fas fa-calendar"></i> 10 Июня 2026</span><span><i class="fas fa-clock"></i> 4 мин</span></div>
+        </div>
+    </a>
+
+    <a href="#" class="blog-card" style="text-decoration:none;color:inherit">
+        <div class="blog-img" style="background:linear-gradient(135deg,#F59E0B,#D97706)"><i class="fas fa-fire"></i></div>
+        <div class="blog-body">
+            <span class="blog-tag" style="background:rgba(245,158,11,0.1);color:#D97706">Гайд</span>
+            <h3>Прогрев аккаунтов: пошаговый гайд для новичков</h3>
+            <p>Как правильно прогревать аккаунты перед активными действиями. Частые ошибки и как их избежать.</p>
+            <div class="blog-meta"><span><i class="fas fa-calendar"></i> 5 Июня 2026</span><span><i class="fas fa-clock"></i> 6 мин</span></div>
+        </div>
+    </a>
+
+    <a href="#" class="blog-card" style="text-decoration:none;color:inherit">
+        <div class="blog-img" style="background:linear-gradient(135deg,#E11D48,#BE123C)"><i class="fas fa-comments"></i></div>
+        <div class="blog-body">
+            <span class="blog-tag" style="background:rgba(225,29,72,0.1);color:#E11D48">Стратегия</span>
+            <h3>Нейрочаттинг: 500+ сценариев отработки возражений</h3>
+            <p>Как AI-автоответчик обрабатывает возражения клиентов и конвертирует лиды в продажи.</p>
+            <div class="blog-meta"><span><i class="fas fa-calendar"></i> 1 Июня 2026</span><span><i class="fas fa-clock"></i> 8 мин</span></div>
+        </div>
+    </a>
+
+    <a href="#" class="blog-card" style="text-decoration:none;color:inherit">
+        <div class="blog-img" style="background:linear-gradient(135deg,#0EA5E9,#0284C7)"><i class="fas fa-crosshairs"></i></div>
+        <div class="blog-body">
+            <span class="blog-tag">Парсинг</span>
+            <h3>Как собрать 10,000 целевых лидов за один вечер</h3>
+            <p>Техники парсинга аудитории с поведенческим анализом и фильтрацией по активности.</p>
+            <div class="blog-meta"><span><i class="fas fa-calendar"></i> 25 Мая 2026</span><span><i class="fas fa-clock"></i> 5 мин</span></div>
+        </div>
+    </a>
+</div>
+
+<div class="container">
+    <div class="cta-box">
+        <h2>Хотите больше контента?</h2>
+        <p>Подпишитесь на наш Telegram-канал и получайте экспертные материалы каждую неделю.</p>
+        <a href="https://t.me/teleboostai" class="btn btn-lg" target="_blank"><i class="fab fa-telegram-plane"></i> Подписаться</a>
+    </div>
+</div>
+
+<footer class="footer">
+    <div class="container"><p>&copy; 2024–2026 TeleBoost AI. Все права защищены.</p></div>
+</footer>
+</body>
+</html>

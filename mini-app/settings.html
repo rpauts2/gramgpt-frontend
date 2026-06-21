@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="color-scheme" content="light dark">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Настройки - GRAMGPT</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="header animate-in">
+        <a href="index.html" style="color: inherit; text-decoration: none;"><i class="fas fa-arrow-left"></i></a>
+        <h2>Настройки</h2>
+        <div></div>
+    </div>
+
+    <!-- Profile -->
+    <div class="card animate-in" style="animation-delay: 0.05s">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+            <div class="avatar avatar-md avatar-gradient" id="profile-avatar">U</div>
+            <div><div style="font-weight:700;font-size:15px;" id="profile-name">Пользователь</div><div style="font-size:11px;color:var(--text-secondary);" id="profile-plan">PRO</div></div>
+            <a href="pricing.html" class="btn-sm" style="margin-left:auto;background:rgba(0,229,255,0.1);color:var(--primary);border:1px solid rgba(0,229,255,0.3);"><i class="fas fa-gem"></i></a>
+        </div>
+        <div class="setting-item"><span class="text-sm">Аккаунтов</span><span style="color: var(--primary);" id="account-count">0</span></div>
+    </div>
+
+    <!-- AI Model -->
+    <div class="card animate-in" style="animation-delay: 0.08s">
+        <h3 class="mb-12">AI Модель</h3>
+        <div class="setting-item"><span class="text-sm">Модель для генерации</span>
+            <select class="form-select" style="width:auto" id="ai-model-select" onchange="saveAiModel(this.value)">
+                <option value="gpt-4o">GPT-4o</option>
+                <option value="gpt-4o-mini">GPT-4o-mini</option>
+                <option value="gpt-4">GPT-4</option>
+                <option value="claude-3-opus">Claude 3 Opus</option>
+                <option value="claude-3-sonnet">Claude 3 Sonnet</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Modules Status -->
+    <div class="card animate-in" style="animation-delay: 0.1s">
+        <h3 class="mb-12">Статус модулей</h3>
+        <div id="modules-status">
+            <div class="skeleton-card"><div class="skeleton-title"></div><div class="skeleton-text"></div></div>
+        </div>
+    </div>
+
+    <!-- Security -->
+    <div class="card animate-in" style="animation-delay: 0.12s">
+        <h3 class="mb-12">Безопасность</h3>
+        <div class="setting-item"><span class="text-sm">Human Emulation</span><span class="status-badge badge-green" id="he-status">Активен</span></div>
+        <div class="setting-item"><span class="text-sm">Anti-Ban Shield</span><span class="status-badge badge-green" id="ab-status">Активен</span></div>
+        <div class="setting-item"><span class="text-sm">AI Crisis Manager</span><span id="crisis-status" class="status-badge badge-green">Активен</span></div>
+    </div>
+
+    <!-- Payment -->
+    <div class="card animate-in" style="animation-delay: 0.15s">
+        <h3 class="mb-12">Платежи (TON Connect)</h3>
+        <p class="text-sm text-secondary mb-12">Подключите TON кошелёк для оплаты подписки и покупки шаблонов.</p>
+        <button class="btn" onclick="connectTON()"><i class="fas fa-gem"></i> Подключить TON Wallet</button>
+    </div>
+
+    <!-- Referral -->
+    <div class="card animate-in" style="animation-delay: 0.18s">
+        <h3 class="mb-12">Реферальная программа</h3>
+        <p class="text-sm text-secondary mb-8">Приглашайте друзей и получайте +20% к лимитам.</p>
+        <div style="display:flex;gap:8px;">
+            <input type="text" class="form-input flex-1" id="ref-link" value="gramgpt.io/ref/your_id" readonly>
+            <button class="btn btn-secondary" onclick="copyRefLink()"><i class="fas fa-copy"></i></button>
+        </div>
+    </div>
+
+    <!-- About -->
+    <div class="card animate-in" style="animation-delay: 0.2s">
+        <h3 class="mb-12">О системе</h3>
+        <div class="setting-item"><span class="text-sm">Версия</span><span id="app-version">2.0.0</span></div>
+        <div class="setting-item" style="border-bottom:none;"><span class="text-sm">Статус API</span><span id="api-status" class="status-badge badge-green">Online</span></div>
+    </div>
+
+    <div class="nav-bar animate-in" style="animation-delay: 0.25s">
+        <a href="index.html" class="nav-item"><i class="fas fa-home"></i></a>
+        <a href="campaigns.html" class="nav-item"><i class="fas fa-tasks"></i></a>
+        <a href="channel.html" class="nav-item"><i class="fas fa-tv"></i></a>
+        <a href="dashboard.html" class="nav-item"><i class="fas fa-chart-pie"></i></a>
+        <a href="settings.html" class="nav-item active"><i class="fas fa-cog"></i></a>
+    </div>
+
+    <script src="main.js"></script>
+    <script>
+        function connectTON() {
+            toast('info', 'Подключение TON', 'Выберите кошелёк для подключения');
+            showMainButton('Подключить Tonkeeper', '#0098EA', function() {
+                hideMainButton();
+                toast('success', 'TON подключён', 'Кошелёк успешно привязан');
+            });
+        }
+        function copyRefLink() {
+            var inp = document.getElementById('ref-link');
+            inp.select();
+            document.execCommand('copy');
+            toast('success', 'Ссылка скопирована', inp.value);
+        }
+        async function saveAiModel(model) {
+            try {
+                await api.patch('/auth/me', { ai_model: model });
+            } catch (e) {}
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const [status, accounts, me] = await Promise.all([
+                    api.get('/status').catch(function(){ return {}; }),
+                    api.get('/accounts').catch(function(){ return {}; }),
+                    api.get('/auth/me').catch(function(){ return {}; }),
+                ]);
+                var totalAcc = (accounts && accounts.total) || (accounts && accounts.accounts && accounts.accounts.length) || 0;
+                document.getElementById('account-count').textContent = totalAcc;
+
+                if (me && me.first_name) {
+                    document.getElementById('profile-name').textContent = me.first_name;
+                    document.getElementById('profile-avatar').textContent = me.first_name.charAt(0).toUpperCase();
+                    document.getElementById('profile-plan').textContent = me.plan || (me.is_pro ? 'PRO' : 'FREE');
+                }
+
+                if (status && status.ai_model) {
+                    var sel = document.getElementById('ai-model-select');
+                    for (var i = 0; i < sel.options.length; i++) {
+                        if (sel.options[i].value === status.ai_model) { sel.value = status.ai_model; break; }
+                    }
+                }
+
+                const modules = await api.get('/subscriptions/modules').catch(function(){ return null; });
+                var container = document.getElementById('modules-status');
+                if (modules && Array.isArray(modules)) {
+                    container.innerHTML = modules.map(function(m) {
+                        var active = m.active || m.purchased;
+                        return '<div class="setting-item"><span class="text-sm">' + escapeHtml(m.name || m.module || '') + '</span><span class="status-badge ' + (active ? 'badge-green' : 'badge-red') + '">' + (active ? 'Активен' : 'Неактивен') + '</span></div>';
+                    }).join('');
+                } else {
+                    container.innerHTML = '<div class="setting-item"><span class="text-sm">Модули</span><span class="status-badge badge-green">Загружено</span></div>';
+                }
+            } catch (e) { console.warn('Settings API error:', e); }
+        });
+        function escapeHtml(str) {
+            if (!str) return '';
+            var d = document.createElement('div');
+            d.textContent = str;
+            return d.innerHTML;
+        }
+    </script>
+</body>
+</html>

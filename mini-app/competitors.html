@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="color-scheme" content="light dark">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>GRAMGPT — Competitor Analysis</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="header animate-in">
+        <h2><i class="fas fa-chess" style="background: linear-gradient(135deg, var(--primary), var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;"></i> Анализ конкурентов</h2>
+        <a href="index.html" style="color: var(--text-secondary); text-decoration: none; font-size: 13px;"><i class="fas fa-arrow-left"></i> Назад</a>
+    </div>
+
+    <!-- Overall Score -->
+    <div class="glass-card animate-in" style="animation-delay: 0.03s; text-align: center;">
+        <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-secondary); margin-bottom: 8px;">Ваш конкурентный рейтинг</div>
+        <div style="font-size: 48px; font-weight: 800; background: linear-gradient(135deg, var(--primary), var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;" id="competitor-score">--<span style="font-size: 24px;">/100</span></div>
+        <div style="font-size: 12px; margin-top: 4px;" id="competitor-change"><span class="text-muted">Загрузка...</span></div>
+        <div style="font-size: 10px; color: var(--text-muted); margin-top: 6px;" id="score-basis"></div>
+    </div>
+
+    <!-- Feature Comparison -->
+    <div class="section-title animate-in" style="animation-delay: 0.05s">Сравнение функций</div>
+    <div class="card animate-in" style="animation-delay: 0.07s; overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse; font-size: 12px; min-width: 340px;">
+            <thead>
+                <tr style="border-bottom: 2px solid var(--border);">
+                    <th style="text-align: left; padding: 10px 8px; color: var(--text-secondary);">Функция</th>
+                    <th style="padding: 10px 8px; color: var(--primary); font-weight: 700;">GRAMGPT</th>
+                    <th style="padding: 10px 8px; color: var(--text-secondary);">gramgpt.io</th>
+                    <th style="padding: 10px 8px; color: var(--text-secondary);">TGParser</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr style="border-bottom: 1px solid var(--border);">
+                    <td style="padding: 10px 8px;">Нейропарсинг</td>
+                    <td style="text-align: center; padding: 10px 8px;"><i class="fas fa-check-circle" style="color: var(--success);"></i></td>
+                    <td style="text-align: center; padding: 10px 8px;"><i class="fas fa-check-circle" style="color: var(--success);"></i></td>
+                    <td style="text-align: center; padding: 10px 8px;"><i class="fas fa-check-circle" style="color: var(--success);"></i></td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border);">
+                    <td style="padding: 10px 8px;">AI Комментинг</td>
+                    <td style="text-align: center; padding: 10px 8px;"><i class="fas fa-check-circle" style="color: var(--success);"></i></td>
+                    <td style="text-align: center; padding: 10px 8px;"><i class="fas fa-check-circle" style="color: var(--success);"></i></td>
+                    <td style="text-align: center; padding: 10px 8px;"><i class="fas fa-times-circle" style="color: var(--danger);"></i></td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border);">
+                    <td style="padding: 10px 8px;">CRM система</td>
+                    <td style="text-align: center; padding: 10px 8px;"><i class="fas fa-check-circle" style="color: var(--success);"></i></td>
+                    <td style="text-align: center; padding: 10px 8px;"><i class="fas fa-times-circle" style="color: var(--danger);"></i></td>
+                    <td style="text-align: center; padding: 10px 8px;"><i class="fas fa-times-circle" style="color: var(--danger);"></i></td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border);">
+                    <td style="padding: 10px 8px;">A/B Тестирование</td>
+                    <td style="text-align: center; padding: 10px 8px;"><i class="fas fa-check-circle" style="color: var(--success);"></i></td>
+                    <td style="text-align: center; padding: 10px 8px;"><i class="fas fa-times-circle" style="color: var(--danger);"></i></td>
+                    <td style="text-align: center; padding: 10px 8px;"><i class="fas fa-times-circle" style="color: var(--danger);"></i></td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border);">
+                    <td style="padding: 10px 8px;">AI Crisis Manager</td>
+                    <td style="text-align: center; padding: 10px 8px;"><i class="fas fa-check-circle" style="color: var(--success);"></i></td>
+                    <td style="text-align: center; padding: 10px 8px;"><i class="fas fa-minus-circle" style="color: var(--warning);"></i></td>
+                    <td style="text-align: center; padding: 10px 8px;"><i class="fas fa-times-circle" style="color: var(--danger);"></i></td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border);">
+                    <td style="padding: 10px 8px;">Ведение канала</td>
+                    <td style="text-align: center; padding: 10px 8px;"><i class="fas fa-check-circle" style="color: var(--success);"></i></td>
+                    <td style="text-align: center; padding: 10px 8px;"><i class="fas fa-times-circle" style="color: var(--danger);"></i></td>
+                    <td style="text-align: center; padding: 10px 8px;"><i class="fas fa-times-circle" style="color: var(--danger);"></i></td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border);">
+                    <td style="padding: 10px 8px;">Реферальная система</td>
+                    <td style="text-align: center; padding: 10px 8px;"><i class="fas fa-check-circle" style="color: var(--success);"></i></td>
+                    <td style="text-align: center; padding: 10px 8px;"><i class="fas fa-times-circle" style="color: var(--danger);"></i></td>
+                    <td style="text-align: center; padding: 10px 8px;"><i class="fas fa-times-circle" style="color: var(--danger);"></i></td>
+                </tr>
+                <tr>
+                    <td style="padding: 10px 8px;">Командная работа</td>
+                    <td style="text-align: center; padding: 10px 8px;"><i class="fas fa-check-circle" style="color: var(--success);"></i></td>
+                    <td style="text-align: center; padding: 10px 8px;"><i class="fas fa-times-circle" style="color: var(--danger);"></i></td>
+                    <td style="text-align: center; padding: 10px 8px;"><i class="fas fa-minus-circle" style="color: var(--warning);"></i></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Market Position -->
+    <div class="section-title animate-in" style="animation-delay: 0.1s">Позиция на рынке</div>
+    <div class="card animate-in" style="animation-delay: 0.12s;">
+        <div style="margin-bottom: 16px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <span style="font-size: 13px; font-weight: 600;">GRAMGPT</span>
+                <span style="font-size: 13px; font-weight: 700; color: var(--primary);">92%</span>
+            </div>
+            <div class="progress-bar"><div class="progress-fill" style="width: 92%;"></div></div>
+        </div>
+        <div style="margin-bottom: 16px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <span style="font-size: 13px; font-weight: 600; color: var(--text-secondary);">gramgpt.io</span>
+                <span style="font-size: 13px; font-weight: 700; color: var(--text-secondary);">71%</span>
+            </div>
+            <div class="progress-bar"><div class="progress-fill" style="width: 71%; background: linear-gradient(135deg, #f39c12, #e67e22);"></div></div>
+        </div>
+        <div style="margin-bottom: 16px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <span style="font-size: 13px; font-weight: 600; color: var(--text-secondary);">TGParser</span>
+                <span style="font-size: 13px; font-weight: 700; color: var(--text-secondary);">45%</span>
+            </div>
+            <div class="progress-bar"><div class="progress-fill" style="width: 45%; background: linear-gradient(135deg, #e74c3c, #c0392b);"></div></div>
+        </div>
+        <div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <span style="font-size: 13px; font-weight: 600; color: var(--text-secondary);">TeleSoft</span>
+                <span style="font-size: 13px; font-weight: 700; color: var(--text-secondary);">38%</span>
+            </div>
+            <div class="progress-bar"><div class="progress-fill" style="width: 38%; background: linear-gradient(135deg, #e74c3c, #c0392b);"></div></div>
+        </div>
+    </div>
+
+    <!-- Your Advantages -->
+    <div class="section-title animate-in" style="animation-delay: 0.15s">Ваши преимущества</div>
+    <div class="card animate-in" style="animation-delay: 0.17s;">
+        <div style="display: flex; gap: 12px; align-items: flex-start; margin-bottom: 14px; padding-bottom: 14px; border-bottom: 1px solid var(--border);">
+            <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(46,204,113,0.15); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                <i class="fas fa-brain" style="color: var(--success); font-size: 16px;"></i>
+            </div>
+            <div>
+                <div style="font-size: 13px; font-weight: 600;">AI Crisis Manager</div>
+                <div style="font-size: 11px; color: var(--text-secondary); margin-top: 2px;">Уникальная система — ни один конкурент не имеет автоматического реагирования на угрозы в реальном времени</div>
+            </div>
+        </div>
+        <div style="display: flex; gap: 12px; align-items: flex-start; margin-bottom: 14px; padding-bottom: 14px; border-bottom: 1px solid var(--border);">
+            <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(0,136,204,0.15); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                <i class="fas fa-chart-pie" style="color: var(--primary); font-size: 16px;"></i>
+            </div>
+            <div>
+                <div style="font-size: 13px; font-weight: 600;">CRM + A/B Testing</div>
+                <div style="font-size: 11px; color: var(--text-secondary); margin-top: 2px;">Полная CRM с пайплайном и A/B тестирование стратегий — эксклюзив GRAMGPT</div>
+            </div>
+        </div>
+        <div style="display: flex; gap: 12px; align-items: flex-start;">
+            <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(155,89,182,0.15); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                <i class="fas fa-users" style="color: var(--accent); font-size: 16px;"></i>
+            </div>
+            <div>
+                <div style="font-size: 13px; font-weight: 600;">Командная работа</div>
+                <div style="font-size: 11px; color: var(--text-secondary); margin-top: 2px;">Мультипользовательский доступ с ролями и аудит логом — только у нас</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="nav-bar">
+        <a href="index.html" class="nav-item"><i class="fas fa-home"></i></a>
+        <a href="campaigns.html" class="nav-item"><i class="fas fa-list"></i></a>
+        <a href="channel.html" class="nav-item"><i class="fas fa-tv"></i></a>
+        <a href="dashboard.html" class="nav-item"><i class="fas fa-chart-line"></i></a>
+        <a href="settings.html" class="nav-item"><i class="fas fa-cog"></i></a>
+    </div>
+<script src='main.js'></script>
+<script>
+    document.addEventListener('DOMContentLoaded', async () => {
+        try {
+            const data = await api.get('/competitors/analysis');
+            if (data && data.score !== undefined) {
+                document.getElementById('competitor-score').innerHTML = data.score + '<span style="font-size: 24px;">/100</span>';
+                var changeEl = document.getElementById('competitor-change');
+                changeEl.innerHTML = '<i class="fas fa-arrow-' + (data.score >= 50 ? 'up' : 'down') + '"></i> ' + data.change + ' за месяц';
+                changeEl.style.color = data.score >= 50 ? 'var(--success)' : 'var(--danger)';
+                if (data.real_score_basis) {
+                    document.getElementById('score-basis').textContent = 'Основа: ' + data.real_score_basis;
+                }
+                if (data.competitors && data.competitors.length) {
+                    var bars = document.querySelectorAll('.card:not(.glass-card) .progress-fill');
+                    data.competitors.slice(0, 4).forEach(function(c, i) {
+                        if (bars[i]) bars[i].style.width = Math.min(c.score, 100) + '%';
+                        var labels = document.querySelectorAll('.card:not(.glass-card) [style*="font-weight: 700"]');
+                        if (labels[i]) labels[i].textContent = c.score + '%';
+                    });
+                }
+            }
+        } catch (e) {
+            console.warn('Competitors API error:', e);
+            document.getElementById('competitor-score').innerHTML = '—<span style="font-size:24px;">/100</span>';
+            document.getElementById('competitor-change').innerHTML = '<span class="text-muted">Нет данных</span>';
+        }
+    });
+</script>
+</body>
+</html>

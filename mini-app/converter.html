@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="color-scheme" content="light dark">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>GRAMGPT — Конвертер</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="header animate-in">
+        <h2><i class="fas fa-exchange-alt" style="color: var(--primary)"></i> Конвертер</h2>
+        <a href="index.html" style="color: var(--text-secondary); text-decoration: none; font-size: 14px;"><i class="fas fa-arrow-left"></i> Назад</a>
+    </div>
+
+    <div class="card animate-in" style="animation-delay: 0.05s">
+        <h4 style="margin-bottom: 12px;">Форматы</h4>
+        <div style="display: flex; align-items: center; gap: 12px; justify-content: center; padding: 20px 0;">
+            <div style="text-align:center;padding:16px 20px;background:var(--primary-dim);border-radius:12px;border:1px solid rgba(0,229,255,0.15);">
+                <i class="fas fa-file-code" style="font-size:24px;color:var(--primary);display:block;margin-bottom:8px;"></i>
+                <div style="font-size:13px;font-weight:700;">TDATA</div>
+                <div style="font-size:10px;color:var(--text-secondary);">Desktop</div>
+            </div>
+            <i class="fas fa-arrow-right" style="font-size:20px;color:var(--primary);"></i>
+            <div style="text-align:center;padding:16px 20px;background:rgba(180,74,255,0.08);border-radius:12px;border:1px solid rgba(180,74,255,0.15);">
+                <i class="fas fa-file-alt" style="font-size:24px;color:var(--accent);display:block;margin-bottom:8px;"></i>
+                <div style="font-size:13px;font-weight:700;">JSON+SESSION</div>
+                <div style="font-size:10px;color:var(--text-secondary);">Web/Mobile</div>
+            </div>
+        </div>
+        <div style="text-align:center;margin-top:8px;">
+            <button class="btn btn-sm" onclick="toggleDirection()" id="dir-btn" style="background:var(--bg-card);border:1px solid var(--border);color:var(--text-secondary);">
+                <i class="fas fa-exchange-alt"></i> Поменять направление
+            </button>
+        </div>
+    </div>
+
+    <div class="card animate-in" style="animation-delay: 0.1s">
+        <h4 style="margin-bottom: 12px;">Загрузите аккаунты</h4>
+        <div class="drop-zone" onclick="document.getElementById('conv-file-input').click()">
+            <div class="drop-zone-icon"><i class="fas fa-cloud-upload-alt"></i></div>
+            <div class="drop-zone-title">Перетащите файлы сюда</div>
+            <div class="drop-zone-hint">TDATA папки или JSON файлы</div>
+        </div>
+        <input type="file" id="conv-file-input" multiple webkitdirectory style="display:none">
+        <div id="conv-file-list" style="margin-top: 12px;"></div>
+    </div>
+
+    <div class="card animate-in" style="animation-delay: 0.15s">
+        <h4 style="margin-bottom: 12px;">Прогресс</h4>
+        <div id="conv-progress" style="text-align:center;padding:20px;">
+            <div style="font-size:13px;color:var(--text-secondary);">Загрузите файлы для конвертации</div>
+        </div>
+    </div>
+
+    <button class="btn animate-in" style="animation-delay: 0.2s" onclick="startConvert()" id="conv-start-btn">
+        <i class="fas fa-exchange-alt"></i> Конвертировать
+    </button>
+
+    <div class="nav-bar animate-in" style="animation-delay: 0.25s">
+        <a href="index.html" class="nav-item"><i class="fas fa-home"></i></a>
+        <a href="campaigns.html" class="nav-item"><i class="fas fa-tasks"></i></a>
+        <a href="channel.html" class="nav-item"><i class="fas fa-tv"></i></a>
+        <a href="dashboard.html" class="nav-item"><i class="fas fa-chart-pie"></i></a>
+        <a href="settings.html" class="nav-item"><i class="fas fa-cog"></i></a>
+    </div>
+
+    <script src="main.js"></script>
+    <script>
+        let convDirection = 'tdata_to_json';
+        function toggleDirection() {
+            convDirection = convDirection === 'tdata_to_json' ? 'json_to_tdata' : 'tdata_to_json';
+            toast('info', 'Направление', convDirection === 'tdata_to_json' ? 'TDATA → JSON+SESSION' : 'JSON+SESSION → TDATA');
+        }
+        async function startConvert() {
+            haptic('medium');
+            const files = document.getElementById('conv-file-input').files;
+            if (!files.length) { toast('warning', 'Загрузите файлы', 'Выберите аккаунты для конвертации'); return; }
+            toast('info', 'Конвертация', 'Обработка ' + files.length + ' файлов...');
+            try {
+                const result = await api.post('/converter/start', { direction: convDirection, file_count: files.length });
+                toast('success', 'Готово', 'Конвертировано: ' + (result.converted || 0) + ' аккаунтов');
+            } catch (e) { toast('error', 'Ошибка', e.message); }
+        }
+    </script>
+</body>
+</html>

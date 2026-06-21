@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="color-scheme" content="light dark">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>GRAMGPT — Спамблок</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="header animate-in">
+        <h2><i class="fas fa-shield" style="color: var(--primary)"></i> Вывод из спамблока</h2>
+        <a href="index.html" class="text-secondary" style="text-decoration: none; font-size: 14px;">
+            <i class="fas fa-arrow-left"></i> Назад
+        </a>
+    </div>
+
+    <div class="card animate-in" style="animation-delay: 0.1s">
+        <h4 class="mb-12">Проверка и разблокировка</h4>
+        <div class="form-group">
+            <label class="form-label">Номер телефона аккаунта</label>
+            <input type="text" class="form-input" id="unspam-phone" placeholder="+79123456789">
+        </div>
+        <div class="flex gap-8">
+            <button class="btn flex-1" onclick="checkSpam()"><i class="fas fa-search"></i> Проверить</button>
+            <button class="btn btn-secondary flex-1" onclick="appealSpam()"><i class="fas fa-paper-plane"></i> Апелляция</button>
+        </div>
+    </div>
+
+    <!-- Result -->
+    <div class="card animate-in" style="animation-delay: 0.15s" id="result-card" style="display:none">
+        <div class="card-header"><h4>Результат</h4><span class="status-badge" id="unspam-badge">—</span></div>
+        <div id="unspam-result"><div class="empty-state"><i class="fas fa-shield"></i><h4>Нет данных</h4></div></div>
+    </div>
+
+    <!-- Info -->
+    <div class="card animate-in" style="animation-delay: 0.2s">
+        <h4 class="mb-12"><i class="fas fa-info-circle" style="color: var(--primary)"></i> Как это работает</h4>
+        <ul style="font-size:12px;color:var(--text-secondary);padding-left:16px;line-height:1.8;">
+            <li>Проверка отправляет /start боту @SpamBot</li>
+            <li>Если аккаунт ограничен — отправляется апелляция</li>
+            <li>Аккаунт должен быть добавлен в систему через аккаунты</li>
+            <li>Для работы нужен активный API_ID/HASH в .env</li>
+        </ul>
+    </div>
+
+    <div class="nav-bar animate-in" style="animation-delay: 0.25s">
+        <a href="index.html" class="nav-item"><i class="fas fa-home"></i></a>
+        <a href="campaigns.html" class="nav-item"><i class="fas fa-tasks"></i></a>
+        <a href="channel.html" class="nav-item"><i class="fas fa-tv"></i></a>
+        <a href="dashboard.html" class="nav-item"><i class="fas fa-chart-pie"></i></a>
+        <a href="settings.html" class="nav-item"><i class="fas fa-cog"></i></a>
+    </div>
+
+    <script src="main.js"></script>
+    <script>
+        async function checkSpam() {
+            const phone = document.getElementById('unspam-phone').value.trim();
+            if (!phone) { toast('warning', 'Введите номер', 'Укажите номер телефона аккаунта'); return; }
+            haptic('medium');
+            try {
+                const r = await api.post('/unspam/check', { phone: phone });
+                showResult(r);
+            } catch (e) { toast('error', 'Ошибка', e.message); }
+        }
+
+        async function appealSpam() {
+            const phone = document.getElementById('unspam-phone').value.trim();
+            if (!phone) { toast('warning', 'Введите номер', 'Укажите номер телефона аккаунта'); return; }
+            haptic('medium');
+            try {
+                const r = await api.post('/unspam/appeal', { phone: phone });
+                showResult(r);
+            } catch (e) { toast('error', 'Ошибка', e.message); }
+        }
+
+        function showResult(r) {
+            const card = document.getElementById('result-card');
+            card.style.display = 'block';
+            const badge = document.getElementById('unspam-badge');
+            const result = document.getElementById('unspam-result');
+
+            var status = r.status || r.initial_status || 'unknown';
+            var badgeClass = 'badge-green';
+            if (status === 'spamblocked' || status === 'error') badgeClass = 'badge-red';
+            else if (status === 'appeal_sent') badgeClass = 'badge-yellow';
+            badge.textContent = status;
+            badge.className = 'status-badge ' + badgeClass;
+
+            var html = '<div style="padding:8px 0;"><div style="font-size:13px;font-weight:600;">Статус: ' + status + '</div>';
+            if (r.details) html += '<div style="font-size:11px;color:var(--text-secondary);margin-top:6px;">' + escapeHtml(r.details) + '</div>';
+            if (r.appeal_result) {
+                html += '<div style="margin-top:10px;padding:8px;background:rgba(243,156,18,0.08);border-radius:8px;font-size:11px;">';
+                html += '<div style="font-weight:600;margin-bottom:4px;">Апелляция:</div>';
+                html += '<div>' + escapeHtml(r.appeal_result.response || r.appeal_result.status || '—') + '</div></div>';
+            }
+            if (r.message) html += '<div style="font-size:11px;color:var(--text-secondary);margin-top:6px;">' + escapeHtml(r.message) + '</div>';
+            html += '</div>';
+            result.innerHTML = html;
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            var d = document.createElement('div');
+            d.textContent = str;
+            return d.innerHTML;
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="color-scheme" content="light dark">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>GRAMGPT — Нейрочаттинг</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="header animate-in">
+        <h2><i class="fas fa-message" style="color: var(--primary)"></i> Нейрочаттинг</h2>
+        <a href="index.html" style="color: var(--text-secondary); text-decoration: none; font-size: 14px;">
+            <i class="fas fa-arrow-left"></i> Назад
+        </a>
+    </div>
+
+    <!-- Stats -->
+    <div class="stat-row animate-in" style="animation-delay: 0.05s">
+        <div style="display: flex; justify-content: space-between;">
+            <div class="stat-item">
+                <h4>Сообщений</h4>
+                <div style="color: var(--primary)" id="chat-msgs">0</div>
+            </div>
+            <div class="stat-item" style="text-align: center;">
+                <h4>Групп</h4>
+                <div id="chat-groups">0</div>
+            </div>
+            <div class="stat-item" style="text-align: right;">
+                <h4>Ответов</h4>
+                <div style="color: var(--success)" id="chat-replies">0</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Target Groups -->
+    <div class="card animate-in" style="animation-delay: 0.1s">
+        <h4 style="margin-bottom: 12px;">Целевые группы</h4>
+        <div style="margin-bottom: 12px;">
+            <input type="text" placeholder="@group_name или t.me/link" class="input-field">
+        </div>
+        <div class="group-list" id="chat-groups-list">
+            <div class="empty-state"><i class="fas fa-message"></i><h4>Нет групп</h4><p>Добавьте целевые группы для нейрочаттинга</p></div>
+        </div>
+    </div>
+
+    <!-- Chat Settings -->
+    <div class="card animate-in" style="animation-delay: 0.15s">
+        <h4 style="margin-bottom: 12px;">Настройки чаттинга</h4>
+        <div style="margin-bottom: 12px;">
+            <label class="label">Стратегия общения</label>
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px;">
+                <button class="tone-btn active" onclick="selectStrategy(this)"><i class="fas fa-user-tie"></i> Эксперт</button>
+                <button class="tone-btn" onclick="selectStrategy(this)"><i class="fas fa-handshake"></i> Networking</button>
+                <button class="tone-btn" onclick="selectStrategy(this)"><i class="fas fa-bullhorn"></i> Промо</button>
+                <button class="tone-btn" onclick="selectStrategy(this)"><i class="fas fa-question"></i> Вопросы</button>
+            </div>
+        </div>
+        <div class="setting-item">
+            <span style="font-size: 13px;">Возражения (500+ сценариев)</span>
+            <div class="toggle-on" onclick="this.classList.toggle('toggle-off');this.classList.toggle('toggle-on')" id="toggle-objections"></div>
+        </div>
+        <div class="setting-item">
+            <span style="font-size: 13px;">Urgency + Social Proof</span>
+            <div class="toggle-on" onclick="this.classList.toggle('toggle-off');this.classList.toggle('toggle-on')" id="toggle-urgency"></div>
+        </div>
+        <div class="setting-item">
+            <span style="font-size: 13px;">Макс. сообщений/час</span>
+            <select>
+                <option>5</option>
+                <option selected>10</option>
+                <option>20</option>
+                <option>50</option>
+            </select>
+        </div>
+        <div class="setting-item" style="border-bottom: none;">
+            <span style="font-size: 13px;">Задержка между сообщениями</span>
+            <select>
+                <option>30сек - 2мин</option>
+                <option selected>2 - 5 мин</option>
+                <option>5 - 15 мин</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Live Chat Preview -->
+    <div class="card animate-in" style="animation-delay: 0.2s">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <h4 style="margin: 0;" id="chat-preview-title"><i class="fas fa-message" style="color: var(--primary);"></i> Чат</h4>
+            <span style="font-size: 11px; color: var(--text-secondary);" id="chat-preview-meta"></span>
+        </div>
+        <div class="chat-preview" id="chat-preview-content">
+            <div class="empty-state"><i class="fas fa-comments"></i><h4>Нет сообщений</h4><p>Запустите нейрочаттинг для начала общения</p></div>
+        </div>
+    </div>
+
+    <button class="btn animate-in" style="animation-delay: 0.25s" onclick="startChatting()" id="chat-start-btn">
+        <i class="fas fa-play"></i> Запустить нейрочаттинг
+    </button>
+    <button class="btn animate-in" style="display:none;background:var(--danger);color:#fff;width:100%;margin-top:8px;" id="chat-stop-btn" onclick="stopChatting()">
+        <i class="fas fa-stop"></i> Остановить нейрочаттинг
+    </button>
+
+    <div class="nav-bar animate-in" style="animation-delay: 0.3s">
+        <a href="index.html" class="nav-item"><i class="fas fa-home"></i></a>
+        <a href="campaigns.html" class="nav-item"><i class="fas fa-tasks"></i></a>
+        <a href="channel.html" class="nav-item"><i class="fas fa-tv"></i></a>
+        <a href="dashboard.html" class="nav-item"><i class="fas fa-chart-pie"></i></a>
+        <a href="settings.html" class="nav-item"><i class="fas fa-cog"></i></a>
+    </div>
+
+    <style>
+        .input-field { width: 100%; padding: 10px 14px; background: rgba(48,54,61,0.4); border: 1px solid var(--border); border-radius: 10px; color: var(--text); font-size: 13px; }
+        .input-field:focus { outline: none; border-color: var(--primary); }
+        .label { font-size: 12px; color: var(--text-secondary); display: block; margin-bottom: 6px; }
+        .group-item { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+        .group-item:last-child { border-bottom: none; }
+        .group-avatar { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: white; flex-shrink: 0; background: linear-gradient(135deg, var(--primary), var(--primary)); }
+        .tone-btn { padding: 10px; border-radius: 10px; border: 1px solid var(--border); background: var(--card-bg); color: var(--text-secondary); font-size: 11px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 6px; justify-content: center; }
+        .tone-btn.active { border-color: var(--primary); color: var(--primary); background: rgba(0,136,204,0.1); }
+        .tone-btn:active { transform: scale(0.96); }
+        .toggle-on { width: 44px; height: 24px; background: var(--success); border-radius: 12px; position: relative; cursor: pointer; }
+        .toggle-on::after { content: ''; width: 20px; height: 20px; background: white; border-radius: 50%; position: absolute; top: 2px; right: 2px; }
+        .chat-preview { display: flex; flex-direction: column; gap: 10px; }
+        .chat-msg { display: flex; gap: 8px; }
+        .chat-msg-avatar { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: white; flex-shrink: 0; background: linear-gradient(135deg, #3498db, #2980b9); }
+        .chat-msg-ai .chat-msg-avatar { background: linear-gradient(135deg, var(--primary), var(--primary)); }
+        .chat-msg-content { flex: 1; }
+        .chat-msg-name { font-size: 11px; font-weight: 600; margin-bottom: 2px; color: var(--text-secondary); }
+        .chat-msg-text { font-size: 12px; line-height: 1.5; background: rgba(48,54,61,0.3); padding: 8px 12px; border-radius: 0 10px 10px 10px; display: inline-block; }
+        .chat-msg-ai .chat-msg-text { background: rgba(0,136,204,0.1); border-left: 2px solid var(--primary); }
+        .ai-tag { background: var(--primary); color: white; font-size: 9px; font-weight: 700; padding: 2px 6px; border-radius: 4px; }
+    </style>
+
+    <script src='main.js'></script>
+    <script>
+        function selectStrategy(btn) {
+            btn.parentElement.querySelectorAll('.tone-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            haptic('light');
+        }
+        async function startChatting() {
+            haptic('medium');
+            const groups = document.getElementById('chat-groups-list');
+            if (groups && groups.querySelector('.empty-state')) {
+                toast('warning', 'Добавьте группы', 'Укажите целевые группы для нейрочаттинга');
+                return;
+            }
+            try {
+                const result = await api.post('/chatting/start');
+                document.getElementById('chat-start-btn').style.display = 'none';
+                document.getElementById('chat-stop-btn').style.display = 'flex';
+                toast('success', 'Чаттинг запущен', 'AI общается в группах — Task: ' + (result.task_id || 'ok'));
+            } catch (e) {
+                toast('error', 'Ошибка', e.message);
+            }
+        }
+        async function stopChatting() {
+            haptic('medium');
+            try { await api.post('/chatting/stop'); } catch (e) {}
+            document.getElementById('chat-start-btn').style.display = 'flex';
+            document.getElementById('chat-stop-btn').style.display = 'none';
+            toast('info', 'Остановлено', 'Нейрочаттинг остановлен');
+        }
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const data = await api.get('/chatting/stats');
+                if (data) {
+                    document.getElementById('chat-msgs').textContent = (data.messages || 0).toLocaleString();
+                    document.getElementById('chat-groups').textContent = data.groups || 0;
+                    document.getElementById('chat-replies').textContent = (data.replies || 0).toLocaleString();
+                }
+                const groups = await api.get('/chatting/groups');
+                const container = document.getElementById('chat-groups-list');
+                if (groups && groups.length) {
+                    container.innerHTML = groups.map(g => '<div class="group-item"><div class="group-avatar">' + (g.name ? g.name.substring(0, 2).toUpperCase() : '??') + '</div><div style="flex:1;"><div style="font-size:13px;font-weight:600;">' + escapeHtml(g.name || '') + '</div><div style="font-size:11px;color:var(--text-secondary);">' + (g.members || 0) + ' участников &bull; ' + (g.msgs_per_hour || 0) + ' сообщ/час</div></div><span class="status-badge" style="background:' + (g.status === 'active' ? 'rgba(46,204,113,0.15);color:var(--success)' : 'rgba(243,156,18,0.15);color:var(--warning)') + ';">' + (g.status === 'active' ? 'Активно' : 'Пауза') + '</span></div>').join('');
+                }
+            } catch (e) { console.warn('Chatting API error:', e); }
+        });
+    </script>
+</body>
+</html>

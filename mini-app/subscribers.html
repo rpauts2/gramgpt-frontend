@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="color-scheme" content="light dark">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>GRAMGPT — Накрутка подписчиков</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="header animate-in">
+        <h2><i class="fas fa-user-plus" style="color: var(--primary)"></i> Накрутка подписчиков</h2>
+        <a href="index.html" style="color: var(--text-secondary); text-decoration: none; font-size: 14px;"><i class="fas fa-arrow-left"></i> Назад</a>
+    </div>
+
+    <div class="stat-row animate-in" style="animation-delay: 0.05s">
+        <div style="display: flex; justify-content: space-between;">
+            <div class="stat-item"><h4>Подписано</h4><div style="color: var(--primary); font-size: 22px; font-weight: 800;" id="sub-added">0</div></div>
+            <div class="stat-item text-center"><h4>Цель</h4><div style="font-size: 22px; font-weight: 800;" id="sub-target">0</div></div>
+            <div class="stat-item" style="text-align: right"><h4>Аккаунтов</h4><div style="color: var(--success); font-size: 22px; font-weight: 800;" id="sub-accounts">0</div></div>
+        </div>
+    </div>
+
+    <div class="card animate-in" style="animation-delay: 0.1s">
+        <h4 style="margin-bottom: 12px;">Целевой канал/группа</h4>
+        <input type="text" id="sub-target-input" placeholder="@channel или t.me/link" class="input-field" style="margin-bottom: 12px;">
+        <div class="setting-item">
+            <span style="font-size: 13px;">Количество подписчиков</span>
+            <select id="sub-count"><option>100</option><option selected>500</option><option>1000</option><option>5000</option></select>
+        </div>
+    </div>
+
+    <div class="card animate-in" style="animation-delay: 0.15s">
+        <h4 style="margin-bottom: 12px;">Настройки</h4>
+        <div class="setting-item">
+            <span style="font-size: 13px;">Скорость</span>
+            <select><option>Медленная (безопасная)</option><option selected>Средняя</option><option>Быстрая</option></select>
+        </div>
+        <div class="setting-item">
+            <span style="font-size: 13px;">Рандомизация</span>
+            <div class="toggle-on" onclick="this.classList.toggle('toggle-off');this.classList.toggle('toggle-on')"></div>
+        </div>
+        <div class="setting-item">
+            <span style="font-size: 13px;">Авто-отписка через (дни)</span>
+            <select><option>Не отписываться</option><option>7 дней</option><option>14 дней</option><option>30 дней</option></select>
+        </div>
+    </div>
+
+    <button class="btn animate-in" style="animation-delay: 0.2s" onclick="startSubscribers()" id="sub-start-btn">
+        <i class="fas fa-user-plus"></i> Запустить накрутку
+    </button>
+    <button class="btn animate-in" style="display:none;background:var(--danger);color:#fff;width:100%;margin-top:8px;" id="sub-stop-btn" onclick="stopSubscribers()">
+        <i class="fas fa-stop"></i> Остановить
+    </button>
+
+    <div class="nav-bar animate-in" style="animation-delay: 0.25s">
+        <a href="index.html" class="nav-item"><i class="fas fa-home"></i></a>
+        <a href="campaigns.html" class="nav-item"><i class="fas fa-tasks"></i></a>
+        <a href="channel.html" class="nav-item"><i class="fas fa-tv"></i></a>
+        <a href="dashboard.html" class="nav-item"><i class="fas fa-chart-pie"></i></a>
+        <a href="settings.html" class="nav-item"><i class="fas fa-cog"></i></a>
+    </div>
+
+    <script src="main.js"></script>
+    <script>
+        async function startSubscribers() {
+            haptic('medium');
+            const target = document.getElementById('sub-target-input').value.trim();
+            if (!target) { toast('warning', 'Укажите цель', 'Введите канал или группу'); return; }
+            try {
+                await api.post('/subscribers/start', { target: target, count: document.getElementById('sub-count').value });
+                document.getElementById('sub-start-btn').style.display = 'none';
+                document.getElementById('sub-stop-btn').style.display = 'flex';
+                toast('success', 'Запущено', 'Накрутка подписчиков началась');
+            } catch (e) { toast('error', 'Ошибка', e.message); }
+        }
+        async function stopSubscribers() {
+            try { await api.post('/subscribers/stop'); } catch (e) {}
+            document.getElementById('sub-start-btn').style.display = 'flex';
+            document.getElementById('sub-stop-btn').style.display = 'none';
+            toast('info', 'Остановлено', 'Накрутка остановлена');
+        }
+    </script>
+</body>
+</html>

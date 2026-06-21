@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="color-scheme" content="light dark">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>GRAMGPT — Уведомления</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="header animate-in">
+        <h2><i class="fas fa-bell" style="color: var(--primary)"></i> Уведомления</h2>
+        <a href="index.html" style="color: var(--text-secondary); text-decoration: none; font-size: 14px;">
+            <i class="fas fa-arrow-left"></i> Назад
+        </a>
+    </div>
+
+    <!-- Filter -->
+    <div class="notif-filter animate-in" style="animation-delay: 0.05s">
+        <button class="filter-btn active" onclick="filterNotif(this, 'all')">Все</button>
+        <button class="filter-btn" onclick="filterNotif(this, 'alerts')"><i class="fas fa-exclamation-triangle"></i> Алерты</button>
+        <button class="filter-btn" onclick="filterNotif(this, 'success')"><i class="fas fa-check"></i> Успех</button>
+        <button class="filter-btn" onclick="filterNotif(this, 'info')"><i class="fas fa-info"></i> Инфо</button>
+    </div>
+
+    <!-- Today -->
+    <div class="section-title animate-in" style="animation-delay: 0.08s">Сегодня</div>
+    <div class="notif-list" id="notif-list-today">
+        <div class="notif-item animate-in" style="animation-delay: 0.1s">
+            <div class="notif-icon" style="background: rgba(48,54,61,0.4);"><i class="fas fa-spinner" style="color: var(--text-secondary);"></i></div>
+            <div style="flex: 1;"><div style="font-size: 13px; font-weight: 600;">Загрузка...</div><div style="font-size: 11px; color: var(--text-secondary);">Получаем уведомления</div></div>
+        </div>
+    </div>
+
+    <div class="section-title animate-in" style="animation-delay: 0.2s">Вчера</div>
+    <div class="notif-list" id="notif-list-yesterday"></div>
+
+    <div class="nav-bar animate-in" style="animation-delay: 0.3s">
+        <a href="index.html" class="nav-item"><i class="fas fa-home"></i></a>
+        <a href="campaigns.html" class="nav-item"><i class="fas fa-tasks"></i></a>
+        <a href="channel.html" class="nav-item"><i class="fas fa-tv"></i></a>
+        <a href="dashboard.html" class="nav-item"><i class="fas fa-chart-pie"></i></a>
+        <a href="settings.html" class="nav-item"><i class="fas fa-cog"></i></a>
+    </div>
+
+    <style>
+        .notif-filter { display: flex; gap: 6px; margin-bottom: 16px; overflow-x: auto; padding-bottom: 4px; }
+        .filter-btn { padding: 8px 14px; border-radius: 10px; border: 1px solid var(--border); background: transparent; color: var(--text-secondary); font-size: 11px; font-weight: 600; cursor: pointer; white-space: nowrap; display: flex; align-items: center; gap: 4px; }
+        .filter-btn.active { background: rgba(0,136,204,0.1); border-color: var(--primary); color: var(--primary); }
+        .notif-list { display: flex; flex-direction: column; gap: 2px; margin-bottom: 16px; }
+        .notif-item { display: flex; gap: 12px; padding: 14px; background: var(--card-bg); border: 1px solid var(--border); border-radius: 14px; align-items: flex-start; cursor: pointer; transition: border-color 0.2s; }
+        .notif-item:active { border-color: var(--primary); }
+        .notif-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+        .notif-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--primary); flex-shrink: 0; margin-top: 4px; }
+    </style>
+
+    <script src='main.js'></script>
+    <script>
+        function filterNotif(btn, type) {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            document.querySelectorAll('.notif-item').forEach(el => {
+                if (type === 'all') { el.style.display = ''; return; }
+                const icon = el.querySelector('.notif-icon i');
+                const match = (type === 'alerts' && icon?.classList.contains('fa-exclamation-triangle')) ||
+                    (type === 'success' && icon?.classList.contains('fa-check')) ||
+                    (type === 'info' && (icon?.classList.contains('fa-info') || (!icon?.classList.contains('fa-exclamation-triangle') && !icon?.classList.contains('fa-check'))));
+                el.style.display = match || type === 'all' ? '' : 'none';
+            });
+        }
+        function renderNotif(item) {
+            const icons = { success: ['fa-check', 'var(--success)'], alert: ['fa-exclamation-triangle', 'var(--warning)'], info: ['fa-info', 'var(--primary)'] };
+            const ico = icons[item.type] || icons.info;
+            return '<div class="notif-item animate-in"><div class="notif-icon" style="background: rgba(48,54,61,0.3);"><i class="fas ' + ico[0] + '" style="color: ' + ico[1] + ';"></i></div><div style="flex: 1;"><div style="font-size: 13px; font-weight: 600;">' + (item.title || '') + '</div><div style="font-size: 11px; color: var(--text-secondary); margin-top: 2px;">' + (item.message || '') + '</div><div style="font-size: 10px; color: var(--text-secondary); margin-top: 4px;"><i class="fas fa-clock"></i> ' + (item.time || '') + '</div></div></div>';
+        }
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const data = await api.get('/notifications');
+                const todayEl = document.getElementById('notif-list-today');
+                const yesterdayEl = document.getElementById('notif-list-yesterday');
+                if (data.notifications && data.notifications.length) {
+                    todayEl.innerHTML = data.notifications.slice(0, 5).map(renderNotif).join('');
+                    if (data.notifications.length > 5) yesterdayEl.innerHTML = data.notifications.slice(5).map(renderNotif).join('');
+                } else {
+                    todayEl.innerHTML = '<div class="notif-item" style="padding: 20px; text-align: center; justify-content: center; color: var(--text-secondary); font-size: 13px;"><i class="fas fa-bell-slash" style="margin-right: 8px;"></i>Нет уведомлений</div>';
+                }
+            } catch (e) { console.warn('Notif API error:', e); }
+        });
+    </script>
+</body>
+</html>

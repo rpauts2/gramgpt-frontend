@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="color-scheme" content="light dark">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>GRAMGPT — НейроДиалоги</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="header animate-in">
+        <h2><i class="fas fa-robot" style="color: var(--primary)"></i> НейроДиалоги</h2>
+        <a href="index.html" style="color: var(--text-secondary); text-decoration: none; font-size: 14px;">
+            <i class="fas fa-arrow-left"></i> Назад
+        </a>
+    </div>
+
+    <!-- Stats -->
+    <div class="stat-row animate-in" style="animation-delay: 0.05s">
+        <div style="display: flex; justify-content: space-between;">
+            <div class="stat-item">
+                <h4>Активных</h4>
+                <div style="color: var(--primary)" id="dialogs-active">0</div>
+            </div>
+            <div class="stat-item" style="text-align: center;">
+                <h4>Конверсия</h4>
+                <div style="color: var(--success)" id="dialogs-conv">0%</div>
+            </div>
+            <div class="stat-item" style="text-align: right;">
+                <h4>Лидов</h4>
+                <div style="color: var(--warning)" id="dialogs-leads">0</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Funnel Settings -->
+    <div class="card animate-in" style="animation-delay: 0.1s">
+        <h4 style="margin-bottom: 12px;">Воронка продаж</h4>
+        <div class="funnel">
+            <div class="funnel-step">
+                <div class="funnel-icon"><i class="fas fa-handshake"></i></div>
+                <div style="flex: 1;">
+                    <div style="font-size: 13px; font-weight: 600;">1. Первый контакт</div>
+                    <div style="font-size: 11px; color: var(--text-secondary);">AI инициирует диалог на основе интересов</div>
+                </div>
+                <span class="status-badge" style="background: rgba(46,204,113,0.15); color: var(--success);">Авто</span>
+            </div>
+            <div class="funnel-step">
+                <div class="funnel-icon" style="background: rgba(243,156,18,0.1);"><i class="fas fa-comments" style="color: var(--warning);"></i></div>
+                <div style="flex: 1;">
+                    <div style="font-size: 13px; font-weight: 600;">2. Прогрев интереса</div>
+                    <div style="font-size: 11px; color: var(--text-secondary);">Обсуждение потребностей, выявление боли</div>
+                </div>
+                <span class="status-badge" style="background: rgba(243,156,18,0.15); color: var(--warning);">2-3 дня</span>
+            </div>
+            <div class="funnel-step">
+                <div class="funnel-icon" style="background: rgba(0,136,204,0.1);"><i class="fas fa-bullseye" style="color: var(--primary);"></i></div>
+                <div style="flex: 1;">
+                    <div style="font-size: 13px; font-weight: 600;">3. Предложение</div>
+                    <div style="font-size: 11px; color: var(--text-secondary);">Персонализированный оффер с social proof</div>
+                </div>
+                <span class="status-badge" style="background: rgba(0,136,204,0.15); color: var(--primary);">AI</span>
+            </div>
+            <div class="funnel-step" style="border-bottom: none;">
+                <div class="funnel-icon" style="background: rgba(46,204,113,0.1);"><i class="fas fa-check-circle" style="color: var(--success);"></i></div>
+                <div style="flex: 1;">
+                    <div style="font-size: 13px; font-weight: 600;">4. Закрытие</div>
+                    <div style="font-size: 11px; color: var(--text-secondary);">Конверсия лида + CRM синхронизация</div>
+                </div>
+                <span class="status-badge" style="background: rgba(46,204,113,0.15); color: var(--success);">89%</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Active Dialogs -->
+    <div class="card animate-in" style="animation-delay: 0.15s">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <h4 style="margin: 0;">Активные диалоги</h4>
+            <span style="font-size: 11px; color: var(--success);" id="dialogs-count"><i class="fas fa-circle" style="font-size: 6px;"></i> 0 активных</span>
+        </div>
+
+        <div id="dialogs-list">
+            <div class="empty-state"><i class="fas fa-robot"></i><h4>Нет диалогов</h4><p>Запустите НейроДиалоги, чтобы начать работу с лидами</p></div>
+        </div>
+    </div>
+
+    <!-- Chat Window Preview -->
+    <div class="card animate-in" style="animation-delay: 0.2s">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <h4 style="margin: 0;"><i class="fas fa-robot" style="color: var(--primary);"></i> Диалог с Иваном</h4>
+            <span class="ai-tag">AI ведёт</span>
+        </div>
+        <div class="dm-chat">
+            <div class="dm-msg dm-msg-out">
+                Привет! Видел ваш пост про крипту — очень интересный взгляд на рынок 👋
+                <span class="dm-time">12:34 <span class="ai-tag" style="font-size: 8px;">AI</span></span>
+            </div>
+            <div class="dm-msg dm-msg-in">
+                Спасибо! Да, рынок сейчас очень интересный
+                <span class="dm-time">12:35</span>
+            </div>
+            <div class="dm-msg dm-msg-out">
+                Хотел бы узнать больше о вашей стратегии. У нас есть инструмент для автоматизации — показать?
+                <span class="dm-time">12:36 <span class="ai-tag" style="font-size: 8px;">AI</span></span>
+            </div>
+            <div class="dm-msg dm-msg-in">
+                Да, расскажите подробнее!
+                <span class="dm-time">12:38</span>
+            </div>
+            <div class="dm-typing">
+                <i class="fas fa-robot" style="color: var(--primary);"></i> AI анализирует и генерирует ответ...
+            </div>
+        </div>
+    </div>
+
+    <button class="btn animate-in" style="animation-delay: 0.25s" onclick="startDialogs()">
+        <i class="fas fa-robot"></i> Запустить НейроДиалоги
+    </button>
+
+    <div class="nav-bar animate-in" style="animation-delay: 0.3s">
+        <a href="index.html" class="nav-item"><i class="fas fa-home"></i></a>
+        <a href="campaigns.html" class="nav-item"><i class="fas fa-tasks"></i></a>
+        <a href="channel.html" class="nav-item"><i class="fas fa-tv"></i></a>
+        <a href="dashboard.html" class="nav-item"><i class="fas fa-chart-pie"></i></a>
+        <a href="settings.html" class="nav-item"><i class="fas fa-cog"></i></a>
+    </div>
+
+    <style>
+        .funnel-step { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border); }
+        .funnel-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 14px; background: rgba(46,204,113,0.1); color: var(--success); flex-shrink: 0; }
+        .dialog-item { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--border); cursor: pointer; }
+        .dialog-item:last-child { border-bottom: none; }
+        .dialog-item:active { opacity: 0.7; }
+        .dialog-avatar { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: white; flex-shrink: 0; background: linear-gradient(135deg, var(--primary), var(--primary)); }
+        .dialog-stage { padding: 3px 8px; border-radius: 6px; font-size: 10px; font-weight: 600; flex-shrink: 0; }
+        .stage-hot { background: rgba(231,76,60,0.15); color: var(--danger); }
+        .stage-warm { background: rgba(243,156,18,0.15); color: var(--warning); }
+        .stage-cold { background: rgba(0,136,204,0.15); color: var(--primary); }
+        .dm-chat { display: flex; flex-direction: column; gap: 8px; }
+        .dm-msg { padding: 10px 12px; border-radius: 12px; font-size: 12px; line-height: 1.5; max-width: 85%; position: relative; }
+        .dm-msg-out { background: rgba(0,136,204,0.12); align-self: flex-end; border-bottom-right-radius: 4px; }
+        .dm-msg-in { background: rgba(48,54,61,0.4); align-self: flex-start; border-bottom-left-radius: 4px; }
+        .dm-time { display: block; font-size: 10px; color: var(--text-secondary); margin-top: 4px; text-align: right; }
+        .dm-typing { font-size: 11px; color: var(--text-secondary); padding: 8px; background: rgba(0,136,204,0.05); border-radius: 8px; display: flex; align-items: center; gap: 6px; }
+        .ai-tag { background: var(--primary); color: white; font-size: 9px; font-weight: 700; padding: 2px 6px; border-radius: 4px; }
+    </style>
+
+    <script src='main.js'></script>
+    <script>
+        function showDialog(name) {
+            if (window.Telegram && window.Telegram.WebApp) {
+                window.Telegram.WebApp.showAlert('Открываю диалог с ' + name + '...');
+            }
+        }
+        async function startDialogs() {
+            try {
+                const result = await api.post('/dialogs/start');
+                toast('success', 'Диалоги запущены', 'AI обрабатывает ' + (result.funnel_steps || 4) + ' этапов воронки');
+            } catch (e) {
+                toast('error', 'Ошибка', e.message);
+            }
+        }
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const data = await api.get('/dialogs/active');
+                if (data) {
+                    document.getElementById('dialogs-active').textContent = data.total_active || 0;
+                    document.getElementById('dialogs-conv').textContent = (data.conversion_rate || 0) + '%';
+                    document.getElementById('dialogs-leads').textContent = data.leads || 0;
+                    document.getElementById('dialogs-count').innerHTML = '<i class="fas fa-circle" style="font-size: 6px;"></i> ' + (data.total_active || 0) + ' активных';
+                }
+                const list = document.getElementById('dialogs-list');
+                if (data && data.dialogs && data.dialogs.length) {
+                    const stageClass = { hot: 'stage-hot', warm: 'stage-warm', cold: 'stage-cold' };
+                    const stageLabel = { hot: 'Горячий', warm: 'Тёплый', cold: 'Новый' };
+                    list.innerHTML = data.dialogs.map(d => '<div class="dialog-item" onclick="showDialog(\'' + escapeHtml(d.name || '') + '\')"><div class="dialog-avatar">' + (d.name ? d.name.substring(0, 2).toUpperCase() : '??') + '</div><div style="flex:1;"><div style="display:flex;justify-content:space-between;"><span style="font-size:13px;font-weight:600;">' + escapeHtml(d.name || '') + '</span><span style="font-size:10px;color:var(--text-secondary);">' + (d.last_time || '') + '</span></div><div style="font-size:11px;color:var(--text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px;">' + escapeHtml(d.last_msg || '') + '</div></div><div class="dialog-stage ' + (stageClass[d.stage] || 'stage-cold') + '">' + (stageLabel[d.stage] || d.stage) + '</div></div>').join('');
+                }
+            } catch (e) { console.warn('Dialogs API error:', e); }
+        });
+        function escapeHtml(str) {
+            var d = document.createElement('div');
+            d.textContent = str;
+            return d.innerHTML;
+        }
+    </script>
+</body>
+</html>

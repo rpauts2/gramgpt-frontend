@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="color-scheme" content="light dark">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>GRAMGPT — Репортер</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="header animate-in">
+        <h2><i class="fas fa-flag" style="color: var(--danger)"></i> Репортер</h2>
+        <a href="index.html" style="color: var(--text-secondary); text-decoration: none; font-size: 14px;"><i class="fas fa-arrow-left"></i> Назад</a>
+    </div>
+
+    <div class="card animate-in" style="animation-delay: 0.05s;border-color:rgba(239,68,68,0.15)">
+        <div style="display:flex;align-items:center;gap:10px">
+            <i class="fas fa-info-circle" style="color:var(--primary);font-size:18px"></i>
+            <div style="font-size:12px;color:var(--text-secondary)">Модуль позволяет отправлять жалобы на аккаунты/каналы через систему Telegram. Используйте ответственно.</div>
+        </div>
+    </div>
+
+    <div class="stat-row animate-in" style="animation-delay: 0.08s">
+        <div style="display: flex; justify-content: space-between;">
+            <div class="stat-item"><h4>Отправлено</h4><div style="color: var(--primary); font-size: 22px; font-weight: 800;" id="rep-sent">0</div></div>
+            <div class="stat-item text-center"><h4>Целей</h4><div style="font-size: 22px; font-weight: 800;" id="rep-targets">0</div></div>
+            <div class="stat-item" style="text-align: right"><h4>Аккаунтов</h4><div style="color: var(--success); font-size: 22px; font-weight: 800;" id="rep-accounts">0</div></div>
+        </div>
+    </div>
+
+    <div class="card animate-in" style="animation-delay: 0.1s">
+        <h4 style="margin-bottom: 12px;">Цель</h4>
+        <input type="text" id="rep-target-input" placeholder="@username или ссылка на канал/пост" class="input-field" style="margin-bottom: 12px;">
+        <div class="setting-item">
+            <span style="font-size: 13px;">Тип жалобы</span>
+            <select id="rep-type">
+                <option>Спам</option>
+                <option>Насилие</option>
+                <option>Детская порнография</option>
+                <option>Терроризм</option>
+                <option>Мошенничество</option>
+                <option>Другое</option>
+            </select>
+        </div>
+        <div class="setting-item">
+            <span style="font-size: 13px;">Количество жалоб</span>
+            <select id="rep-count"><option>10</option><option selected>50</option><option>100</option><option>500</option></select>
+        </div>
+    </div>
+
+    <button class="btn animate-in" style="animation-delay: 0.15s;background:var(--danger);color:#fff" onclick="startReporter()" id="rep-start-btn">
+        <i class="fas fa-flag"></i> Отправить жалобы
+    </button>
+
+    <div class="nav-bar animate-in" style="animation-delay: 0.2s">
+        <a href="index.html" class="nav-item"><i class="fas fa-home"></i></a>
+        <a href="campaigns.html" class="nav-item"><i class="fas fa-tasks"></i></a>
+        <a href="channel.html" class="nav-item"><i class="fas fa-tv"></i></a>
+        <a href="dashboard.html" class="nav-item"><i class="fas fa-chart-pie"></i></a>
+        <a href="settings.html" class="nav-item"><i class="fas fa-cog"></i></a>
+    </div>
+
+    <script src="main.js"></script>
+    <script>
+        async function startReporter() {
+            haptic('medium');
+            const target = document.getElementById('rep-target-input').value.trim();
+            if (!target) { toast('warning', 'Укажите цель', 'Введите username или ссылку'); return; }
+            showConfirm('Подтвердить', 'Отправить ' + document.getElementById('rep-count').value + ' жалоб на ' + target + '?', async function() {
+                try {
+                    await api.post('/reporter/start', { target: target, type: document.getElementById('rep-type').value, count: document.getElementById('rep-count').value });
+                    toast('success', 'Отправлено', 'Жалобы обрабатываются');
+                } catch (e) { toast('error', 'Ошибка', e.message); }
+            });
+        }
+    </script>
+</body>
+</html>

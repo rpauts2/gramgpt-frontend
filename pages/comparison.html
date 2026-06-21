@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Сравнение — TeleBoost AI vs Конкуренты</title>
+    <meta name="description" content="Подробное сравнение TeleBoost AI с TG-Giant, Chatfuel и другими Telegram-инструментами.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2300B4D8'/%3E%3Ctext x='16' y='22' text-anchor='middle' fill='white' font-size='18' font-weight='bold' font-family='system-ui'%3ET%3C/text%3E%3C/svg%3E">
+    <style>
+        :root{--primary:#00B4D8;--accent:#7C3AED;--success:#10B981;--warning:#F59E0B;--danger:#EF4444;--bg:#FAFBFC;--bg-white:#FFFFFF;--bg-section:#F1F5F9;--border:#E2E8F0;--text:#0F172A;--text-secondary:#475569;--text-muted:#94A3B8;--radius:16px;--radius-lg:24px;--shadow:0 4px 16px rgba(0,0,0,0.06);--shadow-lg:0 12px 40px rgba(0,0,0,0.08)}
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;-webkit-font-smoothing:antialiased}
+        .container{max-width:1000px;margin:0 auto;padding:0 24px}
+        .navbar{position:fixed;top:0;left:0;right:0;z-index:1000;padding:16px 0;background:rgba(250,251,252,0.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+        .nav-container{display:flex;align-items:center;justify-content:space-between;max-width:1200px;margin:0 auto;padding:0 24px}
+        .logo{font-size:22px;font-weight:800;color:var(--text);text-decoration:none}.logo span{color:var(--primary)}
+        .nav-links{display:flex;gap:24px;align-items:center}
+        .nav-links a{color:var(--text-secondary);text-decoration:none;font-size:14px;font-weight:500;transition:color .2s}.nav-links a:hover{color:var(--primary)}
+        .btn{display:inline-flex;align-items:center;gap:8px;padding:10px 24px;border-radius:10px;font-weight:600;font-size:14px;text-decoration:none;transition:all .25s;cursor:pointer;border:none}
+        .btn-primary{background:var(--primary);color:#fff}.btn-primary:hover{background:#0096B4}
+        .btn-sm{padding:8px 18px;font-size:13px}
+        .page-header{padding:120px 0 60px;text-align:center}
+        .page-header h1{font-size:clamp(32px,4vw,48px);font-weight:900;letter-spacing:-.03em;margin-bottom:16px}
+        .page-header p{font-size:18px;color:var(--text-secondary);max-width:600px;margin:0 auto}
+        .comparison-section{padding:0 0 60px}
+        .comparison-section h2{font-size:24px;font-weight:800;margin-bottom:24px;letter-spacing:-.02em}
+        .table-wrap{overflow-x:auto;margin-bottom:40px}
+        table{width:100%;border-collapse:collapse;background:var(--bg-white);border-radius:var(--radius);overflow:hidden;border:1px solid var(--border);min-width:700px}
+        th,td{padding:14px 18px;text-align:left;font-size:14px;border-bottom:1px solid var(--border)}
+        th{background:var(--bg-section);font-weight:700;color:var(--text)}
+        th.hl{color:var(--primary);background:rgba(0,180,216,0.05)}
+        td.hl{background:rgba(0,180,216,0.03)}
+        .ck-y{color:var(--success)}.ck-n{color:var(--text-muted)}.ck-p{color:var(--warning)}
+        .verdict{background:var(--bg-white);border:1px solid var(--border);border-radius:var(--radius-lg);padding:32px;margin:32px 0}
+        .verdict h3{font-size:20px;font-weight:800;margin-bottom:12px}
+        .verdict p{font-size:15px;color:var(--text-secondary);line-height:1.7}
+        .cta-box{background:linear-gradient(135deg,var(--primary),var(--accent));border-radius:var(--radius-lg);padding:48px;text-align:center;color:#fff;margin-bottom:80px}
+        .cta-box h2{font-size:28px;font-weight:800;margin-bottom:12px}
+        .cta-box p{font-size:16px;opacity:.9;margin-bottom:24px}
+        .cta-box .btn{background:#fff;color:var(--primary);font-weight:700}
+        .footer{background:var(--bg-white);border-top:1px solid var(--border);padding:32px 0;text-align:center;font-size:13px;color:var(--text-muted)}
+        @media(max-width:768px){.nav-links{display:none}}
+    </style>
+</head>
+<body>
+<nav class="navbar">
+    <div class="nav-container">
+        <a href="index.html" class="logo">Tele<span>Boost</span></a>
+        <div class="nav-links">
+            <a href="index.html">Главная</a>
+            <a href="training.html">Обучение</a>
+            <a href="comparison.html">Сравнение</a>
+            <a href="about.html">О нас</a>
+            <a href="https://t.me/teleboostai_bot" target="_blank" class="btn btn-primary btn-sm">Начать</a>
+        </div>
+    </div>
+</nav>
+
+<div class="page-header">
+    <div class="container">
+        <div style="display:inline-block;padding:4px 14px;border-radius:100px;background:rgba(0,180,216,0.08);color:var(--primary);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:16px">Сравнение</div>
+        <h1>TeleBoost AI vs <span style="color:var(--primary)">Конкуренты</span></h1>
+        <p>Подробное сравнение возможностей. Объективно и без эмоций.</p>
+    </div>
+</div>
+
+<div class="container comparison-section">
+    <h2>Функциональность</h2>
+    <div class="table-wrap">
+        <table>
+            <thead><tr><th>Функция</th><th class="hl">TeleBoost AI</th><th>TG-Giant</th><th>Chatfuel</th><th>TGStat</th></tr></thead>
+            <tbody>
+                <tr><td>Парсинг аудитории</td><td class="hl"><i class="fas fa-check-circle ck-y"></i> 4 типа</td><td><i class="fas fa-check-circle ck-y"></i></td><td><i class="fas fa-minus-circle ck-p"></i></td><td><i class="fas fa-check-circle ck-y"></i></td></tr>
+                <tr><td>AI-комментирование</td><td class="hl"><i class="fas fa-check-circle ck-y"></i> GPT-4o + Cerebras</td><td><i class="fas fa-times-circle ck-n"></i></td><td><i class="fas fa-times-circle ck-n"></i></td><td><i class="fas fa-times-circle ck-n"></i></td></tr>
+                <tr><td>Нейрочаттинг (ЛС)</td><td class="hl"><i class="fas fa-check-circle ck-y"></i> 500+ сценариев</td><td><i class="fas fa-times-circle ck-n"></i></td><td><i class="fas fa-check-circle ck-y"></i></td><td><i class="fas fa-times-circle ck-n"></i></td></tr>
+                <tr><td>Прогрев аккаунтов</td><td class="hl"><i class="fas fa-check-circle ck-y"></i> AI-режим</td><td><i class="fas fa-check-circle ck-y"></i></td><td><i class="fas fa-times-circle ck-n"></i></td><td><i class="fas fa-times-circle ck-n"></i></td></tr>
+                <tr><td>Массовые реакции</td><td class="hl"><i class="fas fa-check-circle ck-y"></i> AI-маппинг</td><td><i class="fas fa-check-circle ck-y"></i></td><td><i class="fas fa-times-circle ck-n"></i></td><td><i class="fas fa-times-circle ck-n"></i></td></tr>
+                <tr><td>Anti-Ban Shield</td><td class="hl"><i class="fas fa-check-circle ck-y"></i> Predictive AI</td><td><i class="fas fa-minus-circle ck-p"></i></td><td><i class="fas fa-times-circle ck-n"></i></td><td><i class="fas fa-times-circle ck-n"></i></td></tr>
+                <tr><td>CRM-система</td><td class="hl"><i class="fas fa-check-circle ck-y"></i></td><td><i class="fas fa-times-circle ck-n"></i></td><td><i class="fas fa-check-circle ck-y"></i></td><td><i class="fas fa-times-circle ck-n"></i></td></tr>
+                <tr><td>AI-воронки продаж</td><td class="hl"><i class="fas fa-check-circle ck-y"></i></td><td><i class="fas fa-times-circle ck-n"></i></td><td><i class="fas fa-check-circle ck-y"></i></td><td><i class="fas fa-times-circle ck-n"></i></td></tr>
+                <tr><td>A/B тестирование</td><td class="hl"><i class="fas fa-check-circle ck-y"></i></td><td><i class="fas fa-times-circle ck-n"></i></td><td><i class="fas fa-minus-circle ck-p"></i></td><td><i class="fas fa-times-circle ck-n"></i></td></tr>
+                <tr><td>Predictive ROI</td><td class="hl"><i class="fas fa-check-circle ck-y"></i></td><td><i class="fas fa-times-circle ck-n"></i></td><td><i class="fas fa-times-circle ck-n"></i></td><td><i class="fas fa-minus-circle ck-p"></i></td></tr>
+                <tr><td>Веб-приложение</td><td class="hl"><i class="fas fa-check-circle ck-y"></i> Mini App</td><td><i class="fas fa-times-circle ck-n"></i></td><td><i class="fas fa-check-circle ck-y"></i></td><td><i class="fas fa-check-circle ck-y"></i></td></tr>
+                <tr><td>Бесплатный период</td><td class="hl"><i class="fas fa-check-circle ck-y"></i> Без ограничений</td><td><i class="fas fa-check-circle ck-y"></i> 2 дня</td><td><i class="fas fa-check-circle ck-y"></i> 14 дней</td><td><i class="fas fa-check-circle ck-y"></i></td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Цены</h2>
+    <div class="table-wrap">
+        <table>
+            <thead><tr><th>Тариф</th><th class="hl">TeleBoost AI</th><th>TG-Giant</th><th>Chatfuel</th></tr></thead>
+            <tbody>
+                <tr><td>Бесплатный</td><td class="hl">$0 (без ограничений по времени)</td><td>$0 (2 дня)</td><td>$0 (14 дней)</td></tr>
+                <tr><td>Базовый</td><td class="hl">$49/мес</td><td>₽6,990/мес (~$75)</td><td>$20/мес</td></tr>
+                <tr><td>Профессиональный</td><td class="hl">$199/мес</td><td>₽15,990/мес (~$170)</td><td>$99/мес</td></tr>
+                <tr><td>Годовая скидка</td><td class="hl">-20%</td><td>Есть</td><td>Есть</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Технологии</h2>
+    <div class="table-wrap">
+        <table>
+            <thead><tr><th>Параметр</th><th class="hl">TeleBoost AI</th><th>TG-Giant</th></tr></thead>
+            <tbody>
+                <tr><td>AI-модели</td><td class="hl">GPT-4o, Cerebras (200+ ток/с)</td><td>Нет AI</td></tr>
+                <tr><td>Защита от банов</td><td class="hl">Predictive AI + Human Emulation</td><td>Базовая ротация</td></tr>
+                <tr><td>Формат аккаунтов</td><td class="hl">JSON+SESSION, TDATA, конвертер</td><td>JSON+SESSION, TDATA</td></tr>
+                <tr><td>Прокси</td><td class="hl">IPv4, SOCKS5, автоматическая ротация</td><td>IPv4, SOCKS5</td></tr>
+                <tr><td>API</td><td class="hl">REST API + Webhook</td><td>Нет</td></tr>
+                <tr><td>Поддержка</td><td class="hl">24/7 Telegram</td><td>24/7 Telegram</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="verdict">
+        <h3>Вердикт</h3>
+        <p><strong>TeleBoost AI</strong> — лучший выбор для тех, кому нужен AI-маркетинг в Telegram. В отличие от TG-Giant (ориентирован на софт-комбайны без AI) и Chatfuel (ориентирован на чат-боты), TeleBoost сочетает парсинг, AI-комментинг, прогрев и воронки в одной платформе.</p>
+        <p style="margin-top:12px"><strong>Кому подойдёт TG-Giant:</strong> Если нужен классический софт-комбайн без AI, с фокусом на инвайтинг и спамер.<br>
+        <strong>Кому подойдёт Chatfuel:</strong> Если нужен конструктор чат-ботов для автоматических ответов.<br>
+        <strong>Кому подойдёт TeleBoost:</strong> Если нужен полноценный AI-маркетинг с нейрокомментингом, воронками и аналитикой.</p>
+    </div>
+</div>
+
+<div class="container">
+    <div class="cta-box">
+        <h2>Убедитесь сами</h2>
+        <p>Попробуйте TeleBoost бесплатно и сравните с тем, что у вас сейчас.</p>
+        <a href="https://t.me/teleboostai_bot?start=comparison" class="btn btn-lg" target="_blank"><i class="fas fa-rocket"></i> Попробовать бесплатно</a>
+    </div>
+</div>
+
+<footer class="footer">
+    <div class="container"><p>&copy; 2024–2026 TeleBoost AI. Все права защищены.</p></div>
+</footer>
+</body>
+</html>

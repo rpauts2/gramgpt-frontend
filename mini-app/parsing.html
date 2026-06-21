@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="color-scheme" content="light dark">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>GRAMGPT — Парсинг</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="header animate-in">
+        <h2><i class="fas fa-crosshairs" style="color: var(--primary)"></i> Парсинг</h2>
+        <a href="index.html" class="text-secondary" style="text-decoration: none; font-size: 14px;">
+            <i class="fas fa-arrow-left"></i> Назад
+        </a>
+    </div>
+
+    <!-- Parser Type Selection -->
+    <div class="card animate-in" style="animation-delay: 0.05s">
+        <h4 class="mb-12">Тип парсинга</h4>
+        <div class="btn-option-grid btn-option-grid-4">
+            <button class="btn-option active" onclick="window.selectOption(this, 'users')">
+                <i class="fas fa-users"></i> Пользователи
+            </button>
+            <button class="btn-option" onclick="window.selectOption(this, 'channels')">
+                <i class="fas fa-broadcast-tower"></i> Каналы
+            </button>
+            <button class="btn-option" onclick="window.selectOption(this, 'messages')">
+                <i class="fas fa-envelope"></i> Сообщения
+            </button>
+            <button class="btn-option" onclick="window.selectOption(this, 'keywords')">
+                <i class="fas fa-key"></i> По ключам
+            </button>
+        </div>
+    </div>
+
+    <!-- Parser Settings -->
+    <div class="card animate-in" style="animation-delay: 0.1s" id="settings-card">
+        <h4 class="mb-12">Настройки</h4>
+        <div class="form-group">
+            <label class="form-label">Целевые каналы / группы</label>
+            <input type="text" class="form-input" id="target-input" placeholder="@channel_name или t.me/link">
+        </div>
+        <div class="form-group">
+            <label class="form-label">Ключевые слова (опционально)</label>
+            <input type="text" class="form-input" id="keywords-input" placeholder="крипто, трейдинг, NFT">
+        </div>
+        <div class="flex gap-8">
+            <div class="flex-1">
+                <label class="form-label">Лимит</label>
+                <select class="form-select" id="limit-select">
+                    <option value="100">100</option>
+                    <option value="500">500</option>
+                    <option value="1000" selected>1000</option>
+                    <option value="5000">5000</option>
+                </select>
+            </div>
+            <div class="flex-1">
+                <label class="form-label">Период</label>
+                <select class="form-select" id="period-select">
+                    <option value="24h">24 часа</option>
+                    <option value="7d" selected>7 дней</option>
+                    <option value="30d">30 дней</option>
+                    <option value="all">Все время</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- Results Preview -->
+    <div class="card animate-in" style="animation-delay: 0.15s" id="results-card">
+        <div class="card-header">
+            <h4>Результаты</h4>
+            <span class="status-badge badge-blue" id="results-count">Нет данных</span>
+        </div>
+        <div id="results-list">
+            <div class="empty-state"><i class="fas fa-crosshairs"></i><h4>Нет результатов</h4><p>Запустите парсинг, чтобы увидеть данные</p></div>
+        </div>
+    </div>
+
+    <button class="btn animate-in" style="animation-delay: 0.2s" onclick="startParsing()" id="parse-start-btn">
+        <i class="fas fa-crosshairs"></i> Запустить парсинг
+    </button>
+    <button class="btn animate-in" style="display:none;background:var(--danger);color:#fff;width:100%;margin-top:8px;" id="parse-stop-btn" onclick="stopParsing()">
+        <i class="fas fa-stop"></i> Остановить парсинг
+    </button>
+    <button class="btn btn-outline animate-in" style="display:none;width:100%;margin-top:8px;" id="parse-export-btn" onclick="exportParseResults()">
+        <i class="fas fa-download"></i> Скачать результаты (CSV)
+    </button>
+
+    <div class="nav-bar animate-in" style="animation-delay: 0.25s">
+        <a href="index.html" class="nav-item"><i class="fas fa-home"></i></a>
+        <a href="campaigns.html" class="nav-item"><i class="fas fa-tasks"></i></a>
+        <a href="channel.html" class="nav-item"><i class="fas fa-tv"></i></a>
+        <a href="dashboard.html" class="nav-item"><i class="fas fa-chart-pie"></i></a>
+        <a href="settings.html" class="nav-item"><i class="fas fa-cog"></i></a>
+    </div>
+
+    <script src="main.js"></script>
+    <script>
+        let currentTaskId = null;
+        let parseResults = [];
+        let parsePolling = null;
+
+        window.selectOption = function(btn) {
+            btn.parentElement.querySelectorAll('.btn-option').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            haptic('light');
+        };
+
+        async function startParsing() {
+            haptic('medium');
+            const target = document.getElementById('target-input').value.trim();
+            if (!target) {
+                toast('warning', 'Укажите цель', 'Введите название канала или группу для парсинга');
+                return;
+            }
+            const activeType = document.querySelector('.btn-option.active');
+            const parserType = activeType ? activeType.textContent.trim().toLowerCase() : 'users';
+
+            toast('info', 'Парсинг запущен', 'Поиск аудитории в фоновом режиме...');
+            document.getElementById('parse-start-btn').style.display = 'none';
+            document.getElementById('parse-stop-btn').style.display = 'flex';
+            document.getElementById('parse-export-btn').style.display = 'none';
+
+            try {
+                const result = await api.post('/parsing/start', {
+                    parser_type: parserType,
+                    target: target,
+                    keywords: document.getElementById('keywords-input').value || null,
+                    limit: parseInt(document.getElementById('limit-select').value) || 1000,
+                    period: document.getElementById('period-select').value || '7d'
+                });
+                currentTaskId = result.task_id;
+                toast('success', 'Парсинг запущен', 'Task ID: ' + currentTaskId);
+                document.getElementById('results-count').textContent = 'Обработка...';
+                document.getElementById('results-count').className = 'status-badge badge-yellow';
+                pollResults(currentTaskId);
+            } catch (err) {
+                toast('error', 'Ошибка', err.message);
+                document.getElementById('parse-start-btn').style.display = 'flex';
+                document.getElementById('parse-stop-btn').style.display = 'none';
+            }
+        }
+
+        function stopParsing() {
+            haptic('medium');
+            if (parsePolling) { clearInterval(parsePolling); parsePolling = null; }
+            currentTaskId = null;
+            document.getElementById('parse-start-btn').style.display = 'flex';
+            document.getElementById('parse-stop-btn').style.display = 'none';
+            document.getElementById('results-count').textContent = 'Остановлено';
+            document.getElementById('results-count').className = 'status-badge badge-red';
+            toast('info', 'Остановлено', 'Парсинг остановлен');
+        }
+
+        function exportParseResults() {
+            if (!parseResults.length) { toast('warning', 'Пусто', 'Нет данных для экспорта'); return; }
+            exportCSV(parseResults, 'parsing_results_' + Date.now() + '.csv');
+        }
+
+        async function pollResults(taskId) {
+            const list = document.getElementById('results-list');
+            const count = document.getElementById('results-count');
+            let ticks = 0;
+            parsePolling = setInterval(async () => {
+                ticks++;
+                if (ticks > 120) { clearInterval(parsePolling); count.textContent = 'Таймаут'; count.className = 'status-badge badge-red'; return; }
+                try {
+                    const data = await api.get('/parsing/results/' + taskId);
+                    if (data.status === 'completed') {
+                        clearInterval(parsePolling);
+                        count.textContent = data.total_found + ' найдено';
+                        count.className = 'status-badge badge-green';
+                        parseResults = data.results || [];
+                        if (parseResults.length) {
+                            document.getElementById('parse-export-btn').style.display = 'flex';
+                            list.innerHTML = parseResults.slice(0, 50).map(r => {
+                                const initials = (r.first_name || r.username || '??').substring(0, 2).toUpperCase();
+                                return '<div class="parsed-user"><div class="avatar avatar-md avatar-gradient">' + initials + '</div><div class="flex-1"><div class="text-sm" style="font-weight:600;">' + escapeHtml(r.first_name || r.username || 'Unknown') + '</div><div class="text-xs text-secondary">@' + escapeHtml(r.username || '—') + ' &bull; ' + escapeHtml(r.source || '') + '</div></div><span class="status-badge badge-blue">Спарсен</span></div>';
+                            }).join('');
+                        } else {
+                            list.innerHTML = '<div class="empty-state"><i class="fas fa-crosshairs"></i><h4>Ничего не найдено</h4><p>Попробуйте изменить параметры поиска</p></div>';
+                        }
+                        document.getElementById('parse-start-btn').style.display = 'flex';
+                        document.getElementById('parse-stop-btn').style.display = 'none';
+                        return;
+                    } else if (data.status === 'failed') {
+                        clearInterval(parsePolling);
+                        count.textContent = 'Ошибка';
+                        count.className = 'status-badge badge-red';
+                        list.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><h4>Ошибка парсинга</h4><p>' + escapeHtml(data.error || 'Неизвестная ошибка') + '</p></div>';
+                        document.getElementById('parse-start-btn').style.display = 'flex';
+                        document.getElementById('parse-stop-btn').style.display = 'none';
+                        return;
+                    }
+                } catch (e) {}
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

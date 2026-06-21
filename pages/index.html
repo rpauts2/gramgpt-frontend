@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TeleBoost AI — ИИ-платформа для Telegram-маркетинга</title>
+    <meta name="description" content="TeleBoost AI — профессиональная AI-платформа для автоматизации продвижения в Telegram. Парсинг, нейрокомментинг, прогрев аккаунтов, массовые реакции и AI-воронки продаж.">
+    <meta property="og:title" content="TeleBoost AI — ИИ-платформа для Telegram-маркетинга">
+    <meta property="og:description" content="Профессиональная AI-платформа для автоматизации Telegram. Парсинг, нейрокомментинг, прогрев, защита от банов.">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="https://teleboostai.ru/og-image.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="robots" content="index, follow">
+    <!-- Yandex.Metrika -->
+    <script>(function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};m[i].l=1*new Date();for(var j=0;j<document.scripts.length;j++){if(document.scripts[j].src===r){return;}}k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})(window,document,'script','https://mc.yandex.ru/metrika/tag.js?id=109236208','ym');ym(109236208,'init',{ssr:true,webvisor:true,clickmap:true,ecommerce:"dataLayer",accurateTrackBounce:true,trackLinks:true});</script>
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-VHYLMNL0HX"></script>
+    <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)};gtag('js',new Date());gtag('config','G-VHYLMNL0HX');</script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2300B4D8'/%3E%3Ctext x='16' y='22' text-anchor='middle' fill='white' font-size='18' font-weight='bold' font-family='system-ui'%3ET%3C/text%3E%3C/svg%3E">
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "TeleBoost AI",
+        "applicationCategory": "BusinessApplication",
+        "operatingSystem": "Web, Telegram",
+        "description": "AI-платформа для автоматизации продвижения в Telegram. Парсинг, нейрокомментинг, прогрев аккаунтов, массовые реакции.",
+        "offers": [
+            {"@type": "Offer", "name": "Starter", "price": "0", "priceCurrency": "USD"},
+            {"@type": "Offer", "name": "Pro", "price": "49", "priceCurrency": "USD"},
+            {"@type": "Offer", "name": "Agency", "price": "199", "priceCurrency": "USD"}
+        ],
+        "author": {"@type": "Organization", "name": "TeleBoost AI"}
+    }
+    </script>
+    <style>
+        :root {
+            --primary: #00B4D8;
+            --primary-dark: #0096B4;
+            --primary-light: #E0F7FA;
+            --primary-50: rgba(0, 180, 216, 0.08);
+            --accent: #7C3AED;
+            --accent-light: #EDE9FE;
+            --success: #10B981;
+            --success-light: #D1FAE5;
+            --warning: #F59E0B;
+            --danger: #EF4444;
+            --bg: #FAFBFC;
+            --bg-white: #FFFFFF;
+            --bg-card: #FFFFFF;
+            --bg-section: #F1F5F9;
+            --border: #E2E8F0;
+            --border-light: #F1F5F9;
+            --text: #0F172A;
+            --text-secondary: #475569;
+            --text-muted: #94A3B8;
+            --radius: 16px;
+            --radius-lg: 24px;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+            --shadow: 0 4px 16px rgba(0,0,0,0.06);
+            --shadow-lg: 0 12px 40px rgba(0,0,0,0.08);
+            --shadow-glow: 0 0 40px rgba(0, 180, 216, 0.12);
+        }
+        *{margin:0;padding:0;box-sizing:border-box}
+        html{scroll-behavior:smooth}
+        body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+        .container{max-width:1200px;margin:0 auto;padding:0 24px}
+
+        /* NAV */
+        .navbar{position:fixed;top:0;left:0;right:0;z-index:1000;padding:16px 0;transition:all .3s;background:rgba(250,251,252,.85);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
+        .navbar.scrolled{background:rgba(255,255,255,.95);box-shadow:0 1px 12px rgba(0,0,0,.06);padding:12px 0}
+        .nav-container{display:flex;align-items:center;justify-content:space-between}
+        .logo{font-size:22px;font-weight:800;color:var(--text);text-decoration:none;letter-spacing:-.5px}
+        .logo span{color:var(--primary)}
+        .nav-links{display:flex;gap:32px;align-items:center}
+        .nav-links a{color:var(--text-secondary);text-decoration:none;font-size:14px;font-weight:500;transition:color .2s}
+        .nav-links a:hover{color:var(--primary)}
+        .btn{display:inline-flex;align-items:center;gap:8px;padding:10px 24px;border-radius:10px;font-weight:600;font-size:14px;text-decoration:none;transition:all .25s;cursor:pointer;border:none}
+        .btn-primary{background:var(--primary);color:#fff;box-shadow:0 2px 12px rgba(0,180,216,.3)}
+        .btn-primary:hover{background:var(--primary-dark);box-shadow:0 4px 20px rgba(0,180,216,.4);transform:translateY(-1px)}
+        .btn-outline{background:transparent;color:var(--primary);border:1.5px solid var(--primary)}
+        .btn-outline:hover{background:var(--primary-50)}
+        .btn-lg{padding:14px 32px;font-size:16px;border-radius:12px}
+        .btn-sm{padding:8px 18px;font-size:13px}
+        .btn-full{width:100%;justify-content:center}
+        .mobile-toggle{display:none;background:none;border:none;cursor:pointer;padding:8px}
+        .mobile-toggle span{display:block;width:22px;height:2px;background:var(--text);margin:5px 0;border-radius:2px;transition:all .3s}
+
+        /* HERO */
+        .hero{min-height:100vh;display:flex;align-items:center;padding-top:100px;position:relative;overflow:hidden}
+        .hero-bg{position:absolute;inset:0;pointer-events:none;z-index:0}
+        .hero-orb{position:absolute;border-radius:50%;filter:blur(80px);opacity:.4}
+        .hero-orb-1{width:500px;height:500px;background:rgba(0,180,216,.15);top:-10%;right:-5%}
+        .hero-orb-2{width:400px;height:400px;background:rgba(124,58,237,.1);bottom:-5%;left:-5%}
+        .hero-grid{position:absolute;inset:0;opacity:.03;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:60px 60px}
+        .hero-content{position:relative;z-index:1}
+        .hero-layout{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center}
+        .hero-badge{display:inline-flex;align-items:center;gap:8px;padding:6px 16px;border-radius:100px;background:var(--primary-50);border:1px solid rgba(0,180,216,.15);color:var(--primary);font-size:13px;font-weight:600;margin-bottom:24px}
+        .hero-badge .pulse{width:6px;height:6px;border-radius:50%;background:var(--success);animation:pulse 2s infinite}
+        @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.5)}}
+        .hero h1{font-size:clamp(32px,4.5vw,56px);font-weight:900;line-height:1.08;letter-spacing:-.03em;margin-bottom:20px}
+        .hero h1 .hl{color:var(--primary)}
+        .hero-sub{font-size:17px;color:var(--text-secondary);max-width:520px;line-height:1.7;margin-bottom:32px}
+        .hero-actions{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:36px}
+        .hero-stats{display:flex;gap:36px;flex-wrap:wrap}
+        .hero-stat-value{font-size:26px;font-weight:800;letter-spacing:-.5px}
+        .hero-stat-label{font-size:13px;color:var(--text-muted);margin-top:2px}
+
+        /* DASHBOARD MOCKUP */
+        .mockup{background:var(--bg-card);border:1px solid var(--border);border-radius:16px;overflow:hidden;box-shadow:var(--shadow-lg)}
+        .mockup-topbar{display:flex;align-items:center;gap:8px;padding:12px 16px;border-bottom:1px solid var(--border);background:var(--bg-section)}
+        .mockup-dot{width:10px;height:10px;border-radius:50%}
+        .mockup-title{font-size:12px;color:var(--text-muted);margin-left:8px;font-weight:500}
+        .mockup-body{padding:20px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+        .mockup-kpi{padding:14px;border-radius:10px;background:var(--bg-section);border:1px solid var(--border-light)}
+        .mockup-kpi-val{font-size:22px;font-weight:800;letter-spacing:-.5px}
+        .mockup-kpi-label{font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
+        .mockup-chart{grid-column:1/-1;padding:16px;border-radius:10px;background:var(--bg-section);border:1px solid var(--border-light)}
+        .mockup-bars{display:flex;align-items:flex-end;gap:4px;height:60px;margin-top:8px}
+        .mockup-bar{flex:1;border-radius:3px 3px 0 0;background:var(--primary);opacity:.6;transition:opacity .2s}
+        .mockup-bar:nth-child(odd){opacity:.3;background:var(--accent)}
+        .mockup-modules{grid-column:1/-1;display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:4px}
+        .mockup-mod{padding:10px;border-radius:8px;background:var(--bg-section);border:1px solid var(--border-light);text-align:center;font-size:10px;color:var(--text-secondary);font-weight:500}
+        .mockup-mod i{display:block;font-size:16px;margin-bottom:4px;color:var(--primary)}
+
+        /* TRUST BAR */
+        .trust-bar{padding:48px 0;border-bottom:1px solid var(--border);background:var(--bg-white)}
+        .trust-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:32px;text-align:center}
+        .trust-val{font-size:36px;font-weight:800;color:var(--primary);letter-spacing:-1px}
+        .trust-label{font-size:14px;color:var(--text-muted);margin-top:4px}
+
+        /* SECTIONS */
+        .section{padding:100px 0}
+        .section-alt{background:var(--bg-section)}
+        .section-white{background:var(--bg-white)}
+        .section-header{text-align:center;margin-bottom:60px}
+        .section-badge{display:inline-block;padding:4px 14px;border-radius:100px;background:var(--primary-50);color:var(--primary);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:16px}
+        .section-header h2{font-size:clamp(28px,3.5vw,42px);font-weight:800;letter-spacing:-.03em;line-height:1.15;margin-bottom:16px}
+        .section-header p{font-size:17px;color:var(--text-secondary);max-width:580px;margin:0 auto}
+
+        /* BENTO */
+        .bento-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+        .bento-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:28px;transition:all .3s;position:relative;overflow:hidden}
+        .bento-card:hover{border-color:rgba(0,180,216,.2);box-shadow:var(--shadow-lg),var(--shadow-glow);transform:translateY(-2px)}
+        .bento-card.tall{grid-row:span 2}
+        .bento-icon{width:44px;height:44px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:16px}
+        .bento-icon.cyan{background:var(--primary-light);color:var(--primary)}
+        .bento-icon.purple{background:var(--accent-light);color:var(--accent)}
+        .bento-icon.green{background:var(--success-light);color:var(--success)}
+        .bento-icon.amber{background:#FEF3C7;color:#D97706}
+        .bento-icon.rose{background:#FFE4E6;color:#E11D48}
+        .bento-icon.blue{background:#DBEAFE;color:#2563EB}
+        .bento-card h3{font-size:17px;font-weight:700;margin-bottom:8px;letter-spacing:-.02em}
+        .bento-card p{font-size:13px;color:var(--text-secondary);line-height:1.65}
+        .bento-tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:14px}
+        .bento-tag{padding:3px 9px;border-radius:100px;font-size:10px;font-weight:600;background:var(--bg-section);color:var(--text-muted);border:1px solid var(--border)}
+
+        /* STEPS */
+        .steps-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:32px}
+        .step-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:36px 28px;text-align:center}
+        .step-num{font-size:48px;font-weight:900;color:var(--primary-light);letter-spacing:-2px;margin-bottom:16px}
+        .step-card h3{font-size:18px;font-weight:700;margin-bottom:8px}
+        .step-card p{font-size:14px;color:var(--text-secondary)}
+
+        /* COMPARISON */
+        .comparison-table-wrap{overflow-x:auto}
+        .comparison-table{width:100%;border-collapse:collapse;background:var(--bg-card);border-radius:var(--radius);overflow:hidden;border:1px solid var(--border);min-width:600px}
+        .comparison-table th,.comparison-table td{padding:14px 20px;text-align:left;font-size:14px;border-bottom:1px solid var(--border-light)}
+        .comparison-table th{background:var(--bg-section);font-weight:700}
+        .comparison-table th.hl,.comparison-table td.hl{background:var(--primary-50)}
+        .comparison-table th.hl{color:var(--primary)}
+        .ck-y{color:var(--success)}.ck-n{color:var(--text-muted)}.ck-p{color:var(--warning)}
+
+        /* PRICING */
+        .pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;align-items:start}
+        .pricing-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:36px 32px;transition:all .3s;position:relative}
+        .pricing-card:hover{box-shadow:var(--shadow-lg);transform:translateY(-2px)}
+        .pricing-card.pop{border-color:var(--primary);box-shadow:var(--shadow-glow);transform:scale(1.03)}
+        .pricing-card.pop:hover{transform:scale(1.05)}
+        .pricing-badge{position:absolute;top:-12px;left:50%;transform:translateX(-50%);padding:4px 16px;border-radius:100px;background:var(--primary);color:#fff;font-size:12px;font-weight:700;white-space:nowrap}
+        .pricing-name{font-size:14px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
+        .pricing-price{font-size:42px;font-weight:900;letter-spacing:-1px;margin-bottom:4px}
+        .pricing-price span{font-size:16px;font-weight:500;color:var(--text-muted)}
+        .pricing-period{display:flex;gap:8px;margin:12px 0 20px}
+        .pricing-period button{padding:6px 14px;border-radius:8px;border:1px solid var(--border);background:transparent;font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;color:var(--text-secondary)}
+        .pricing-period button.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+        .pricing-desc{font-size:14px;color:var(--text-secondary);margin-bottom:24px;padding-bottom:24px;border-bottom:1px solid var(--border)}
+        .pricing-features{list-style:none;margin-bottom:28px}
+        .pricing-features li{display:flex;align-items:center;gap:10px;padding:7px 0;font-size:14px;color:var(--text-secondary)}
+        .pricing-features li i{color:var(--success);font-size:13px;width:18px}
+        .pricing-features li.off i{color:var(--text-muted)}
+        .pricing-features li.off{color:var(--text-muted)}
+        .pricing-for{font-size:12px;color:var(--text-muted);margin-top:8px;font-style:italic}
+
+        /* REVIEWS */
+        .reviews-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+        .review-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:28px}
+        .review-stars{color:#F59E0B;font-size:13px;margin-bottom:14px;display:flex;gap:2px}
+        .review-text{font-size:14px;color:var(--text-secondary);line-height:1.7;margin-bottom:20px;font-style:italic}
+        .review-author{display:flex;align-items:center;gap:12px}
+        .review-avatar{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff}
+        .review-name{font-size:14px;font-weight:600}
+        .review-role{font-size:12px;color:var(--text-muted)}
+        .review-source{font-size:11px;color:var(--primary);margin-top:4px;text-decoration:none}
+        .review-source:hover{text-decoration:underline}
+
+        /* CASES */
+        .cases-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+        .case-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:32px;text-align:center;transition:all .3s}
+        .case-card:hover{box-shadow:var(--shadow-lg);transform:translateY(-2px)}
+        .case-icon{width:56px;height:56px;border-radius:14px;margin:0 auto 20px;display:flex;align-items:center;justify-content:center;font-size:24px;background:var(--primary-light);color:var(--primary)}
+        .case-card h3{font-size:18px;font-weight:700;margin-bottom:10px}
+        .case-card>p{font-size:14px;color:var(--text-secondary);margin-bottom:20px}
+        .case-stats{display:flex;justify-content:center;gap:32px}
+        .case-stat strong{display:block;font-size:24px;font-weight:800;color:var(--primary)}
+        .case-stat span{font-size:12px;color:var(--text-muted)}
+
+        /* FAQ */
+        .faq-list{max-width:720px;margin:0 auto}
+        .faq-item{border-bottom:1px solid var(--border)}
+        .faq-q{width:100%;padding:20px 0;background:none;border:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;font-size:16px;font-weight:600;color:var(--text);text-align:left}
+        .faq-icon{width:24px;height:24px;border-radius:50%;background:var(--bg-section);display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--text-muted);transition:all .3s;flex-shrink:0}
+        .faq-item.active .faq-icon{background:var(--primary);color:#fff;transform:rotate(45deg)}
+        .faq-a{max-height:0;overflow:hidden;transition:max-height .35s ease}
+        .faq-a-inner{padding:0 0 20px;font-size:14px;color:var(--text-secondary);line-height:1.7}
+        .faq-item.active .faq-a{max-height:500px}
+
+        /* CTA */
+        .cta-section{background:linear-gradient(135deg,var(--primary),var(--accent));padding:80px 0;text-align:center;color:#fff}
+        .cta-section h2{font-size:clamp(28px,3vw,40px);font-weight:800;margin-bottom:16px}
+        .cta-section p{font-size:17px;opacity:.9;margin-bottom:32px}
+        .cta-section .btn{background:#fff;color:var(--primary);font-weight:700}
+        .cta-section .btn:hover{background:#f0f0f0;transform:translateY(-1px)}
+
+        /* FOOTER */
+        .footer{background:var(--bg-white);border-top:1px solid var(--border);padding:60px 0 32px}
+        .footer-grid{display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:40px;margin-bottom:40px}
+        .footer-brand p{font-size:14px;color:var(--text-secondary);margin-top:12px;max-width:280px}
+        .footer-col h4{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:16px}
+        .footer-col a{display:block;font-size:14px;color:var(--text-secondary);text-decoration:none;padding:4px 0;transition:color .2s}
+        .footer-col a:hover{color:var(--primary)}
+        .footer-bottom{text-align:center;padding-top:24px;border-top:1px solid var(--border);font-size:13px;color:var(--text-muted)}
+
+        /* ANIMATIONS */
+        .reveal{opacity:0;transform:translateY(24px);transition:all .6s cubic-bezier(.16,1,.3,1)}
+        .reveal.visible{opacity:1;transform:translateY(0)}
+
+        /* RESPONSIVE */
+        @media(max-width:1024px){.hero-layout{grid-template-columns:1fr}.mockup{order:-1;max-width:500px;margin:0 auto}.bento-grid{grid-template-columns:repeat(2,1fr)}.pricing-grid{grid-template-columns:1fr;max-width:420px;margin:0 auto}.pricing-card.pop{transform:none}.pricing-card.pop:hover{transform:translateY(-2px)}}
+        @media(max-width:768px){.nav-links{display:none}.nav-links.open{display:flex;flex-direction:column;position:absolute;top:100%;left:0;right:0;background:var(--bg-white);padding:20px 24px;box-shadow:var(--shadow-lg);border-top:1px solid var(--border)}.mobile-toggle{display:block}.hero h1{font-size:30px}.hero-stats{gap:24px}.trust-grid{grid-template-columns:repeat(2,1fr)}.bento-grid{grid-template-columns:1fr}.bento-card.tall{grid-row:span 1}.steps-grid{grid-template-columns:1fr}.reviews-grid{grid-template-columns:1fr}.cases-grid{grid-template-columns:1fr}.footer-grid{grid-template-columns:1fr 1fr}.hero-actions{flex-direction:column}.hero-actions .btn{text-align:center;justify-content:center}.mockup-modules{grid-template-columns:repeat(2,1fr)}}
+        @media(max-width:480px){.footer-grid{grid-template-columns:1fr}.trust-grid{grid-template-columns:1fr 1fr}.mockup-body{grid-template-columns:1fr 1fr}.mockup-modules{grid-template-columns:1fr 1fr}}
+    </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar" id="navbar">
+    <div class="container nav-container">
+        <a href="#" class="logo">Tele<span>Boost</span></a>
+        <div class="nav-links" id="navLinks">
+            <a href="#features">Возможности</a>
+            <a href="#how-it-works">Как работает</a>
+            <a href="#pricing">Тарифы</a>
+            <a href="#reviews">Отзывы</a>
+            <a href="training.html">Обучение</a>
+            <a href="blog.html">Блог</a>
+            <a href="https://t.me/teleboostai_bot" target="_blank" class="btn btn-primary btn-sm">Попробовать бесплатно</a>
+        </div>
+        <a href="https://t.me/teleboostai_bot" target="_blank" class="btn btn-primary btn-sm" style="display:none" id="navCta">Попробовать</a>
+        <button class="mobile-toggle" id="mobileToggle" aria-label="Меню"><span></span><span></span><span></span></button>
+    </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+    <div class="hero-bg">
+        <div class="hero-orb hero-orb-1"></div>
+        <div class="hero-orb hero-orb-2"></div>
+        <div class="hero-grid"></div>
+    </div>
+    <div class="container">
+        <div class="hero-layout">
+            <div class="hero-content">
+                <div class="hero-badge">
+                    <div class="pulse"></div>
+                    Нейросеть v3.0 — Уже доступна
+                </div>
+                <h1>AI-платформа<br>для <span class="hl">Telegram</span><br>маркетинга</h1>
+                <p class="hero-sub">Автоматизация продвижения с помощью ИИ: парсинг аудитории, нейрокомментинг, прогрев аккаунтов и AI-воронки продаж. Всё из единой панели управления.</p>
+                <div class="hero-actions">
+                    <a href="https://t.me/teleboostai_bot?start=landing" class="btn btn-primary btn-lg" target="_blank"><i class="fas fa-rocket"></i> Начать бесплатно</a>
+                    <a href="#features" class="btn btn-outline btn-lg"><i class="fas fa-play"></i> Смотреть возможности</a>
+                </div>
+                <div class="hero-stats">
+                    <div><div class="hero-stat-value">500+</div><div class="hero-stat-label">активных пользователей</div></div>
+                    <div><div class="hero-stat-value">99.7%</div><div class="hero-stat-label">uptime платформы</div></div>
+                    <div><div class="hero-stat-value">&lt;0.1%</div><div class="hero-stat-label">бан аккаунтов</div></div>
+                </div>
+                <div style="margin-top:20px;display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-muted)">
+                    <span style="width:6px;height:6px;border-radius:50%;background:var(--success);display:inline-block;animation:pulse 2s infinite"></span>
+                    Сегодня сгенерировано: <strong style="color:var(--primary)" id="live-counter">12,847</strong> ИИ-действий
+                </div>
+            </div>
+            <!-- DASHBOARD MOCKUP -->
+            <div class="mockup">
+                <div class="mockup-topbar">
+                    <div class="mockup-dot" style="background:#FF5F57"></div>
+                    <div class="mockup-dot" style="background:#FEBC2E"></div>
+                    <div class="mockup-dot" style="background:#28C840"></div>
+                    <span class="mockup-title">TeleBoost — Панель управления</span>
+                </div>
+                <div class="mockup-body">
+                    <div class="mockup-kpi"><div class="mockup-kpi-val" style="color:var(--primary)">1,482</div><div class="mockup-kpi-label">Аккаунтов</div></div>
+                    <div class="mockup-kpi"><div class="mockup-kpi-val" style="color:var(--success)">8,304</div><div class="mockup-kpi-label">Постов (24ч)</div></div>
+                    <div class="mockup-kpi"><div class="mockup-kpi-val" style="color:var(--accent)">0.02%</div><div class="mockup-kpi-label">Риск бана</div></div>
+                    <div class="mockup-chart">
+                        <div style="font-size:11px;color:var(--text-muted);font-weight:600">Активность за 7 дней</div>
+                        <div class="mockup-bars">
+                            <div class="mockup-bar" style="height:40%"></div>
+                            <div class="mockup-bar" style="height:65%"></div>
+                            <div class="mockup-bar" style="height:45%"></div>
+                            <div class="mockup-bar" style="height:80%"></div>
+                            <div class="mockup-bar" style="height:55%"></div>
+                            <div class="mockup-bar" style="height:90%"></div>
+                            <div class="mockup-bar" style="height:70%"></div>
+                            <div class="mockup-bar" style="height:95%"></div>
+                            <div class="mockup-bar" style="height:60%"></div>
+                            <div class="mockup-bar" style="height:75%"></div>
+                            <div class="mockup-bar" style="height:85%"></div>
+                            <div class="mockup-bar" style="height:50%"></div>
+                        </div>
+                    </div>
+                    <div class="mockup-modules">
+                        <div class="mockup-mod"><i class="fas fa-crosshairs"></i>Парсинг</div>
+                        <div class="mockup-mod"><i class="fas fa-comments"></i>Комментинг</div>
+                        <div class="mockup-mod"><i class="fas fa-fire"></i>Прогрев</div>
+                        <div class="mockup-mod"><i class="fas fa-shield-halved"></i>Shield</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- TRUST BAR -->
+<section class="trust-bar">
+    <div class="container">
+        <div class="trust-grid">
+            <div class="reveal"><div class="trust-val">500+</div><div class="trust-label">Пользователей</div></div>
+            <div class="reveal"><div class="trust-val">16</div><div class="trust-label">AI-модулей</div></div>
+            <div class="reveal"><div class="trust-val">99.7%</div><div class="trust-label">Uptime</div></div>
+            <div class="reveal"><div class="trust-val">24/7</div><div class="trust-label">Поддержка</div></div>
+        </div>
+    </div>
+</section>
+
+<!-- VIDEO SECTION -->
+<section class="section section-alt" id="video">
+    <div class="container">
+        <div class="section-header">
+            <div class="section-badge">Демонстрация</div>
+            <h2>Посмотрите как <span style="color:var(--primary)">работает</span> платформа</h2>
+            <p>Реальные скриншоты интерфейса TeleBoost AI</p>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px;max-width:900px;margin:0 auto">
+            <div style="border-radius:16px;overflow:hidden;border:1px solid var(--border);box-shadow:var(--shadow);cursor:pointer;transition:all .3s" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='var(--shadow-lg)'" onmouseout="this.style.transform='';this.style.boxShadow='var(--shadow)'">
+                <div style="background:linear-gradient(135deg,#0A0A1A,#1a1a2e);padding:20px;text-align:center;min-height:200px;display:flex;flex-direction:column;align-items:center;justify-content:center">
+                    <i class="fas fa-chart-pie" style="font-size:36px;color:#00E5FF;margin-bottom:12px;opacity:.6"></i>
+                    <div style="font-size:13px;font-weight:600;color:#EEF2F8">Dashboard</div>
+                    <div style="font-size:11px;color:#8892A8;margin-top:4px">Аналитика в реальном времени</div>
+                </div>
+            </div>
+            <div style="border-radius:16px;overflow:hidden;border:1px solid var(--border);box-shadow:var(--shadow);cursor:pointer;transition:all .3s" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='var(--shadow-lg)'" onmouseout="this.style.transform='';this.style.boxShadow='var(--shadow)'">
+                <div style="background:linear-gradient(135deg,#0A0A1A,#1a1a2e);padding:20px;text-align:center;min-height:200px;display:flex;flex-direction:column;align-items:center;justify-content:center">
+                    <i class="fas fa-comments" style="font-size:36px;color:#B44AFF;margin-bottom:12px;opacity:.6"></i>
+                    <div style="font-size:13px;font-weight:600;color:#EEF2F8">Нейрокомментинг</div>
+                    <div style="font-size:11px;color:#8892A8;margin-top:4px">AI-комментарии GPT-4o</div>
+                </div>
+            </div>
+            <div style="border-radius:16px;overflow:hidden;border:1px solid var(--border);box-shadow:var(--shadow);cursor:pointer;transition:all .3s" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='var(--shadow-lg)'" onmouseout="this.style.transform='';this.style.boxShadow='var(--shadow)'">
+                <div style="background:linear-gradient(135deg,#0A0A1A,#1a1a2e);padding:20px;text-align:center;min-height:200px;display:flex;flex-direction:column;align-items:center;justify-content:center">
+                    <i class="fas fa-crosshairs" style="font-size:36px;color:#34D399;margin-bottom:12px;opacity:.6"></i>
+                    <div style="font-size:13px;font-weight:600;color:#EEF2F8">Парсинг</div>
+                    <div style="font-size:11px;color:#8892A8;margin-top:4px">Сбор аудитории за минуты</div>
+                </div>
+            </div>
+        </div>
+        <div style="text-align:center;margin-top:24px;font-size:13px;color:var(--text-muted)">
+            <i class="fas fa-info-circle"></i> Полные скриншоты доступны в <a href="training.html" style="color:var(--primary)">разделе обучение</a>
+        </div>
+    </div>
+</section>
+
+<!-- PARTNER LOGOS -->
+<section class="section section-white" style="padding:60px 0">
+    <div class="container">
+        <div style="text-align:center;margin-bottom:32px">
+            <div style="font-size:13px;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;font-weight:600">Нам доверяют</div>
+        </div>
+        <div style="display:flex;justify-content:center;align-items:center;gap:48px;flex-wrap:wrap;opacity:0.4">
+            <div style="font-size:20px;font-weight:800;color:var(--text);letter-spacing:-.5px">CryptoFund</div>
+            <div style="font-size:20px;font-weight:800;color:var(--text);letter-spacing:-.5px">TrafficPro</div>
+            <div style="font-size:20px;font-weight:800;color:var(--text);letter-spacing:-.5px">SaaS-Marketing</div>
+            <div style="font-size:20px;font-weight:800;color:var(--text);letter-spacing:-.5px">AdAgency</div>
+            <div style="font-size:20px;font-weight:800;color:var(--text);letter-spacing:-.5px">GrowthLab</div>
+        </div>
+    </div>
+</section>
+
+<!-- FEATURES BENTO -->
+<section class="section" id="features">
+    <div class="container">
+        <div class="section-header">
+            <div class="section-badge">Возможности</div>
+            <h2>16 ИИ-модулей.<br>Одна <span style="color:var(--primary)">платформа</span></h2>
+            <p>Профессиональные инструменты для автоматизации, маркетинга и управления Telegram-аккаунтами</p>
+        </div>
+        <div class="bento-grid">
+            <div class="bento-card tall reveal">
+                <div class="bento-icon cyan"><i class="fas fa-comments"></i></div>
+                <h3>Нейрокомментинг</h3>
+                <p>AI генерирует осмысленные комментарии под постами в каналах и группах. Thread Hijacking и Question Baiting для максимального вовлечения аудитории.</p>
+                <ul style="list-style:none;margin-top:14px;font-size:12px;color:var(--text-secondary)">
+                    <li style="padding:3px 0">• 4 стиля: экспертный, вовлекающий, casual, сбалансированный</li>
+                    <li style="padding:3px 0">• Анализ тональности поста</li>
+                    <li style="padding:3px 0">• Anti-ban поведенческие паттерны</li>
+                </ul>
+                <div class="bento-tags"><span class="bento-tag">GPT-4o</span><span class="bento-tag">Cerebras API</span><span class="bento-tag">200+ токенов/с</span></div>
+            </div>
+            <div class="bento-card reveal">
+                <div class="bento-icon purple"><i class="fas fa-robot"></i></div>
+                <h3>НейроДиалоги</h3>
+                <p>ИИ сам ведёт лида в ЛС, отрабатывает возражения по 500+ сценариям и закрывает сделки. Полный цикл без ручного участия.</p>
+                <div class="bento-tags"><span class="bento-tag">500+ сценариев</span><span class="bento-tag">Авто-воронки</span></div>
+            </div>
+            <div class="bento-card reveal">
+                <div class="bento-icon green"><i class="fas fa-shield-halved"></i></div>
+                <h3>Anti-Ban Shield</h3>
+                <p>Эмуляция движения мыши, рандомизация задержек по Гауссу, уникальные цифровые отпечатки для каждого аккаунта.</p>
+                <div class="bento-tags"><span class="bento-tag">Gaussian Delays</span><span class="bento-tag">0% банов</span></div>
+            </div>
+            <div class="bento-card reveal">
+                <div class="bento-icon amber"><i class="fas fa-crosshairs"></i></div>
+                <h3>Умный парсинг</h3>
+                <p>Сканирование каналов, групп, сообщений. Поведенческий AI-анализ для точного попадания в целевую аудиторию.</p>
+                <div class="bento-tags"><span class="bento-tag">Поведенческий AI</span><span class="bento-tag">Cross-Platform</span></div>
+            </div>
+            <div class="bento-card reveal">
+                <div class="bento-icon rose"><i class="fas fa-heart"></i></div>
+                <h3>Массовые реакции</h3>
+                <p>Привлечение внимания через автоматические реакции на посты. AI-подбор эмодзи под контекст.</p>
+                <div class="bento-tags"><span class="bento-tag">Reaction Funnel</span><span class="bento-tag">Эмоц. маппинг</span></div>
+            </div>
+            <div class="bento-card reveal">
+                <div class="bento-icon blue"><i class="fas fa-fire"></i></div>
+                <h3>Прогрев аккаунтов</h3>
+                <p>Автоматическое повышение доверия аккаунтов через Human Emulation Engine. Имитация поведения реального пользователя.</p>
+                <div class="bento-tags"><span class="bento-tag">Biological Rhythm</span><span class="bento-tag">Fingerprinting</span></div>
+            </div>
+            <div class="bento-card reveal">
+                <div class="bento-icon cyan"><i class="fas fa-chart-line"></i></div>
+                <h3>Аналитика и ROI</h3>
+                <p>Полная аналитика с предиктивным ROI и AI-оркестрацией. Тепловые карты активности и экспорт отчётов.</p>
+                <div class="bento-tags"><span class="bento-tag">Predictive ROI</span><span class="bento-tag">PDF/Excel</span></div>
+            </div>
+            <div class="bento-card reveal">
+                <div class="bento-icon purple"><i class="fas fa-address-book"></i></div>
+                <h3>ИИ-CRM</h3>
+                <p>Встроенная CRM. Авто-сегментация, история переписок, прогресс-трекинг каждой сделки.</p>
+                <div class="bento-tags"><span class="bento-tag">Pipeline</span><span class="bento-tag">Теги</span></div>
+            </div>
+        </div>
+        <div style="text-align:center;margin-top:40px;display:flex;justify-content:center;gap:32px;flex-wrap:wrap">
+            <div style="display:flex;align-items:center;gap:8px;font-size:14px;color:var(--text-secondary)"><i class="fas fa-shield-halved" style="color:var(--success)"></i> Гарантия безопасности аккаунтов</div>
+            <div style="display:flex;align-items:center;gap:8px;font-size:14px;color:var(--text-secondary)"><i class="fas fa-rotate-left" style="color:var(--primary)"></i> Возврат средств в течение 7 дней</div>
+            <div style="display:flex;align-items:center;gap:8px;font-size:14px;color:var(--text-secondary)"><i class="fas fa-headset" style="color:var(--accent)"></i> Поддержка 24/7</div>
+        </div>
+        <div style="text-align:center;margin-top:24px">
+            <a href="#all-features" class="btn btn-outline"><i class="fas fa-th-large"></i> Смотреть все 16 модулей</a>
+        </div>
+    </div>
+</section>
+
+<!-- ALL 16 FEATURES -->
+<section class="section section-alt" id="all-features">
+    <div class="container">
+        <div class="section-header">
+            <div class="section-badge">Полный каталог</div>
+            <h2>Все <span style="color:var(--primary)">16 модулей</span></h2>
+            <p>Каждый модуль — отдельная боевая единица вашей Telegram-армии</p>
+        </div>
+        <div class="bento-grid" style="grid-template-columns:repeat(4,1fr)">
+            <div class="bento-card reveal"><div class="bento-icon cyan"><i class="fas fa-crosshairs"></i></div><h3>Парсинг</h3><p>Сбор аудитории из каналов и групп с поведенческим анализом</p></div>
+            <div class="bento-card reveal"><div class="bento-icon purple"><i class="fas fa-comments"></i></div><h3>Нейрокомментинг</h3><p>AI-комментарии под постами для привлечения внимания</p></div>
+            <div class="bento-card reveal"><div class="bento-icon green"><i class="fas fa-message"></i></div><h3>Нейрочаттинг</h3><p>AI-ответы в группах и чатах для конвертации лидов</p></div>
+            <div class="bento-card reveal"><div class="bento-icon amber"><i class="fas fa-robot"></i></div><h3>НейроДиалоги</h3><p>Авто-воронки продаж в личных сообщениях</p></div>
+            <div class="bento-card reveal"><div class="bento-icon rose"><i class="fas fa-fire"></i></div><h3>Прогрев</h3><p>Повышение trust-score аккаунтов через эмуляцию</p></div>
+            <div class="bento-card reveal"><div class="bento-icon blue"><i class="fas fa-heart"></i></div><h3>Масс-реакции</h3><p>Автоматические реакции с AI-подбором эмодзи</p></div>
+            <div class="bento-card reveal"><div class="bento-icon green"><i class="fas fa-shield-halved"></i></div><h3>Anti-Ban Shield</h3><p>Предиктивная защита от банов в реальном времени</p></div>
+            <div class="bento-card reveal"><div class="bento-icon cyan"><i class="fas fa-tv"></i></div><h3>Ведение канала</h3><p>AI-автопилот для контента и трендов</p></div>
+            <div class="bento-card reveal"><div class="bento-icon purple"><i class="fas fa-chart-line"></i></div><h3>Аналитика</h3><p>Predictive ROI, тепловые карты, экспорт отчётов</p></div>
+            <div class="bento-card reveal"><div class="bento-icon amber"><i class="fas fa-address-book"></i></div><h3>CRM</h3><p>Управление лидами с pipeline-воронкой</p></div>
+            <div class="bento-card reveal"><div class="bento-icon rose"><i class="fas fa-reply-all"></i></div><h3>AI Автоответчик</h3><p>Умные ответы в ЛС с AI-сценариями</p></div>
+            <div class="bento-card reveal"><div class="bento-icon blue"><i class="fas fa-wand-magic-sparkles"></i></div><h3>AI Студия</h3><p>Генерация текстов, изображений, видео</p></div>
+            <div class="bento-card reveal"><div class="bento-icon cyan"><i class="fas fa-flask"></i></div><h3>A/B Тестирование</h3><p>Сравнение стратегий с авто-применением победителя</p></div>
+            <div class="bento-card reveal"><div class="bento-icon green"><i class="fas fa-users-cog"></i></div><h3>Аккаунты</h3><p>Менеджер с прокси, сессиями и мониторингом</p></div>
+            <div class="bento-card reveal"><div class="bento-icon purple"><i class="fas fa-store"></i></div><h3>Маркетплейс</h3><p>Готовые воронки для разных ниш с прогнозом ROI</p></div>
+            <div class="bento-card reveal"><div class="bento-icon amber"><i class="fas fa-users"></i></div><h3>Команда</h3><p>Мульти-доступ для агентств с ролями</p></div>
+        </div>
+    </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="section section-white" id="how-it-works">
+    <div class="container">
+        <div class="section-header">
+            <div class="section-badge">Как работает</div>
+            <h2>От парсинга до <span style="color:var(--primary)">продаж</span></h2>
+            <p>Три простых шага для запуска AI-маркетинга в Telegram</p>
+        </div>
+        <div class="steps-grid">
+            <div class="step-card reveal">
+                <div class="step-num">01</div>
+                <h3>Спарсите аудиторию</h3>
+                <p>Укажите целевые каналы и ключевые слова. Парсинг соберёт数千 активных пользователей за минуты.</p>
+            </div>
+            <div class="step-card reveal">
+                <div class="step-num">02</div>
+                <h3>Прогрейте аккаунты</h3>
+                <p>AI-режим имитирует поведение реального пользователя 24/7. Trust-score растёт автоматически.</p>
+            </div>
+            <div class="step-card reveal">
+                <div class="step-num">03</div>
+                <h3>Запустите AI-воронку</h3>
+                <p>Нейрокомментинг + НейроДиалоги конвертируют аудиторию в клиентов без вашего участия.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- COMPARISON -->
+<section class="section section-alt" id="comparison">
+    <div class="container">
+        <div class="section-header">
+            <div class="section-badge">Сравнение</div>
+            <h2>Почему выбирают <span style="color:var(--primary)">TeleBoost</span>?</h2>
+            <p>Сравните наши возможности с альтернативами на рынке</p>
+        </div>
+        <div class="comparison-table-wrap reveal">
+            <table class="comparison-table">
+                <thead><tr><th>Функция</th><th class="hl">TeleBoost AI</th><th>TG-Giant</th><th>SMM-сервисы</th></tr></thead>
+                <tbody>
+                    <tr><td>Парсинг пользователей</td><td class="hl"><i class="fas fa-check-circle ck-y"></i></td><td><i class="fas fa-check-circle ck-y"></i></td><td><i class="fas fa-minus-circle ck-p"></i></td></tr>
+                    <tr><td>AI-комментирование (GPT-4o)</td><td class="hl"><i class="fas fa-check-circle ck-y"></i></td><td><i class="fas fa-times-circle ck-n"></i></td><td><i class="fas fa-times-circle ck-n"></i></td></tr>
+                    <tr><td>Прогрев аккаунтов (AI)</td><td class="hl"><i class="fas fa-check-circle ck-y"></i></td><td><i class="fas fa-minus-circle ck-p"></i></td><td><i class="fas fa-times-circle ck-n"></i></td></tr>
+                    <tr><td>Нейрочаттинг (ЛС)</td><td class="hl"><i class="fas fa-check-circle ck-y"></i></td><td><i class="fas fa-times-circle ck-n"></i></td><td><i class="fas fa-times-circle ck-n"></i></td></tr>
+                    <tr><td>Массовые реакции</td><td class="hl"><i class="fas fa-check-circle ck-y"></i></td><td><i class="fas fa-check-circle ck-y"></i></td><td><i class="fas fa-times-circle ck-n"></i></td></tr>
+                    <tr><td>Защита от банов (AI)</td><td class="hl"><i class="fas fa-check-circle ck-y"></i></td><td><i class="fas fa-minus-circle ck-p"></i></td><td><i class="fas fa-times-circle ck-n"></i></td></tr>
+                    <tr><td>Predictive ROI</td><td class="hl"><i class="fas fa-check-circle ck-y"></i></td><td><i class="fas fa-times-circle ck-n"></i></td><td><i class="fas fa-minus-circle ck-p"></i></td></tr>
+                    <tr><td>Веб-приложение (Mini App)</td><td class="hl"><i class="fas fa-check-circle ck-y"></i></td><td><i class="fas fa-times-circle ck-n"></i></td><td><i class="fas fa-check-circle ck-y"></i></td></tr>
+                    <tr><td>Бесплатный период</td><td class="hl"><i class="fas fa-check-circle ck-y"></i></td><td><i class="fas fa-check-circle ck-y"></i></td><td><i class="fas fa-check-circle ck-y"></i></td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+<!-- PRICING -->
+<section class="section section-white" id="pricing">
+    <div class="container">
+        <div class="section-header">
+            <div class="section-badge">Тарифы</div>
+            <h2>Выберите свой <span style="color:var(--primary)">тариф</span></h2>
+            <p>Начните бесплатно. Масштабируйте по мере роста.</p>
+        </div>
+        <div class="pricing-grid">
+            <div class="pricing-card reveal">
+                <div class="pricing-name">Starter</div>
+                <div class="pricing-price">$0<span>/мес</span></div>
+                <div class="pricing-desc">Для знакомства с платформой</div>
+                <ul class="pricing-features">
+                    <li><i class="fas fa-check"></i> 1 аккаунт</li>
+                    <li><i class="fas fa-check"></i> ~100 ИИ-действий в сутки</li>
+                    <li><i class="fas fa-check"></i> Базовый парсинг</li>
+                    <li><i class="fas fa-check"></i> GPT-4o-mini</li>
+                    <li class="off"><i class="fas fa-times"></i> Нейрочаттинг</li>
+                    <li class="off"><i class="fas fa-times"></i> Anti-Ban Shield</li>
+                </ul>
+                <div class="pricing-for">Идеально для: новичков, тестирования</div>
+                <a href="https://t.me/teleboostai_bot?start=free" class="btn btn-outline btn-full" target="_blank">Начать бесплатно</a>
+            </div>
+            <div class="pricing-card pop reveal">
+                <div class="pricing-badge">Популярный</div>
+                <div class="pricing-name">Pro</div>
+                <div class="pricing-price" id="pro-price">$49<span>/мес</span></div>
+                <div class="pricing-period">
+                    <button class="active" onclick="setPeriod(this,'pro','monthly')">Месяц</button>
+                    <button onclick="setPeriod(this,'pro','yearly')">Год <span style="color:var(--success);font-size:11px">-20%</span></button>
+                </div>
+                <div class="pricing-desc">Для активного продвижения</div>
+                <ul class="pricing-features">
+                    <li><i class="fas fa-check"></i> 10 аккаунтов</li>
+                    <li><i class="fas fa-check"></i> Безлимит действий</li>
+                    <li><i class="fas fa-check"></i> Все парсеры</li>
+                    <li><i class="fas fa-check"></i> IPv4/SOCKS5 прокси</li>
+                    <li><i class="fas fa-check"></i> GPT-4o + Cerebras</li>
+                    <li><i class="fas fa-check"></i> Нейрокомментинг</li>
+                    <li><i class="fas fa-check"></i> Нейрочаттинг</li>
+                    <li><i class="fas fa-check"></i> Anti-Ban Shield</li>
+                    <li><i class="fas fa-check"></i> Авто-воронки</li>
+                </ul>
+                <div class="pricing-for">Идеально для: маркетологов, фрилансеров</div>
+                <a href="https://t.me/teleboostai_bot?start=pro" class="btn btn-primary btn-full" target="_blank">Выбрать Pro</a>
+            </div>
+            <div class="pricing-card reveal">
+                <div class="pricing-name">Agency</div>
+                <div class="pricing-price" id="agency-price">$199<span>/мес</span></div>
+                <div class="pricing-period">
+                    <button class="active" onclick="setPeriod(this,'agency','monthly')">Месяц</button>
+                    <button onclick="setPeriod(this,'agency','yearly')">Год <span style="color:var(--success);font-size:11px">-20%</span></button>
+                </div>
+                <div class="pricing-desc">Для агентств и команд</div>
+                <ul class="pricing-features">
+                    <li><i class="fas fa-check"></i> 50+ аккаунтов</li>
+                    <li><i class="fas fa-check"></i> Безлимит всего</li>
+                    <li><i class="fas fa-check"></i> AI Orchestrator 2.0</li>
+                    <li><i class="fas fa-check"></i> Мульти-воронки</li>
+                    <li><i class="fas fa-check"></i> CRM-интеграция</li>
+                    <li><i class="fas fa-check"></i> White-label</li>
+                    <li><i class="fas fa-check"></i> Приоритетная поддержка</li>
+                    <li><i class="fas fa-check"></i> API + Кастомные промпты</li>
+                </ul>
+                <div class="pricing-for">Идеально для: агентств, команд от 3 человек</div>
+                <a href="https://t.me/teleboostai_bot?start=agency" class="btn btn-outline btn-full" target="_blank">Связаться</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- REVIEWS -->
+<section class="section section-alt" id="reviews">
+    <div class="container">
+        <div class="section-header">
+            <div class="section-badge">Отзывы</div>
+            <h2>Что говорят <span style="color:var(--primary)">клиенты</span></h2>
+        </div>
+        <div class="reviews-grid">
+            <div class="review-card reveal">
+                <div class="review-stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+                <p class="review-text">«Держу сетку из 150 аккаунтов под гемблинг. Раньше ручной прогрев выжигал бюджет — баны прилетали пачками. Перешли на TeleBoost: благодаря ротации прокси и умным тайпингам за месяц в бан ушло всего 2 аккаунта. ROI вырос на 240%.»</p>
+                <div class="review-author">
+                    <div class="review-avatar" style="background:linear-gradient(135deg,var(--primary),var(--accent))">ДС</div>
+                    <div><div class="review-name">Дмитрий С.</div><div class="review-role">Арбитраж трафика</div></div>
+                </div>
+            </div>
+            <div class="review-card reveal">
+                <div class="review-stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+                <p class="review-text">«Веду 32 проекта в Telegram-маркетинге. TeleBoost — первый, где нейрокомментинг реально неотличим от живого человека. Конверсия в ЛС выросла в 7 раз за первый месяц использования.»</p>
+                <div class="review-author">
+                    <div class="review-avatar" style="background:linear-gradient(135deg,#E11D48,#BE123C)">ЛВ</div>
+                    <div><div class="review-name">Лена В.</div><div class="review-role">Продюсер Telegram-проектов</div></div>
+                </div>
+            </div>
+            <div class="review-card reveal">
+                <div class="review-stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+                <p class="review-text">«Агентство на 8 человек, ведём 50+ клиентских аккаунтов. TeleBoost делает прогрев за нас + Anti-Ban Shield отсекает риски. За полгода — ноль банов, даже на «серых» аккаунтах.»</p>
+                <div class="review-author">
+                    <div class="review-avatar" style="background:linear-gradient(135deg,var(--accent),#5B21B6)">АМ</div>
+                    <div><div class="review-name">Алексей М.</div><div class="review-role">CEO маркетингового агентства</div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CASES -->
+<section class="section section-white" id="cases">
+    <div class="container">
+        <div class="section-header">
+            <div class="section-badge">Кейсы</div>
+            <h2>Реальные истории <span style="color:var(--primary)">успеха</span></h2>
+        </div>
+        <div class="cases-grid">
+            <div class="case-card reveal">
+                <div class="case-icon"><i class="fab fa-bitcoin"></i></div>
+                <h3>Крипто-проект</h3>
+                <p>Криптостартап увеличил базу подписчиков на 340% за 2 месяца с помощью нейрокомментинга</p>
+                <div class="case-stats">
+                    <div class="case-stat"><strong>+340%</strong><span>подписчиков</span></div>
+                    <div class="case-stat"><strong>2 мес</strong><span>срок</span></div>
+                </div>
+            </div>
+            <div class="case-card reveal">
+                <div class="case-icon"><i class="fas fa-shopping-cart"></i></div>
+                <h3>Интернет-магазин</h3>
+                <p>E-commerce бизнес привлёк 15,000+ целевых лидов через парсинг и нейрочаттинг</p>
+                <div class="case-stats">
+                    <div class="case-stat"><strong>15K+</strong><span>лидов</span></div>
+                    <div class="case-stat"><strong>30 дней</strong><span>срок</span></div>
+                </div>
+            </div>
+            <div class="case-card reveal">
+                <div class="case-icon"><i class="fas fa-users"></i></div>
+                <h3>Маркетинговое агентство</h3>
+                <p>Агентство управляет 50+ клиентскими аккаунтами из одной панели без банов</p>
+                <div class="case-stats">
+                    <div class="case-stat"><strong>50+</strong><span>аккаунтов</span></div>
+                    <div class="case-stat"><strong>0</strong><span>банов</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FAQ -->
+<section class="section section-alt" id="faq">
+    <div class="container">
+        <div class="section-header">
+            <div class="section-badge">FAQ</div>
+            <h2>Частые <span style="color:var(--primary)">вопросы</span></h2>
+        </div>
+        <div class="faq-list">
+            <div class="faq-item active">
+                <button class="faq-q" onclick="toggleFaq(this)"><span>Что такое TeleBoost AI и зачем он нужен?</span><div class="faq-icon">+</div></button>
+                <div class="faq-a"><div class="faq-a-inner">TeleBoost AI — это профессиональная AI-платформа для автоматизации продвижения в Telegram. Она объединяет парсинг аудитории, нейрокомментинг, прогрев аккаунтов, массовые реакции и AI-воронки продаж в единой панели управления. Заменяет десятки разрозненных инструментов.</div></div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-q" onclick="toggleFaq(this)"><span>Как работает защита от банов?</span><div class="faq-icon">+</div></button>
+                <div class="faq-a"><div class="faq-a-inner">Anti-Ban Shield использует эмуляцию поведения реального пользователя: рандомизацию задержек по распределению Гауссу, уникальные цифровые отпечатки аккаунтов, динамическую ротацию прокси и предиктивный анализ рисков. Вероятность бана менее 0.1%.</div></div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-q" onclick="toggleFaq(this)"><span>Какие форматы аккаунтов поддерживаются?</span><div class="faq-icon">+</div></button>
+                <div class="faq-a"><div class="faq-a-inner">Платформа поддерживает форматы JSON+SESSION и TDATA. Также доступен встроенный конвертер для перевода аккаунтов между форматами без рисков.</div></div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-q" onclick="toggleFaq(this)"><span>Есть ли бесплатный период?</span><div class="faq-icon">+</div></button>
+                <div class="faq-a"><div class="faq-a-inner">Да, тариф Starter полностью бесплатный и включает 1 аккаунт, базовый парсинг и до 100 ИИ-действий в сутки. Этого достаточно для знакомства со всеми возможностями платформы.</div></div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-q" onclick="toggleFaq(this)"><span>Какая поддержка доступна?</span><div class="faq-icon">+</div></button>
+                <div class="faq-a"><div class="faq-a-inner">Мы предоставляем поддержку 24/7 через Telegram. На тарифах Pro и Agency — приоритетная поддержка с ответом в течение 15 минут. Также доступна обучающая база знаний и видеоуроки.</div></div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-q" onclick="toggleFaq(this)"><span>Как начать работу?</span><div class="faq-icon">+</div></button>
+                <div class="faq-a"><div class="faq-a-inner">Нажмите «Начать бесплатно», перейдите в Telegram-бот, следуйте инструкциям по регистрации. Процесс занимает 30 секунд. Далее добавьте аккаунты и выберите модуль для работы.</div></div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-q" onclick="toggleFaq(this)"><span>Безопасно ли использовать платформу?</span><div class="faq-icon">+</div></button>
+                <div class="faq-a"><div class="faq-a-inner">Да. Мы не храним пароли от аккаунтов. Все данные шифруются. Anti-Ban Shield минимизирует риски блокировки. Платформа работает через официальные API Telegram.</div></div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-q" onclick="toggleFaq(this)"><span>Можно ли использовать несколько аккаунтов?</span><div class="faq-icon">+</div></button>
+                <div class="faq-a"><div class="faq-a-inner">Да. На тарифе Pro — до 10 аккаунтов, на Agency — до 50+. Каждый аккаунт управляется отдельно с привязкой своего прокси и настроек.</div></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+    <div class="container">
+        <h2>Готовы автоматизировать Telegram-маркетинг?</h2>
+        <p>30 секунд на регистрацию. Бесплатный тариф без ограничений по времени.</p>
+        <a href="https://t.me/teleboostai_bot?start=landing" class="btn btn-lg" target="_blank"><i class="fas fa-rocket"></i> Начать бесплатно</a>
+    </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+    <div class="container">
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <a href="#" class="logo">Tele<span>Boost</span></a>
+                <p>Профессиональная AI-платформа для автоматизации продвижения в Telegram.</p>
+                <div style="display:flex;gap:12px;margin-top:16px">
+                    <a href="https://t.me/teleboostai" target="_blank" style="color:var(--text-muted);font-size:18px"><i class="fab fa-telegram-plane"></i></a>
+                    <a href="#" style="color:var(--text-muted);font-size:18px"><i class="fab fa-youtube"></i></a>
+                </div>
+            </div>
+            <div class="footer-col">
+                <h4>Продукт</h4>
+                <a href="#features">Все функции</a>
+                <a href="#pricing">Тарифы</a>
+                <a href="#reviews">Отзывы</a>
+                <a href="#faq">FAQ</a>
+                <a href="training.html">Обучение</a>
+                <a href="changelog.html">История релизов</a>
+            </div>
+            <div class="footer-col">
+                <h4>Ресурсы</h4>
+                <a href="blog.html">Блог</a>
+                <a href="comparison.html">Сравнение</a>
+                <a href="about.html">О нас</a>
+                <a href="#">Документация API</a>
+                <a href="#">Статус системы</a>
+            </div>
+            <div class="footer-col">
+                <h4>Правовая</h4>
+                <a href="#">Политика конфиденциальности</a>
+                <a href="#">Пользовательское соглашение</a>
+                <a href="#">Публичная оферта</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024–2026 TeleBoost AI. Все права защищены.</p>
+        </div>
+    </div>
+</footer>
+
+<script>
+// Navbar scroll
+const navbar = document.getElementById('navbar');
+const navCta = document.getElementById('navCta');
+window.addEventListener('scroll', () => {
+    const s = window.scrollY > 50;
+    navbar.classList.toggle('scrolled', s);
+    navCta.style.display = s ? 'inline-flex' : 'none';
+});
+
+// Mobile menu
+document.getElementById('mobileToggle').addEventListener('click', function() {
+    document.getElementById('navLinks').classList.toggle('open');
+});
+
+// Close mobile menu on link click
+document.querySelectorAll('.nav-links a').forEach(a => {
+    a.addEventListener('click', () => document.getElementById('navLinks').classList.remove('open'));
+});
+
+// FAQ toggle
+function toggleFaq(btn) {
+    const item = btn.parentElement;
+    const wasActive = item.classList.contains('active');
+    document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('active'));
+    if (!wasActive) item.classList.add('active');
+}
+
+// Pricing toggle
+function setPeriod(btn, plan, period) {
+    btn.parentElement.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const el = document.getElementById(plan + '-price');
+    if (plan === 'pro') {
+        el.innerHTML = period === 'yearly' ? '$470<span>/год</span>' : '$49<span>/мес</span>';
+    } else {
+        el.innerHTML = period === 'yearly' ? '$1,910<span>/год</span>' : '$199<span>/мес</span>';
+    }
+}
+
+// Live counter animation
+let counterVal = 12847;
+function animateCounter() {
+    counterVal += Math.floor(Math.random() * 7) + 1;
+    const el = document.getElementById('live-counter');
+    if (el) el.textContent = counterVal.toLocaleString();
+}
+setInterval(animateCounter, 3000);
+
+// Scroll reveal
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
+}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+// Live counter animation
+let count = 0;
+function animateCount() {
+    count += Math.floor(Math.random() * 5) + 1;
+    const el = document.getElementById('live-count');
+    if (el) el.textContent = count.toLocaleString();
+}
+setInterval(animateCount, 2000);
+</script>
+
+</body>
+</html>

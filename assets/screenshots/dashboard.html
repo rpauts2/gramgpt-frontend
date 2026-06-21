@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TeleBoost — Dashboard Screenshot</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Inter',sans-serif;background:#05050A;color:#EEF2F8;padding:20px;min-height:100vh}
+        .phone{width:375px;margin:0 auto;background:#0A0A1A;border-radius:32px;border:2px solid rgba(0,229,255,0.1);overflow:hidden;box-shadow:0 0 60px rgba(0,229,255,0.08)}
+        .phone-header{padding:16px 20px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(0,229,255,0.06)}
+        .phone-header h2{font-size:18px;font-weight:800}.phone-header h2 span{color:#00E5FF}
+        .status-bar{padding:12px 20px;display:flex;justify-content:space-between;align-items:center;background:rgba(12,15,35,0.55);border:1px solid rgba(0,229,255,0.06);margin:12px 16px;border-radius:10px}
+        .live-dot{width:6px;height:6px;border-radius:50%;background:#34D399;display:inline-block;animation:pulse 2s infinite}
+        @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+        .stat-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;padding:0 16px;margin-bottom:12px}
+        .stat-card{padding:14px;border-radius:10px;background:rgba(12,15,35,0.55);border:1px solid rgba(0,229,255,0.06);text-align:center}
+        .stat-val{font-size:22px;font-weight:900;margin-bottom:2px}
+        .stat-label{font-size:9px;color:#8892A8;text-transform:uppercase;letter-spacing:.5px}
+        .card{margin:0 16px 12px;padding:16px;border-radius:12px;background:rgba(12,15,35,0.55);border:1px solid rgba(0,229,255,0.06)}
+        .card h4{font-size:13px;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+        .chart{display:flex;align-items:flex-end;gap:4px;height:80px}
+        .bar{flex:1;border-radius:3px 3px 0 0;transition:height .6s}
+        .kpi-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+        .kpi{padding:12px;border-radius:8px;background:rgba(12,15,35,0.4);border:1px solid rgba(0,229,255,0.04)}
+        .kpi-val{font-size:20px;font-weight:900}.kpi-label{font-size:9px;color:#8892A8;text-transform:uppercase}
+        .nav-bar{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:375px;display:flex;justify-content:space-around;padding:12px 0;background:rgba(10,10,26,0.95);border-top:1px solid rgba(0,229,255,0.06)}
+        .nav-item{color:#5A6480;font-size:18px;text-decoration:none;padding:8px}.nav-item.active{color:#00E5FF}
+    </style>
+</head>
+<body>
+<div class="phone">
+    <div class="phone-header"><h2>Tele<span>Boost</span></h2><div style="display:flex;gap:12px;align-items:center"><i class="fas fa-bell" style="color:#5A6480;font-size:16px"></i><div class="live-dot"></div></div></div>
+    <div class="status-bar"><div style="display:flex;align-items:center;gap:8px"><div class="live-dot"></div><span style="font-size:12px;color:#34D399;font-weight:600">Все системы активны</span></div><span style="font-size:10px;padding:4px 10px;border-radius:6px;background:rgba(52,211,153,0.08);color:#34D399"><i class="fas fa-shield-halved"></i> Shield: OK</span></div>
+    <div class="stat-row">
+        <div class="stat-card"><div class="stat-val" style="color:#00E5FF">1,482</div><div class="stat-label">Аккаунтов</div></div>
+        <div class="stat-card"><div class="stat-val">8,304</div><div class="stat-label">Постов (24ч)</div></div>
+        <div class="stat-card"><div class="stat-val" style="color:#34D399">0.02%</div><div class="stat-label">Риск бана</div></div>
+    </div>
+    <div class="card">
+        <h4><i class="fas fa-chart-line" style="color:#00E5FF"></i> Активность (7 дней)</h4>
+        <div class="chart">
+            <div class="bar" style="height:40%;background:#00E5FF;opacity:.4"></div>
+            <div class="bar" style="height:65%;background:#B44AFF;opacity:.4"></div>
+            <div class="bar" style="height:45%;background:#00E5FF;opacity:.5"></div>
+            <div class="bar" style="height:80%;background:#B44AFF;opacity:.5"></div>
+            <div class="bar" style="height:55%;background:#00E5FF;opacity:.6"></div>
+            <div class="bar" style="height:90%;background:#B44AFF;opacity:.6"></div>
+            <div class="bar" style="height:70%;background:#00E5FF;opacity:.7"></div>
+            <div class="bar" style="height:95%;background:#00E5FF;opacity:.8"></div>
+            <div class="bar" style="height:60%;background:#B44AFF;opacity:.7"></div>
+            <div class="bar" style="height:75%;background:#00E5FF;opacity:.8"></div>
+            <div class="bar" style="height:85%;background:#B44AFF;opacity:.8"></div>
+            <div class="bar" style="height:50%;background:#00E5FF;opacity:.9"></div>
+        </div>
+    </div>
+    <div class="card">
+        <h4><i class="fas fa-bolt" style="color:#F59E0B"></i> Live Activity</h4>
+        <div style="font-size:12px;color:#8892A8;padding:8px 0;border-bottom:1px solid rgba(0,229,255,0.04)"><span style="color:#34D399">+</span> @crypto_fan подписан на канал</div>
+        <div style="font-size:12px;color:#8892A8;padding:8px 0;border-bottom:1px solid rgba(0,229,255,0.04)"><span style="color:#00E5FF">💬</span> AI-комментарий в @trading_chat</div>
+        <div style="font-size:12px;color:#8892A8;padding:8px 0"><span style="color:#B44AFF">❤️</span> Реакция на пост в @crypto_news</div>
+    </div>
+    <div class="card">
+        <h4><i class="fas fa-shield-halved" style="color:#34D399"></i> Anti-Ban Shield</h4>
+        <div class="kpi-grid">
+            <div class="kpi"><div class="kpi-val" style="color:#34D399">2.1%</div><div class="kpi-label">Risk Score</div></div>
+            <div class="kpi"><div class="kpi-val" style="color:#00E5FF">99.2%</div><div class="kpi-label">Human-Like</div></div>
+            <div class="kpi"><div class="kpi-val" style="color:#34D399">0</div><div class="kpi-label">Банов</div></div>
+            <div class="kpi"><div class="kpi-val" style="color:#00E5FF">127</div><div class="kpi-label">Дней без бана</div></div>
+        </div>
+    </div>
+    <div style="height:60px"></div>
+</div>
+<div class="nav-bar">
+    <a href="#" class="nav-item active"><i class="fas fa-home"></i></a>
+    <a href="#" class="nav-item"><i class="fas fa-tasks"></i></a>
+    <a href="#" class="nav-item"><i class="fas fa-chart-pie"></i></a>
+    <a href="#" class="nav-item"><i class="fas fa-cog"></i></a>
+</div>
+</body>
+</html>

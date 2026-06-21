@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="color-scheme" content="light dark">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>GRAMGPT — Авторегистрация</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="header animate-in">
+        <h2><i class="fas fa-user-plus" style="color: var(--primary)"></i> Авторегистрация</h2>
+        <a href="index.html" style="color: var(--text-secondary); text-decoration: none; font-size: 14px;"><i class="fas fa-arrow-left"></i> Назад</a>
+    </div>
+
+    <div class="stat-row animate-in" style="animation-delay: 0.05s">
+        <div style="display: flex; justify-content: space-between;">
+            <div class="stat-item"><h4>Создано</h4><div style="color: var(--primary); font-size: 22px; font-weight: 800;" id="autoreg-created">0</div></div>
+            <div class="stat-item text-center"><h4>Активных</h4><div style="color: var(--success); font-size: 22px; font-weight: 800;" id="autoreg-active">0</div></div>
+            <div class="stat-item" style="text-align: right"><h4>Ошибок</h4><div style="color: var(--danger); font-size: 22px; font-weight: 800;" id="autoreg-errors">0</div></div>
+        </div>
+    </div>
+
+    <div class="card animate-in" style="animation-delay: 0.1s">
+        <h4 style="margin-bottom: 12px;">Настройки регистрации</h4>
+        <div class="setting-item">
+            <span style="font-size: 13px;">Количество аккаунтов</span>
+            <select id="autoreg-count"><option>1</option><option selected>5</option><option>10</option><option>25</option><option>50</option></select>
+        </div>
+        <div class="setting-item">
+            <span style="font-size: 13px;">Имя аккаунта</span>
+            <input type="text" placeholder="Случайное или введите шаблон" class="input-field" style="margin:0">
+        </div>
+        <div class="setting-item">
+            <span style="font-size: 13px;">Формат номеров</span>
+            <select><option selected>Покупные SIM</option><option>Виртуальные номера</option><option>Свои номера</option></select>
+        </div>
+        <div class="setting-item">
+            <span style="font-size: 13px;">Прокси для регистрации</span>
+            <select><option>IPv4</option><option selected>SOCKS5</option><option>MTProto Proxy</option></select>
+        </div>
+        <div class="setting-item">
+            <span style="font-size: 13px;">Прогрев после регистрации</span>
+            <div class="toggle-on" onclick="this.classList.toggle('toggle-off');this.classList.toggle('toggle-on')"></div>
+        </div>
+    </div>
+
+    <div class="card animate-in" style="animation-delay: 0.15s">
+        <h4 style="margin-bottom: 12px;">Шаблон профиля</h4>
+        <div class="setting-item">
+            <span style="font-size: 13px;">Фото профиля</span>
+            <select><option selected>Случайное</option><option>Из папки</option><option>Без фото</option></select>
+        </div>
+        <div class="setting-item">
+            <span style="font-size: 13px;">Bio</span>
+            <input type="text" placeholder="Опционально" class="input-field" style="margin:0">
+        </div>
+        <div class="setting-item">
+            <span style="font-size: 13px;">Username</span>
+            <select><option selected>Случайный</option><option>По шаблону</option><option>Без username</option></select>
+        </div>
+    </div>
+
+    <button class="btn animate-in" style="animation-delay: 0.2s" onclick="startAutoreg()" id="autoreg-start-btn">
+        <i class="fas fa-user-plus"></i> Начать регистрацию
+    </button>
+    <button class="btn animate-in" style="display:none;background:var(--danger);color:#fff;width:100%;margin-top:8px;" id="autoreg-stop-btn" onclick="stopAutoreg()">
+        <i class="fas fa-stop"></i> Остановить
+    </button>
+
+    <div class="nav-bar animate-in" style="animation-delay: 0.25s">
+        <a href="index.html" class="nav-item"><i class="fas fa-home"></i></a>
+        <a href="campaigns.html" class="nav-item"><i class="fas fa-tasks"></i></a>
+        <a href="channel.html" class="nav-item"><i class="fas fa-tv"></i></a>
+        <a href="dashboard.html" class="nav-item"><i class="fas fa-chart-pie"></i></a>
+        <a href="settings.html" class="nav-item"><i class="fas fa-cog"></i></a>
+    </div>
+
+    <script src="main.js"></script>
+    <script>
+        async function startAutoreg() {
+            haptic('medium');
+            toast('info', 'Регистрация', 'Создание аккаунтов...');
+            try {
+                await api.post('/autoreg/start', { count: document.getElementById('autoreg-count').value });
+                document.getElementById('autoreg-start-btn').style.display = 'none';
+                document.getElementById('autoreg-stop-btn').style.display = 'flex';
+                toast('success', 'Запущено', 'Авторегистрация началась');
+            } catch (e) { toast('error', 'Ошибка', e.message); }
+        }
+        async function stopAutoreg() {
+            try { await api.post('/autoreg/stop'); } catch (e) {}
+            document.getElementById('autoreg-start-btn').style.display = 'flex';
+            document.getElementById('autoreg-stop-btn').style.display = 'none';
+            toast('info', 'Остановлено', 'Авторегистрация остановлена');
+        }
+    </script>
+</body>
+</html>

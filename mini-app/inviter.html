@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="color-scheme" content="light dark">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>GRAMGPT — Инвайтер</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="header animate-in">
+        <h2><i class="fas fa-user-plus" style="color: var(--primary)"></i> Инвайтер</h2>
+        <a href="index.html" class="text-secondary" style="text-decoration: none; font-size: 14px;">
+            <i class="fas fa-arrow-left"></i> Назад
+        </a>
+    </div>
+
+    <!-- Stats -->
+    <div class="stat-row animate-in" style="animation-delay: 0.05s">
+        <div class="stat-flex">
+            <div class="stat-item"><h4>Кампаний</h4><div id="inv-count" style="color: var(--primary)">0</div></div>
+            <div class="stat-item text-center"><h4>Приглашено</h4><div id="inv-invited" style="color: var(--success)">0</div></div>
+            <div class="stat-item text-right"><h4>Активных</h4><div id="inv-active">0</div></div>
+        </div>
+    </div>
+
+    <!-- Start Campaign -->
+    <div class="card animate-in" style="animation-delay: 0.1s" id="campaign-card">
+        <h4 class="mb-12"><i class="fas fa-play" style="color: var(--primary)"></i> Новая кампания</h4>
+        <div class="form-group">
+            <label class="form-label">Целевой канал</label>
+            <input type="text" class="form-input" id="target-channel" placeholder="@channel_name">
+        </div>
+        <div class="form-group">
+            <label class="form-label">Канал-источник (опционально)</label>
+            <input type="text" class="form-input" id="source-channel" placeholder="@source для парсинга участников">
+        </div>
+        <div class="flex gap-8">
+            <div class="flex-1"><label class="form-label">На аккаунт</label><input type="number" class="form-input" id="max-per-account" value="50"></div>
+            <div class="flex-1"><label class="form-label">Лимит участников</label><input type="number" class="form-input" id="participant-limit" value="500"></div>
+        </div>
+        <div class="flex gap-8 mt-8">
+            <div class="flex-1"><label class="form-label">Задержка от (сек)</label><input type="number" class="form-input" id="delay-min" value="3"></div>
+            <div class="flex-1"><label class="form-label">Задержка до (сек)</label><input type="number" class="form-input" id="delay-max" value="10"></div>
+        </div>
+        <button class="btn mt-12" onclick="startCampaign()"><i class="fas fa-play"></i> Запустить кампанию</button>
+    </div>
+
+    <!-- Jobs List -->
+    <div class="card animate-in" style="animation-delay: 0.15s">
+        <div class="card-header"><h4>Кампании</h4><span class="status-badge badge-blue" id="jobs-count">0</span></div>
+        <div id="jobs-list"><div class="empty-state"><i class="fas fa-user-plus"></i><h4>Нет кампаний</h4><p>Запустите инвайт-кампанию</p></div></div>
+    </div>
+
+    <div class="nav-bar animate-in" style="animation-delay: 0.25s">
+        <a href="index.html" class="nav-item"><i class="fas fa-home"></i></a>
+        <a href="campaigns.html" class="nav-item"><i class="fas fa-tasks"></i></a>
+        <a href="channel.html" class="nav-item"><i class="fas fa-tv"></i></a>
+        <a href="dashboard.html" class="nav-item"><i class="fas fa-chart-pie"></i></a>
+        <a href="settings.html" class="nav-item"><i class="fas fa-cog"></i></a>
+    </div>
+
+    <script src="main.js"></script>
+    <script>
+        async function startCampaign() {
+            const target = document.getElementById('target-channel').value.trim();
+            if (!target) { toast('warning', 'Укажите канал', 'Введите целевой канал'); return; }
+            haptic('medium');
+            try {
+                const r = await api.post('/inviter/start', {
+                    target_channel: target,
+                    source_channel: document.getElementById('source-channel').value.trim() || null,
+                    max_per_account: parseInt(document.getElementById('max-per-account').value) || 50,
+                    participant_limit: parseInt(document.getElementById('participant-limit').value) || 500,
+                    delay_min: parseInt(document.getElementById('delay-min').value) || 3,
+                    delay_max: parseInt(document.getElementById('delay-max').value) || 10,
+                });
+                if (r && r.job_id) {
+                    toast('success', 'Кампания запущена', 'ID: ' + r.job_id);
+                    document.getElementById('target-channel').value = '';
+                    await loadJobs();
+                }
+            } catch (e) { toast('error', 'Ошибка', e.message); }
+        }
+
+        async function pauseJob(id) {
+            try {
+                await api.post('/inviter/' + id + '/pause');
+                toast('info', 'Пауза', 'Кампания приостановлена');
+                await loadJobs();
+            } catch (e) { toast('error', 'Ошибка', e.message); }
+        }
+
+        async function stopJob(id) {
+            try {
+                await api.post('/inviter/' + id + '/stop');
+                toast('info', 'Стоп', 'Кампания остановлена');
+                await loadJobs();
+            } catch (e) { toast('error', 'Ошибка', e.message); }
+        }
+
+        async function loadJobs() {
+            try {
+                const data = await api.get('/inviter/list');
+                const jobs = data && data.data ? data.data : (Array.isArray(data) ? data : []);
+                document.getElementById('jobs-count').textContent = jobs.length;
+                document.getElementById('inv-count').textContent = jobs.length;
+                let totalInvited = 0, active = 0;
+                const list = document.getElementById('jobs-list');
+                if (jobs.length === 0) {
+                    list.innerHTML = '<div class="empty-state"><i class="fas fa-user-plus"></i><h4>Нет кампаний</h4><p>Запустите инвайт-кампанию</p></div>';
+                    return;
+                }
+                list.innerHTML = jobs.map(function(j) {
+                    var s = j.status || 'unknown';
+                    var badgeClass = s === 'running' ? 'badge-green' : s === 'paused' ? 'badge-yellow' : 'badge-red';
+                    if (s === 'running') active++;
+                    var inv = (j.stats && j.stats.invited) || 0;
+                    totalInvited += inv;
+                    var actions = '';
+                    if (s === 'running') actions = '<button class="btn-sm" onclick="pauseJob(' + j.id + ')" style="background:rgba(243,156,18,0.1);color:var(--warning);border:1px solid rgba(243,156,18,0.3);"><i class="fas fa-pause"></i></button> <button class="btn-sm" onclick="stopJob(' + j.id + ')" style="background:rgba(239,68,68,0.1);color:var(--danger);border:1px solid rgba(239,68,68,0.3);"><i class="fas fa-stop"></i></button>';
+                    else if (s === 'paused') actions = '<button class="btn-sm" onclick="resumeJob(' + j.id + ')" style="background:rgba(46,204,113,0.1);color:var(--success);border:1px solid rgba(46,204,113,0.3);"><i class="fas fa-play"></i></button> <button class="btn-sm" onclick="stopJob(' + j.id + ')" style="background:rgba(239,68,68,0.1);color:var(--danger);border:1px solid rgba(239,68,68,0.3);"><i class="fas fa-stop"></i></button>';
+                    return '<div class="job-item"><div class="flex-1"><div style="font-size:13px;font-weight:600;">' + escapeHtml(j.config.target_channel || '—') + '</div><div style="font-size:10px;color:var(--text-secondary);">#' + j.id + ' — ' + escapeHtml(j.config.source_channel || 'no source') + ' — приглашено: ' + inv + '</div></div><div class="flex gap-4" style="align-items:center;"><span class="status-badge ' + badgeClass + '">' + s + '</span>' + actions + '</div></div>';
+                }).join('');
+                document.getElementById('inv-invited').textContent = totalInvited;
+                document.getElementById('inv-active').textContent = active;
+            } catch (e) { console.warn('Inviter load error:', e); }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadJobs);
+        function escapeHtml(str) { var d = document.createElement('div'); d.textContent = str; return d.innerHTML; }
+    </script>
+</body>
+</html>

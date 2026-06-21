@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Обучение — TeleBoost AI</title>
+    <meta name="description" content="Пошаговые гайды по использованию TeleBoost AI. Как начать работу с парсингом, нейрокомментингом, прогревом аккаунтов.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2300B4D8'/%3E%3Ctext x='16' y='22' text-anchor='middle' fill='white' font-size='18' font-weight='bold' font-family='system-ui'%3ET%3C/text%3E%3C/svg%3E">
+    <style>
+        :root{--primary:#00B4D8;--primary-dark:#0096B4;--primary-light:#E0F7FA;--primary-50:rgba(0,180,216,0.08);--accent:#7C3AED;--accent-light:#EDE9FE;--success:#10B981;--success-light:#D1FAE5;--warning:#F59E0B;--danger:#EF4444;--bg:#FAFBFC;--bg-white:#FFFFFF;--bg-card:#FFFFFF;--bg-section:#F1F5F9;--border:#E2E8F0;--text:#0F172A;--text-secondary:#475569;--text-muted:#94A3B8;--radius:16px;--radius-lg:24px;--shadow:0 4px 16px rgba(0,0,0,0.06);--shadow-lg:0 12px 40px rgba(0,0,0,0.08)}
+        *{margin:0;padding:0;box-sizing:border-box}
+        html{scroll-behavior:smooth}
+        body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;-webkit-font-smoothing:antialiased}
+        .container{max-width:900px;margin:0 auto;padding:0 24px}
+        .navbar{position:fixed;top:0;left:0;right:0;z-index:1000;padding:16px 0;background:rgba(250,251,252,0.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+        .nav-container{display:flex;align-items:center;justify-content:space-between;max-width:1200px;margin:0 auto;padding:0 24px}
+        .logo{font-size:22px;font-weight:800;color:var(--text);text-decoration:none;letter-spacing:-.5px}
+        .logo span{color:var(--primary)}
+        .nav-links{display:flex;gap:24px;align-items:center}
+        .nav-links a{color:var(--text-secondary);text-decoration:none;font-size:14px;font-weight:500;transition:color .2s}
+        .nav-links a:hover{color:var(--primary)}
+        .btn{display:inline-flex;align-items:center;gap:8px;padding:10px 24px;border-radius:10px;font-weight:600;font-size:14px;text-decoration:none;transition:all .25s;cursor:pointer;border:none}
+        .btn-primary{background:var(--primary);color:#fff;box-shadow:0 2px 12px rgba(0,180,216,0.3)}
+        .btn-primary:hover{background:var(--primary-dark);transform:translateY(-1px)}
+        .btn-sm{padding:8px 18px;font-size:13px}
+        .page-header{padding:120px 0 60px;text-align:center}
+        .page-header h1{font-size:clamp(32px,4vw,48px);font-weight:900;letter-spacing:-.03em;margin-bottom:16px}
+        .page-header p{font-size:18px;color:var(--text-secondary);max-width:600px;margin:0 auto}
+        .guide-list{padding:0 0 80px}
+        .guide-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:28px;margin-bottom:16px;transition:all .3s}
+        .guide-card:hover{box-shadow:var(--shadow-lg);transform:translateY(-2px)}
+        .guide-num{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:8px;background:var(--primary);color:#fff;font-size:14px;font-weight:800;margin-right:12px}
+        .guide-card h3{display:inline;font-size:18px;font-weight:700}
+        .guide-card>p{font-size:14px;color:var(--text-secondary);margin:12px 0 16px;line-height:1.7}
+        .guide-steps{list-style:none;counter-reset:step}
+        .guide-steps li{counter-increment:step;padding:8px 0 8px 36px;position:relative;font-size:14px;color:var(--text-secondary);border-bottom:1px solid var(--border-light)}
+        .guide-steps li:last-child{border-bottom:none}
+        .guide-steps li::before{content:counter(step);position:absolute;left:0;top:8px;width:24px;height:24px;border-radius:6px;background:var(--primary-50);color:var(--primary);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center}
+        .tag{display:inline-block;padding:3px 10px;border-radius:100px;font-size:11px;font-weight:600;margin-right:6px}
+        .tag-cyan{background:var(--primary-light);color:var(--primary)}
+        .tag-purple{background:var(--accent-light);color:var(--accent)}
+        .tag-green{background:var(--success-light);color:var(--success)}
+        .cta-box{background:linear-gradient(135deg,var(--primary),var(--accent));border-radius:var(--radius-lg);padding:48px;text-align:center;color:#fff;margin-bottom:80px}
+        .cta-box h2{font-size:28px;font-weight:800;margin-bottom:12px}
+        .cta-box p{font-size:16px;opacity:.9;margin-bottom:24px}
+        .cta-box .btn{background:#fff;color:var(--primary);font-weight:700}
+        .footer{background:var(--bg-white);border-top:1px solid var(--border);padding:32px 0;text-align:center;font-size:13px;color:var(--text-muted)}
+        @media(max-width:768px){.nav-links{display:none}.guide-card{padding:20px}}
+    </style>
+</head>
+<body>
+<nav class="navbar">
+    <div class="nav-container">
+        <a href="index.html" class="logo">Tele<span>Boost</span></a>
+        <div class="nav-links">
+            <a href="index.html">Главная</a>
+            <a href="training.html">Обучение</a>
+            <a href="changelog.html">Релизы</a>
+            <a href="about.html">О нас</a>
+            <a href="https://t.me/teleboostai_bot" target="_blank" class="btn btn-primary btn-sm">Начать</a>
+        </div>
+    </div>
+</nav>
+
+<div class="page-header">
+    <div class="container">
+        <div style="display:inline-block;padding:4px 14px;border-radius:100px;background:var(--primary-50);color:var(--primary);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:16px">Обучение</div>
+        <h1>Пошаговые <span style="color:var(--primary)">гайды</span></h1>
+        <p>Изучите каждый модуль TeleBoost AI за 5 минут. От регистрации до первых продаж.</p>
+    </div>
+</div>
+
+<div class="container guide-list">
+    <div class="guide-card">
+        <span class="guide-num">1</span>
+        <h3>Быстрый старт</h3>
+        <p>Регистрация, настройка аккаунта и запуск первого модуля за 5 минут.</p>
+        <span class="tag tag-cyan">Для новичков</span>
+        <span class="tag tag-green">5 мин</span>
+        <ol class="guide-steps" style="margin-top:16px">
+            <li>Перейдите в Telegram-бот <a href="https://t.me/teleboostai_bot" target="_blank" style="color:var(--primary)">@teleboostai_bot</a> и нажмите /start</li>
+            <li>Следуйте инструкциям по регистрации — процесс занимает 30 секунд</li>
+            <li>Откройте Mini App нажатием кнопки «Открыть панель»</li>
+            <li>Добавьте первый Telegram-аккаунт через менеджер аккаунтов</li>
+            <li>Запустите базовый парсинг для тестирования</li>
+        </ol>
+    </div>
+
+    <div class="guide-card">
+        <span class="guide-num">2</span>
+        <h3>Парсинг аудитории</h3>
+        <p>Сбор целевой аудитории из каналов и групп с поведенческим анализом.</p>
+        <span class="tag tag-cyan">Парсинг</span>
+        <span class="tag tag-purple">AI</span>
+        <ol class="guide-steps" style="margin-top:16px">
+            <li>Откройте модуль «Парсинг» на главной странице</li>
+            <li>Выберите тип: Пользователи / Каналы / Сообщения / По ключам</li>
+            <li>Введите ссылку на целевой канал или группу</li>
+            <li>Укажите ключевые слова для фильтрации (опционально)</li>
+            <li>Настройте лимит (рекомендуется 1000 для начала) и период</li>
+            <li>Нажмите «Запустить парсинг» и дождитесь результатов</li>
+            <li>Скачайте результаты в CSV или JSON для дальнейшего использования</li>
+        </ol>
+    </div>
+
+    <div class="guide-card">
+        <span class="guide-num">3</span>
+        <h3>Прогрев аккаунтов</h3>
+        <p>Повышение trust-score аккаунтов перед активными действиями.</p>
+        <span class="tag tag-green">Безопасность</span>
+        <span class="tag tag-cyan">Anti-Ban</span>
+        <ol class="guide-steps" style="margin-top:16px">
+            <li>Добавьте аккаунты через менеджер аккаунтов</li>
+            <li>Перейдите в модуль «Прогрев»</li>
+            <li>Выберите AI-режим (рекомендуется «Средний»)</li>
+            <li>Установите цель прогрева: 80% для обычной работы</li>
+            <li>Включите «Авто-пауза при риске» для безопасности</li>
+            <li>Нажмите «Запустить прогрев» — AI работает 24/7</li>
+            <li>Дождитесь достижения trust-score 80%+ (обычно 3-7 дней)</li>
+        </ol>
+    </div>
+
+    <div class="guide-card">
+        <span class="guide-num">4</span>
+        <h3>Нейрокомментинг</h3>
+        <p>AI-генерация комментариев под постами для привлечения аудитории.</p>
+        <span class="tag tag-purple">GPT-4o</span>
+        <span class="tag tag-cyan">Cerebras</span>
+        <ol class="guide-steps" style="margin-top:16px">
+            <li>Убедитесь что аккаунты прогреты (trust-score 80%+)</li>
+            <li>Откройте модуль «Нейрокомментинг»</li>
+            <li>Введите целевые каналы через запятую</li>
+            <li>Выберите тон: Экспертный / Дружелюбный / Провокационный</li>
+            <li>Выберите модель: GPT-4o (качество) или GPT-4o-mini (скорость)</li>
+            <li>Настройте частоту: каждый пост / каждый 2-й / каждый 5-й</li>
+            <li>Нажмите «Запустить» — AI генерирует и публикует комментарии</li>
+            <li>Мониторьте лог активности в реальном времени</li>
+        </ol>
+    </div>
+
+    <div class="guide-card">
+        <span class="guide-num">5</span>
+        <h3>Нейрочаттинг</h3>
+        <p>AI-ответы в группах и чатах для конвертации лидов.</p>
+        <span class="tag tag-purple">AI-воронки</span>
+        <span class="tag tag-green">500+ сценариев</span>
+        <ol class="guide-steps" style="margin-top:16px">
+            <li>Добавьте целевые группы в модуле «Нейрочаттинг»</li>
+            <li>Выберите стратегию: Эксперт / Networking / Промо / Вопросы</li>
+            <li>Включите «Возражения» для отработки 500+ сценариев</li>
+            <li>Включите «Urgency + Social Proof» для повышения конверсии</li>
+            <li>Настройте лимит сообщений в час (рекомендуется 10)</li>
+            <li>Установите задержку между сообщениями (2-5 мин)</li>
+            <li>Запустите и мониторьте активные диалоги</li>
+        </ol>
+    </div>
+
+    <div class="guide-card">
+        <span class="guide-num">6</span>
+        <h3>НейроДиалоги (AI-воронки)</h3>
+        <p>Автоматические ЛС с AI-ведением воронки продаж.</p>
+        <span class="tag tag-purple">Автоматизация</span>
+        <span class="tag tag-cyan">CRM</span>
+        <ol class="guide-steps" style="margin-top:16px">
+            <li>Настройте воронку: Первый контакт → Прогрев → Предложение → Закрытие</li>
+            <li>Выберите сценарий под вашу нишу (крипто, e-commerce, SaaS)</li>
+            <li>Настройте тексты сообщений для каждого шага воронки</li>
+            <li>Включите A/B тестирование для оптимизации</li>
+            <li>Запустите воронку — AI ведёт диалоги автоматически</li>
+            <li>Отслеживайте конверсию в CRM</li>
+        </ol>
+    </div>
+
+    <div class="guide-card">
+        <span class="guide-num">7</span>
+        <h3>Anti-Ban Shield</h3>
+        <p>Настройка максимальной защиты аккаунтов от блокировок.</p>
+        <span class="tag tag-green">Безопасность</span>
+        <span class="tag tag-cyan">24/7</span>
+        <ol class="guide-steps" style="margin-top:16px">
+            <li>Проверьте статус Shield на главной странице</li>
+            <li>Убедитесь что все компоненты активны: Typing Emulation, Activity Schedule, Random Delays, Device Fingerprint, Read Simulation</li>
+            <li>Настройте прокси: IPv4/SOCKS5 с ротацией</li>
+            <li>Включите «Авто-пауза при риске» во всех модулях</li>
+            <li>Мониторьте Risk Score и Human-Like метрику</li>
+            <li>При получении Flood Wait — AI автоматически делает паузу</li>
+        </ol>
+    </div>
+
+    <div class="guide-card">
+        <span class="guide-num">8</span>
+        <h3>Массовые реакции</h3>
+        <p>Автоматические реакции на посты с AI-подбором эмодзи.</p>
+        <span class="tag tag-purple">Эмоциональный маппинг</span>
+        <ol class="guide-steps" style="margin-top:16px">
+            <li>Добавьте целевые каналы</li>
+            <li>Выберите реакции:👍❤️🔥👏😍🚀💯🎉</li>
+            <li>Выберите режим: AI-подбор / Случайные / Позитивные / Ручной</li>
+            <li>Настройте частоту и задержки</li>
+            <li>Запустите — AI анализирует контент поста и подбирает подходящую реакцию</li>
+        </ol>
+    </div>
+</div>
+
+<div class="container">
+    <div class="cta-box">
+        <h2>Готовы начать?</h2>
+        <p>Зарегистрируйтесь бесплатно и запустите первый модуль за 5 минут.</p>
+        <a href="https://t.me/teleboostai_bot?start=training" class="btn btn-lg" target="_blank"><i class="fas fa-rocket"></i> Начать бесплатно</a>
+    </div>
+</div>
+
+<footer class="footer">
+    <div class="container">
+        <p>&copy; 2024–2026 TeleBoost AI. Все права защищены.</p>
+    </div>
+</footer>
+</body>
+</html>

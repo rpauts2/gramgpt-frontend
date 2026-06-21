@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="color-scheme" content="light dark">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>GRAMGPT — CRM</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="header animate-in">
+        <h2><i class="fas fa-address-book" style="color: var(--primary)"></i> CRM</h2>
+        <a href="index.html" style="color: var(--text-secondary); text-decoration: none; font-size: 14px;">
+            <i class="fas fa-arrow-left"></i> Назад
+        </a>
+    </div>
+
+    <!-- Pipeline Stats -->
+    <div class="metric-grid animate-in" style="animation-delay: 0.05s">
+        <div class="metric-card">
+            <div class="metric-value" id="crm-contacts">0</div>
+            <div class="metric-label">Контактов</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-value green" id="crm-hot">0</div>
+            <div class="metric-label">Горячих</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-value orange" id="crm-pipeline">$0</div>
+            <div class="metric-label">Pipeline</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-value purple" id="crm-winrate">0%</div>
+            <div class="metric-label">Win Rate</div>
+        </div>
+    </div>
+
+    <!-- Pipeline Board -->
+    <div class="card animate-in" style="animation-delay: 0.1s">
+        <h4 style="margin-bottom: 14px;"><i class="fas fa-columns" style="color: var(--primary);"></i> Pipeline</h4>
+        <div class="pipeline-scroll" id="pipeline-scroll">
+            <div class="pipeline-col"><div class="pipeline-header" style="border-color: var(--primary);"><span>Новые</span><span class="pipeline-count" id="pipe-new">0</span></div></div>
+            <div class="pipeline-col"><div class="pipeline-header" style="border-color: var(--warning);"><span>В работе</span><span class="pipeline-count" id="pipe-progress">0</span></div></div>
+            <div class="pipeline-col"><div class="pipeline-header" style="border-color: var(--success);"><span>Горячие</span><span class="pipeline-count" id="pipe-hot">0</span></div></div>
+        </div>
+    </div>
+
+    <!-- Contact Card Detail -->
+    <div class="glass-card animate-in" style="animation-delay: 0.15s" id="contact-detail">
+        <div class="empty-state"><i class="fas fa-user"></i><h4>Выберите контакт</h4><p>Нажмите на контакт в pipeline, чтобы увидеть детали</p></div>
+    </div>
+
+    <!-- Search / Filter -->
+    <div class="card animate-in" style="animation-delay: 0.2s">
+        <div style="margin-bottom: 12px;">
+            <input type="text" placeholder="Поиск контактов..." class="input-field" style="width: 100%;">
+        </div>
+        <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+            <button class="filter-chip active" onclick="toggleFilter(this)">Все</button>
+            <button class="filter-chip" onclick="toggleFilter(this)">Горячие</button>
+            <button class="filter-chip" onclick="toggleFilter(this)">В работе</button>
+            <button class="filter-chip" onclick="toggleFilter(this)">Крипто</button>
+            <button class="filter-chip" onclick="toggleFilter(this)">DeFi</button>
+            <button class="filter-chip" onclick="toggleFilter(this)">SMM</button>
+        </div>
+    </div>
+
+    <div class="nav-bar animate-in" style="animation-delay: 0.25s">
+        <a href="index.html" class="nav-item"><i class="fas fa-home"></i></a>
+        <a href="campaigns.html" class="nav-item"><i class="fas fa-tasks"></i></a>
+        <a href="channel.html" class="nav-item"><i class="fas fa-tv"></i></a>
+        <a href="dashboard.html" class="nav-item"><i class="fas fa-chart-pie"></i></a>
+        <a href="settings.html" class="nav-item"><i class="fas fa-cog"></i></a>
+    </div>
+
+    <style>
+        .pipeline-scroll { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 8px; }
+        .pipeline-col { min-width: 160px; flex-shrink: 0; }
+        .pipeline-header { display: flex; justify-content: space-between; align-items: center; padding: 8px 10px; border-radius: 8px; background: rgba(48,54,61,0.3); border-left: 3px solid; font-size: 12px; font-weight: 600; margin-bottom: 8px; }
+        .pipeline-count { background: rgba(48,54,61,0.6); padding: 2px 8px; border-radius: 10px; font-size: 10px; }
+        .pipeline-card { background: rgba(48,54,61,0.3); border: 1px solid var(--border); border-radius: 12px; padding: 12px; margin-bottom: 8px; cursor: pointer; transition: border-color 0.2s; }
+        .pipeline-card:active { border-color: var(--primary); }
+        .pip-avatar { width: 30px; height: 30px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: white; flex-shrink: 0; background: linear-gradient(135deg, var(--primary), var(--primary)); }
+        .pip-tags { display: flex; gap: 4px; flex-wrap: wrap; }
+        .pip-tag { font-size: 9px; padding: 2px 6px; border-radius: 4px; background: rgba(48,54,61,0.6); color: var(--text-secondary); }
+        .pip-tag.hot { background: rgba(46,204,113,0.15); color: var(--success); font-weight: 600; }
+        .contact-info { display: flex; flex-direction: column; gap: 8px; }
+        .info-row { display: flex; align-items: center; gap: 10px; font-size: 12px; }
+        .info-row i { width: 16px; color: var(--text-secondary); font-size: 11px; }
+        .timeline { display: flex; flex-direction: column; gap: 0; }
+        .timeline-item { display: flex; align-items: flex-start; gap: 10px; padding: 8px 0; position: relative; }
+        .timeline-item::before { content: ''; position: absolute; left: 5px; top: 20px; bottom: -8px; width: 1px; background: var(--border); }
+        .timeline-item:last-child::before { display: none; }
+        .tl-dot { width: 11px; height: 11px; border-radius: 50%; flex-shrink: 0; margin-top: 2px; }
+        .tl-dot.green { background: var(--success); }
+        .tl-dot.blue { background: var(--primary); }
+        .tl-dot.gray { background: var(--text-secondary); }
+        .input-field { padding: 10px 14px; background: rgba(48,54,61,0.4); border: 1px solid var(--border); border-radius: 10px; color: var(--text); font-size: 13px; }
+        .input-field:focus { outline: none; border-color: var(--primary); }
+        .filter-chip { padding: 6px 12px; border-radius: 8px; border: 1px solid var(--border); background: transparent; color: var(--text-secondary); font-size: 10px; font-weight: 600; cursor: pointer; }
+        .filter-chip.active { background: rgba(0,136,204,0.1); border-color: var(--primary); color: var(--primary); }
+    </style>
+
+    <script src='main.js'></script>
+    <script>
+        function sendMessage() { toast('info', 'Чат', 'Открывается чат для отправки...'); }
+        function addNote() { toast('info', 'Заметка', 'Функция добавления заметки'); }
+        function toggleFilter(btn) {
+            document.querySelectorAll('.filter-chip').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+        }
+        function renderPipelineCard(c) {
+            const initials = (c.name || '??').substring(0, 2).toUpperCase();
+            const colors = ['var(--primary),var(--primary)', '#e74c3c,#c0392b', '#f39c12,#e67e22', '#2ecc71,#27ae60'];
+            const stageColors = { new: 'var(--primary)', in_progress: 'var(--warning)', hot: 'var(--success)' };
+            return '<div class="pipeline-card" onclick="openContact(\'' + escapeHtml(c.id || '') + '\')"><div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;"><div class="pip-avatar" style="background:linear-gradient(135deg,' + colors[Math.floor(Math.random() * 4)] + ')">' + initials + '</div><div><div style="font-size:12px;font-weight:600;">' + escapeHtml(c.name || '') + '</div><div style="font-size:10px;color:var(--text-secondary);">@' + escapeHtml(c.username || '—') + '</div></div></div>' + (c.tags ? '<div class="pip-tags">' + c.tags.slice(0, 3).map(t => '<span class="pip-tag' + (t.hot ? ' hot' : '') + '">' + escapeHtml(t.label || t) + '</span>').join('') + '</div>' : '') + '<div style="font-size:10px;color:var(--text-secondary);margin-top:6px;"><i class="fas fa-clock"></i> ' + (c.last_contact || '—') + '</div></div>';
+        }
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const data = await api.get('/crm/contacts');
+                if (data) {
+                    document.getElementById('crm-contacts').textContent = data.total || data.contacts?.length || 0;
+                    document.getElementById('crm-hot').textContent = data.hot_count || 0;
+                    document.getElementById('crm-pipeline').textContent = '$' + ((data.pipeline_value || 0) / 1000).toFixed(1) + 'K';
+                    document.getElementById('crm-winrate').textContent = (data.win_rate || 0) + '%';
+                }
+                if (data && data.contacts && data.contacts.length) {
+                    const stages = { new: [], in_progress: [], hot: [] };
+                    data.contacts.forEach(c => { if (stages[c.stage]) stages[c.stage].push(c); });
+                    document.getElementById('pipe-new').textContent = stages.new.length;
+                    document.getElementById('pipe-progress').textContent = stages.in_progress.length;
+                    document.getElementById('pipe-hot').textContent = stages.hot.length;
+                    const scroll = document.getElementById('pipeline-scroll');
+                    const cols = scroll.querySelectorAll('.pipeline-col');
+                    if (cols[0]) cols[0].innerHTML = '<div class="pipeline-header" style="border-color:var(--primary);"><span>Новые</span><span class="pipeline-count">' + stages.new.length + '</span></div>' + stages.new.map(renderPipelineCard).join('');
+                    if (cols[1]) cols[1].innerHTML = '<div class="pipeline-header" style="border-color:var(--warning);"><span>В работе</span><span class="pipeline-count">' + stages.in_progress.length + '</span></div>' + stages.in_progress.map(renderPipelineCard).join('');
+                    if (cols[2]) cols[2].innerHTML = '<div class="pipeline-header" style="border-color:var(--success);"><span>Горячие</span><span class="pipeline-count">' + stages.hot.length + '</span></div>' + stages.hot.map(renderPipelineCard).join('');
+                }
+            } catch (e) { console.warn('CRM API error:', e); }
+        });
+        function escapeHtml(str) {
+            var d = document.createElement('div');
+            d.textContent = str;
+            return d.innerHTML;
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="color-scheme" content="light dark">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>GRAMGPT — Turbo Mode</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .turbo-header { display:flex;justify-content:space-between;align-items:center;margin-bottom:16px; }
+        .turbo-toggle { display:flex;align-items:center;gap:10px; }
+        .turbo-toggle-label { font-size:12px;font-weight:600;color:var(--text-secondary); }
+        .switch { position:relative;width:48px;height:26px;flex-shrink:0; }
+        .switch input { opacity:0;width:0;height:0; }
+        .switch .slider { position:absolute;cursor:pointer;inset:0;background:var(--bg-card);border:1px solid var(--border);border-radius:13px;transition:var(--transition); }
+        .switch .slider::before { content:'';position:absolute;left:3px;top:3px;width:18px;height:18px;border-radius:50%;background:var(--text-muted);transition:var(--transition); }
+        .switch input:checked + .slider { background:rgba(0,229,255,0.15);border-color:var(--primary); }
+        .switch input:checked + .slider::before { background:var(--primary);transform:translateX(22px);box-shadow:0 0 12px rgba(0,229,255,0.4); }
+        .speed-hero { background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:14px;backdrop-filter:blur(12px);text-align:center; }
+        .speed-hero-value { font-size:48px;font-weight:900;background:linear-gradient(135deg,var(--primary),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:-0.03em; }
+        .speed-hero-label { font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin-top:2px; }
+        .speed-hero-sub { font-size:12px;color:var(--text-secondary);margin-top:6px; }
+        .chart-card { background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:18px;margin-bottom:14px;backdrop-filter:blur(12px); }
+        .chart-card h4 { font-size:13px;font-weight:700;margin-bottom:14px; }
+        .chart-card h4 i { margin-right:6px; }
+        .bar-chart { display:flex;flex-direction:column;gap:12px; }
+        .bar-row { display:flex;align-items:center;gap:10px; }
+        .bar-label { width:100px;font-size:11px;font-weight:600;color:var(--text-secondary);flex-shrink:0;text-align:right; }
+        .bar-track { flex:1;height:28px;background:rgba(255,255,255,0.03);border-radius:6px;overflow:hidden;position:relative; }
+        .bar-fill { height:100%;border-radius:6px;transition:width 1.2s cubic-bezier(0.22,1,0.36,1);position:relative;display:flex;align-items:center;padding-left:10px;min-width:0; }
+        .bar-fill span { font-size:10px;font-weight:700;color:#05050A;white-space:nowrap;opacity:0;transition:opacity 0.3s 1s; }
+        .bar-fill.show span { opacity:1; }
+        .bar-row.highlight .bar-label { color:var(--primary); }
+        .bar-row.highlight .bar-track { box-shadow:0 0 16px rgba(0,229,255,0.08); }
+        .bar-value { font-size:11px;font-weight:700;color:var(--text);width:40px;text-align:right;font-variant-numeric:tabular-nums; }
+        .bench-table { width:100%;border-collapse:collapse;font-size:12px; }
+        .bench-table th { text-align:left;color:var(--text-muted);font-size:9px;text-transform:uppercase;letter-spacing:0.5px;padding:8px 4px;border-bottom:1px solid var(--border);font-weight:600; }
+        .bench-table td { padding:8px 4px;border-bottom:1px solid var(--border);font-variant-numeric:tabular-nums; }
+        .bench-table tr:last-child td { border-bottom:none; }
+        .bench-table .highlight-row td { background:rgba(0,229,255,0.04); }
+        .bench-table .highlight-row td:first-child { border-radius:6px 0 0 6px; }
+        .bench-table .highlight-row td:last-child { border-radius:0 6px 6px 0; }
+        .provider-dot { width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:6px;vertical-align:middle; }
+        .turbo-modules { display:flex;gap:6px;flex-wrap:wrap;margin-top:10px; }
+        .turbo-module-tag { padding:4px 10px;border-radius:6px;font-size:10px;font-weight:600;background:var(--primary-dim);color:var(--primary);border:1px solid rgba(0,229,255,0.1); }
+        .turbo-module-tag i { margin-right:4px;font-size:9px; }
+        .turbo-module-tag.inactive { background:rgba(255,255,255,0.03);color:var(--text-muted);border-color:var(--border); }
+        @keyframes pulseGlow { 0%,100% { box-shadow:0 0 12px rgba(0,229,255,0.1); } 50% { box-shadow:0 0 24px rgba(0,229,255,0.25); } }
+        .turbo-active .speed-hero { border-color:rgba(0,229,255,0.15);animation:pulseGlow 3s ease-in-out infinite; }
+        .latency-col { color:var(--text-muted); }
+    </style>
+</head>
+<body>
+    <div class="turbo-header animate-in">
+        <div class="flex gap-10" style="align-items:center;">
+            <a href="index.html" style="color:inherit;text-decoration:none;"><i class="fas fa-arrow-left"></i></a>
+            <h2 style="margin:0;"><i class="fas fa-bolt" style="color:var(--primary)"></i> Turbo Mode</h2>
+        </div>
+        <div class="turbo-toggle">
+            <span class="turbo-toggle-label" id="toggle-label">Выкл</span>
+            <label class="switch">
+                <input type="checkbox" id="turbo-switch">
+                <span class="slider"></span>
+            </label>
+        </div>
+    </div>
+
+    <div id="page-content">
+        <div class="speed-hero animate-in" style="animation-delay:0.03s">
+            <div class="speed-hero-value" id="hero-tps">0</div>
+            <div class="speed-hero-label">токенов/сек</div>
+            <div class="speed-hero-sub"><i class="fas fa-microchip" style="color:var(--primary)"></i> Cerebras — самый быстрый AI-инференс</div>
+        </div>
+
+        <div class="chart-card animate-in" style="animation-delay:0.06s">
+            <h4><i class="fas fa-chart-bar" style="color:var(--primary)"></i> Сравнение скорости</h4>
+            <div class="bar-chart" id="bar-chart"></div>
+        </div>
+
+        <div class="card animate-in" style="animation-delay:0.09s">
+            <h4 style="font-size:13px;font-weight:700;margin-bottom:10px;"><i class="fas fa-table" style="color:var(--text-secondary)"></i> Benchmark Results</h4>
+            <table class="bench-table" id="bench-table">
+                <thead>
+                    <tr>
+                        <th>Провайдер</th>
+                        <th style="text-align:right">Токенов/сек</th>
+                        <th style="text-align:right">Задержка</th>
+                    </tr>
+                </thead>
+                <tbody id="bench-body"></tbody>
+            </table>
+        </div>
+
+        <div class="card animate-in" style="animation-delay:0.12s">
+            <h4 style="font-size:13px;font-weight:700;margin-bottom:10px;"><i class="fas fa-cubes" style="color:var(--accent)"></i> Turbo-модули</h4>
+            <p style="font-size:11px;color:var(--text-secondary);margin-bottom:10px;">Модули, которые используют Cerebras для ускорения:</p>
+            <div class="turbo-modules" id="turbo-modules"></div>
+        </div>
+    </div>
+
+    <div class="nav-bar animate-in" style="animation-delay:0.2s">
+        <a href="index.html" class="nav-item"><i class="fas fa-home"></i></a>
+        <a href="campaigns.html" class="nav-item"><i class="fas fa-tasks"></i></a>
+        <a href="speed.html" class="nav-item active"><i class="fas fa-bolt"></i></a>
+        <a href="dashboard.html" class="nav-item"><i class="fas fa-chart-pie"></i></a>
+        <a href="settings.html" class="nav-item"><i class="fas fa-cog"></i></a>
+    </div>
+
+    <button id="back-to-top" class="back-to-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Наверх"><i class="fas fa-arrow-up"></i></button>
+
+    <script src="main.js"></script>
+    <script>
+    (function() {
+        showBackButton();
+
+        var providers = [];
+        var turboModules = [];
+        var turboEnabled = false;
+        var animating = false;
+
+        var heroEl = document.getElementById('hero-tps');
+        var toggle = document.getElementById('turbo-switch');
+        var toggleLabel = document.getElementById('toggle-label');
+        var pageContent = document.getElementById('page-content');
+
+        function animateCounter(el, target, duration) {
+            if (!el) return;
+            var start = parseInt(el.textContent.replace(/[^0-9]/g,'')) || 0;
+            duration = duration || 1200;
+            var startTime = performance.now();
+            function tick(now) {
+                var elapsed = now - startTime;
+                var progress = Math.min(elapsed / duration, 1);
+                var eased = 1 - Math.pow(1 - progress, 3);
+                var current = Math.round(start + (target - start) * eased);
+                el.textContent = current.toLocaleString();
+                if (progress < 1) requestAnimationFrame(tick);
+            }
+            requestAnimationFrame(tick);
+        }
+
+        function renderBars() {
+            var container = document.getElementById('bar-chart');
+            var maxTps = Math.max.apply(null, providers.map(function(p) { return p.tokens_per_sec; })) || 1;
+            var html = '';
+            providers.forEach(function(p, idx) {
+                var pct = (p.tokens_per_sec / maxTps) * 100;
+                var highlight = p.name === 'Cerebras' ? ' highlight' : '';
+                html += '<div class="bar-row' + highlight + '">';
+                html += '<div class="bar-label">' + p.name + '</div>';
+                html += '<div class="bar-track"><div class="bar-fill" id="bar-fill-' + idx + '" style="width:0%;background:' + p.color + '"><span>' + p.tokens_per_sec.toLocaleString() + ' t/s</span></div></div>';
+                html += '<div class="bar-value" id="bar-val-' + idx + '">0</div>';
+                html += '</div>';
+            });
+            container.innerHTML = html;
+
+            setTimeout(function() {
+                providers.forEach(function(p, idx) {
+                    var fill = document.getElementById('bar-fill-' + idx);
+                    var val = document.getElementById('bar-val-' + idx);
+                    var pct = (p.tokens_per_sec / maxTps) * 100;
+                    if (fill) {
+                        fill.style.width = pct + '%';
+                        setTimeout(function() { fill.classList.add('show'); }, 1000);
+                    }
+                    if (val) animateCounter(val, p.tokens_per_sec, 1200);
+                });
+            }, 200);
+        }
+
+        function renderTable() {
+            var tbody = document.getElementById('bench-body');
+            var html = '';
+            providers.forEach(function(p) {
+                var highlight = p.name === 'Cerebras' ? ' class="highlight-row"' : '';
+                html += '<tr' + highlight + '>';
+                html += '<td><span class="provider-dot" style="background:' + p.color + '"></span>' + p.name + '</td>';
+                html += '<td style="text-align:right;font-weight:600">' + p.tokens_per_sec.toLocaleString() + '</td>';
+                html += '<td style="text-align:right" class="latency-col">' + p.latency_ms + 'ms</td>';
+                html += '</tr>';
+            });
+            tbody.innerHTML = html;
+        }
+
+        function renderModules() {
+            var container = document.getElementById('turbo-modules');
+            var labels = { commenting: 'Нейрокомментинг', parsing: 'Парсинг', chatting: 'Нейрочаттинг' };
+            var icons = { commenting: 'comments', parsing: 'crosshairs', chatting: 'message' };
+            var html = '';
+            turboModules.forEach(function(m) {
+                var cls = turboEnabled ? '' : ' inactive';
+                html += '<span class="turbo-module-tag' + cls + '"><i class="fas fa-' + (icons[m] || 'cube') + '"></i>' + (labels[m] || m) + '</span>';
+            });
+            container.innerHTML = html;
+        }
+
+        function updateTurboUI(state) {
+            turboEnabled = state;
+            toggle.checked = state;
+            toggleLabel.textContent = state ? 'Вкл' : 'Выкл';
+            pageContent.classList.toggle('turbo-active', state);
+            renderModules();
+            if (state) {
+                animateCounter(heroEl, 2000, 1200);
+            } else {
+                heroEl.textContent = '0';
+            }
+        }
+
+        async function loadBenchmarks() {
+            try {
+                var res = await api.get('/benchmarks');
+                var d = res.data || res;
+                providers = d.providers || [];
+                turboModules = d.turbo_modules || [];
+                renderBars();
+                renderTable();
+                renderModules();
+                if (turboEnabled) {
+                    pageContent.classList.add('turbo-active');
+                    heroEl.textContent = '2000';
+                }
+            } catch (e) {
+                toast('error', 'Ошибка', 'Не удалось загрузить benchmark-данные');
+            }
+        }
+
+        async function loadTurboStatus() {
+            try {
+                var res = await api.get('/turbo/status');
+                var d = res.data || res;
+                turboEnabled = d.turbo_enabled || false;
+                turboModules = d.turbo_modules || [];
+                updateTurboUI(turboEnabled);
+            } catch (e) {}
+        }
+
+        toggle.addEventListener('change', async function() {
+            haptic('medium');
+            var state = toggle.checked;
+            try {
+                var res = await api.post('/turbo/toggle', { enabled: state });
+                var d = res.data || res;
+                updateTurboUI(d.turbo_enabled);
+                toast(state ? 'success' : 'info', state ? 'Turbo Mode включён' : 'Turbo Mode выключен', state ? 'Cerebras приоритет активирован' : 'Стандартный режим');
+            } catch (e) {
+                toggle.checked = !state;
+                toast('error', 'Ошибка', 'Не удалось переключить режим');
+            }
+        });
+
+        // Back-to-top
+        (function() {
+            var sentinel = document.createElement('div');
+            sentinel.style.cssText = 'height:0;width:0;pointer-events:none';
+            document.body.insertBefore(sentinel, document.body.firstChild);
+            var btn = document.getElementById('back-to-top');
+            var observer = new IntersectionObserver(function(entries) {
+                entries.forEach(function(e) { btn.classList.toggle('visible', !e.isIntersecting); });
+            }, { root: null, threshold: 0 });
+            observer.observe(sentinel);
+        })();
+
+        document.addEventListener('DOMContentLoaded', function() {
+            loadTurboStatus().then(function() {
+                loadBenchmarks();
+            });
+        });
+    })();
+    </script>
+</body>
+</html>

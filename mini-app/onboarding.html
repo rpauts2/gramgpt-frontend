@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="color-scheme" content="light dark">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>GRAMGPT — Онбординг</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="welcome" class="screen active">
+    <div class="welcome-inner">
+        <div class="welcome-logo">
+            <div class="logo-ring">
+                <i class="fas fa-bolt"></i>
+            </div>
+        </div>
+        <h1 class="welcome-title">GRAM<span>GPT</span></h1>
+        <p class="welcome-desc">AI-платформа для полной автоматизации Telegram маркетинга</p>
+        <div class="welcome-features">
+            <div class="wf-item"><i class="fas fa-crosshairs"></i> Нейропарсинг</div>
+            <div class="wf-item"><i class="fas fa-comments"></i> AI-комментинг</div>
+            <div class="wf-item"><i class="fas fa-robot"></i> НейроДиалоги</div>
+            <div class="wf-item"><i class="fas fa-shield-halved"></i> Anti-Ban Shield</div>
+        </div>
+        <button class="btn btn-neon" onclick="startOnboarding()" style="margin-top: 24px;">
+            <i class="fas fa-rocket"></i> Запустить настройку (2 мин)
+        </button>
+    </div>
+</div>
+
+<div id="onboarding" class="screen">
+    <div class="ob-header">
+        <div class="step-indicators" id="stepIndicators">
+            <div class="sd-wrap" onclick="window.haptic && haptic('light')">
+                <div class="sd-circle active" data-s="1">1</div>
+                <div class="sd-label">Аккаунт</div>
+            </div>
+            <div class="sd-line"></div>
+            <div class="sd-wrap" onclick="window.haptic && haptic('light')">
+                <div class="sd-circle" data-s="2">2</div>
+                <div class="sd-label">Прокси</div>
+            </div>
+            <div class="sd-line"></div>
+            <div class="sd-wrap" onclick="window.haptic && haptic('light')">
+                <div class="sd-circle" data-s="3">3</div>
+                <div class="sd-label">Модули</div>
+            </div>
+            <div class="sd-line"></div>
+            <div class="sd-wrap" onclick="window.haptic && haptic('light')">
+                <div class="sd-circle" data-s="4">4</div>
+                <div class="sd-label">Старт</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="ob-body">
+        <div id="s1" class="ob-step active">
+            <h2 class="ob-step-title"><i class="fas fa-user-plus" style="color:var(--primary)"></i> Добавьте Telegram аккаунт</h2>
+            <p class="ob-step-desc">Введите данные для подключения аккаунта</p>
+
+            <div id="s1-body">
+                <div id="s1-api">
+                    <div class="form-group">
+                        <label class="form-label">API ID</label>
+                        <input class="form-input" id="s1-api-id" type="text" inputmode="numeric" placeholder="1234567">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">API Hash</label>
+                        <input class="form-input" id="s1-api-hash" type="text" placeholder="1a2b3c4d5e6f7g8h9i0j">
+                    </div>
+                    <div class="form-hint mb-12">Получить: <a href="https://my.telegram.org" target="_blank" style="color:var(--primary)">my.telegram.org</a></div>
+                    <button class="btn" onclick="s1Connect()" id="s1-connect-btn"><i class="fas fa-plug"></i> Подключить</button>
+                </div>
+
+                <div id="s1-phone" style="display:none">
+                    <div class="form-group">
+                        <label class="form-label">Номер телефона</label>
+                        <input class="form-input" id="s1-phone-input" type="tel" placeholder="+79123456789">
+                    </div>
+                    <div id="s1-phone-status" class="ob-status"></div>
+                    <button class="btn" onclick="s1SendCode()" id="s1-send-btn"><i class="fas fa-paper-plane"></i> Отправить код</button>
+                    <button class="btn btn-secondary mt-8" onclick="s1BackToApi()"><i class="fas fa-arrow-left"></i> Назад</button>
+                </div>
+
+                <div id="s1-code" style="display:none">
+                    <div class="form-group">
+                        <label class="form-label">Код из Telegram</label>
+                        <input class="form-input" id="s1-code-input" type="text" inputmode="numeric" placeholder="12345" style="font-size:20px;text-align:center;letter-spacing:4px">
+                    </div>
+                    <div id="s1-code-status" class="ob-status"></div>
+                    <button class="btn" onclick="s1Verify()" id="s1-verify-btn"><i class="fas fa-check"></i> Подтвердить</button>
+                    <button class="btn btn-secondary mt-8" onclick="s1BackToPhone()"><i class="fas fa-arrow-left"></i> Назад</button>
+                </div>
+
+                <div id="s1-done" style="display:none">
+                    <div class="ob-success-icon"><i class="fas fa-check-circle"></i></div>
+                    <p style="color:var(--success);font-weight:600">Аккаунт подключён</p>
+                    <button class="btn btn-neon" onclick="nextStep()">
+                        <i class="fas fa-arrow-right"></i> Далее
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="s2" class="ob-step">
+            <h2 class="ob-step-title"><i class="fas fa-globe" style="color:var(--primary)"></i> Прокси (необязательно)</h2>
+            <p class="ob-step-desc">Добавьте прокси для безопасной работы аккаунтов</p>
+
+            <div class="form-group">
+                <label class="form-label">Адрес прокси</label>
+                <input class="form-input" id="s2-url" placeholder="socks5://user:pass@host:1080">
+            </div>
+            <div class="form-hint mb-12">Поддерживается SOCKS5, HTTP, HTTPS. Можно пропустить.</div>
+            <div id="s2-status" class="ob-status"></div>
+
+            <div class="ob-btn-row">
+                <button class="btn btn-secondary" onclick="skipProxy()"><i class="fas fa-forward"></i> Пропустить</button>
+                <button class="btn" onclick="addProxy()" id="s2-add-btn"><i class="fas fa-plus"></i> Добавить</button>
+            </div>
+        </div>
+
+        <div id="s3" class="ob-step">
+            <h2 class="ob-step-title"><i class="fas fa-puzzle-piece" style="color:var(--primary)"></i> Выберите модули</h2>
+            <p class="ob-step-desc">Включите нужные модули — первые 7 дней бесплатно</p>
+            <div id="s3-loading" style="text-align:center;padding:32px">
+                <div class="spinner"></div>
+                <div style="color:var(--text-secondary);font-size:13px;margin-top:12px">Загрузка модулей...</div>
+            </div>
+            <div id="s3-modules"></div>
+            <div id="s3-error" style="display:none;text-align:center;padding:16px">
+                <div style="color:var(--danger);font-size:13px">Не удалось загрузить модули</div>
+            </div>
+            <button class="btn btn-neon" onclick="nextStep()" id="s3-next" style="display:none">
+                <i class="fas fa-arrow-right"></i> Далее
+            </button>
+        </div>
+
+        <div id="s4" class="ob-step">
+            <h2 class="ob-step-title"><i class="fas fa-rocket" style="color:var(--primary)"></i> Первая кампания</h2>
+            <p class="ob-step-desc">Создайте первую кампанию для старта</p>
+
+            <div class="form-group">
+                <label class="form-label">Название кампании</label>
+                <input class="form-input" id="s4-name" placeholder="Например: Крипта-февраль 2026" value="Первая кампания">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Цель кампании</label>
+                <div class="btn-option-grid btn-option-grid-4" id="s4-goals">
+                    <button class="btn-option active" data-goal="leads" onclick="selectGoal(this)"><i class="fas fa-users"></i> Лиды</button>
+                    <button class="btn-option" data-goal="traffic" onclick="selectGoal(this)"><i class="fas fa-chart-line"></i> Трафик</button>
+                    <button class="btn-option" data-goal="engagement" onclick="selectGoal(this)"><i class="fas fa-heart"></i> Вовлеч.</button>
+                    <button class="btn-option" data-goal="sales" onclick="selectGoal(this)"><i class="fas fa-dollar-sign"></i> Продажи</button>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Целевые каналы (необязательно)</label>
+                <textarea class="form-input" id="s4-channels" rows="2" placeholder="@channel1&#10;@channel2"></textarea>
+            </div>
+            <div id="s4-status" class="ob-status"></div>
+            <button class="btn btn-neon" onclick="finishOnboarding()" id="s4-launch-btn">
+                <i class="fas fa-rocket"></i> Запустить GRAMGPT
+            </button>
+        </div>
+    </div>
+</div>
+
+<style>
+body { padding: 0; margin: 0; overflow: hidden; height: 100dvh; display: flex; }
+.screen { display: none; flex-direction: column; width: 100%; height: 100dvh; padding: 20px 16px; overflow-y: auto; }
+.screen.active { display: flex; }
+#welcome { justify-content: center; align-items: center; text-align: center; }
+.welcome-inner { max-width: 360px; width: 100%; display: flex; flex-direction: column; align-items: center; }
+.logo-ring { width: 96px; height: 96px; border-radius: 50%; border: 2px solid rgba(0,229,255,0.2); display: flex; align-items: center; justify-content: center; margin-bottom: 20px; background: var(--bg-card); backdrop-filter: blur(12px); }
+.logo-ring i { font-size: 42px; background: linear-gradient(135deg, var(--primary), var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.welcome-title { font-size: 32px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 8px; }
+.welcome-title span { color: var(--primary); }
+.welcome-desc { font-size: 14px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 20px; max-width: 280px; }
+.welcome-features { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; width: 100%; }
+.wf-item { display: flex; align-items: center; gap: 8px; padding: 12px; border-radius: 12px; background: rgba(48,54,61,0.3); font-size: 12px; font-weight: 600; }
+.wf-item i { color: var(--primary); width: 16px; text-align: center; font-size: 11px; }
+
+.ob-header { flex-shrink: 0; padding-bottom: 16px; }
+.step-indicators { display: flex; align-items: center; justify-content: center; gap: 0; }
+.sd-wrap { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: default; }
+.sd-circle { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; background: rgba(255,255,255,0.04); border: 2px solid var(--border); color: var(--text-muted); transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1); }
+.sd-circle.active { background: var(--primary); border-color: var(--primary); color: #05050A; box-shadow: 0 0 16px rgba(0,229,255,0.25); }
+.sd-circle.done { background: rgba(52,211,153,0.15); border-color: var(--success); color: var(--success); }
+.sd-line { width: 28px; height: 2px; background: var(--border); flex-shrink: 0; transition: background 0.3s; }
+.sd-line.done { background: var(--primary); }
+.sd-label { font-size: 9px; color: var(--text-muted); font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; }
+
+.ob-body { flex: 1; display: flex; flex-direction: column; min-height: 0; }
+.ob-step { display: none; flex-direction: column; animation: fadeInUp 0.35s ease-out; flex: 1; }
+.ob-step.active { display: flex; }
+.ob-step-title { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+.ob-step-desc { font-size: 12px; color: var(--text-secondary); margin-bottom: 16px; }
+.ob-status { font-size: 12px; margin-bottom: 8px; padding: 6px 10px; border-radius: 8px; display: none; }
+.ob-status.success { display: block; background: rgba(52,211,153,0.1); color: var(--success); }
+.ob-status.error { display: block; background: rgba(239,68,68,0.1); color: var(--danger); }
+.ob-status.info { display: block; background: rgba(0,229,255,0.08); color: var(--primary); }
+.ob-success-icon { text-align: center; font-size: 48px; color: var(--success); margin: 12px 0; }
+.ob-btn-row { display: flex; gap: 8px; margin-top: auto; padding-top: 16px; }
+.ob-btn-row .btn { flex: 1; }
+.mt-8 { margin-top: 8px; }
+.mb-12 { margin-bottom: 12px; }
+.spinner { width: 28px; height: 28px; border: 3px solid rgba(255,255,255,0.08); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.7s linear infinite; margin: 0 auto; display: inline-block; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+#s1-body { flex: 1; display: flex; flex-direction: column; }
+#s1-body .form-group:first-child { margin-top: 0; }
+.module-grid { display: flex; flex-direction: column; gap: 8px; }
+.module-card { display: flex; align-items: center; gap: 12px; padding: 14px; border-radius: var(--radius-sm); border: 1px solid var(--border); background: var(--bg-card); cursor: pointer; transition: all 0.2s; }
+.module-card:active { transform: scale(0.98); }
+.module-card.active { border-color: var(--primary); background: rgba(0,229,255,0.06); }
+.module-card.active .mc-toggle { background: var(--primary); }
+.module-card.active .mc-toggle i { color: #05050A; }
+.module-card.disabled { opacity: 0.4; pointer-events: none; }
+.mc-icon { width: 36px; height: 36px; border-radius: 10px; background: rgba(0,229,255,0.08); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 15px; color: var(--primary); }
+.mc-info { flex: 1; min-width: 0; }
+.mc-name { font-size: 13px; font-weight: 600; }
+.mc-desc { font-size: 10px; color: var(--text-secondary); }
+.mc-toggle { width: 28px; height: 28px; border-radius: 8px; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 12px; color: var(--text-muted); flex-shrink: 0; transition: all 0.2s; background: transparent; }
+.module-card.active .mc-toggle { background: var(--primary); border-color: var(--primary); color: #05050A; }
+
+@media (max-width: 360px) {
+    .sd-line { width: 16px; }
+    .sd-label { font-size: 8px; }
+    .welcome-features { grid-template-columns: 1fr; }
+}
+</style>
+<script src='main.js'></script>
+<script>
+let currentStep = 1;
+let step1State = 'api';
+let s1ApiId = '', s1ApiHash = '', s1Phone = '';
+let selectedModules = {};
+let selectedGoal = 'leads';
+
+Telegram.WebApp.BackButton.offClick();
+Telegram.WebApp.BackButton.onClick(function() {
+    if (currentStep === 1) {
+        showWelcome();
+    } else {
+        goToStep(currentStep - 1);
+    }
+});
+
+function showWelcome() {
+    hideBackButton();
+    document.getElementById('welcome').classList.add('active');
+    document.getElementById('onboarding').classList.remove('active');
+}
+
+function startOnboarding() {
+    haptic('medium');
+    document.getElementById('welcome').classList.remove('active');
+    document.getElementById('onboarding').classList.add('active');
+    currentStep = 1;
+    showBackButton();
+    updateProgress();
+}
+
+function goToStep(n) {
+    haptic('light');
+    document.querySelectorAll('.ob-step').forEach(function(el) { el.classList.remove('active'); });
+    document.getElementById('s' + n).classList.add('active');
+    currentStep = n;
+    updateProgress();
+    if (n === 3 && !document.getElementById('s3-modules').dataset.loaded) loadModules();
+}
+
+function nextStep() {
+    if (currentStep < 4) goToStep(currentStep + 1);
+}
+
+function updateProgress() {
+    document.querySelectorAll('.sd-circle').forEach(function(c) {
+        var s = parseInt(c.dataset.s);
+        c.classList.toggle('active', s === currentStep);
+        c.classList.toggle('done', s < currentStep);
+    });
+    document.querySelectorAll('.sd-line').forEach(function(l, i) {
+        l.classList.toggle('done', i + 1 < currentStep);
+    });
+}
+
+// ===== Step 1: Account =====
+function s1Connect() {
+    var apiId = document.getElementById('s1-api-id').value.trim();
+    var apiHash = document.getElementById('s1-api-hash').value.trim();
+    if (!apiId || !apiHash) return toast('error', 'Введите API ID и Hash');
+    if (!/^\d+$/.test(apiId)) return toast('error', 'API ID должен быть числом');
+    s1ApiId = parseInt(apiId);
+    s1ApiHash = apiHash;
+    step1State = 'phone';
+    document.getElementById('s1-api').style.display = 'none';
+    document.getElementById('s1-phone').style.display = 'block';
+}
+
+function s1BackToApi() {
+    step1State = 'api';
+    document.getElementById('s1-phone').style.display = 'none';
+    document.getElementById('s1-code').style.display = 'none';
+    document.getElementById('s1-done').style.display = 'none';
+    document.getElementById('s1-api').style.display = 'block';
+}
+
+function s1BackToPhone() {
+    step1State = 'phone';
+    document.getElementById('s1-code').style.display = 'none';
+    document.getElementById('s1-phone').style.display = 'block';
+}
+
+function s1SetStatus(el, type, msg) {
+    el.className = 'ob-status ' + type;
+    el.textContent = msg;
+    el.style.display = 'block';
+}
+
+async function s1SendCode() {
+    var phone = document.getElementById('s1-phone-input').value.trim();
+    if (!phone) return toast('error', 'Введите номер телефона');
+    if (!/^\+\d{7,15}$/.test(phone)) return toast('error', 'Формат: +79123456789');
+    s1Phone = phone;
+
+    var btn = document.getElementById('s1-send-btn');
+    var status = document.getElementById('s1-phone-status');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Отправка...';
+    s1SetStatus(status, 'info', 'Отправка кода...');
+
+    try {
+        await api.post('/accounts/send-code', { api_id: s1ApiId, api_hash: s1ApiHash, phone: s1Phone });
+        s1SetStatus(status, 'success', 'Код отправлен в Telegram');
+        setTimeout(function() {
+            step1State = 'code';
+            document.getElementById('s1-phone').style.display = 'none';
+            document.getElementById('s1-code').style.display = 'block';
+        }, 600);
+    } catch (e) {
+        s1SetStatus(status, 'error', e.data?.detail || e.message || 'Ошибка');
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-paper-plane"></i> Отправить код';
+    }
+}
+
+async function s1Verify() {
+    var code = document.getElementById('s1-code-input').value.trim();
+    if (!code) return toast('error', 'Введите код из Telegram');
+
+    var btn = document.getElementById('s1-verify-btn');
+    var status = document.getElementById('s1-code-status');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Проверка...';
+    s1SetStatus(status, 'info', 'Проверка кода...');
+
+    try {
+        var res = await api.post('/accounts/verify-code', { phone: s1Phone, code: code });
+        s1SetStatus(status, 'success', res.message || 'Аккаунт добавлен');
+        toast('success', 'Аккаунт подключён');
+        step1State = 'done';
+        setTimeout(function() {
+            document.getElementById('s1-code').style.display = 'none';
+            document.getElementById('s1-done').style.display = 'block';
+        }, 500);
+    } catch (e) {
+        var detail = e.data?.detail || e.message || '';
+        if (detail.includes('2FA')) {
+            s1SetStatus(status, 'error', 'Требуется 2FA пароль. Попробуйте позже или введите пароль.');
+        } else {
+            s1SetStatus(status, 'error', detail || 'Ошибка');
+        }
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-check"></i> Подтвердить';
+    }
+}
+
+// ===== Step 2: Proxy =====
+function skipProxy() {
+    toast('info', 'Прокси пропущен', 'Можно добавить позже в настройках');
+    nextStep();
+}
+async function addProxy() {
+    var url = document.getElementById('s2-url').value.trim();
+    if (!url) return toast('error', 'Введите адрес прокси');
+    var btn = document.getElementById('s2-add-btn');
+    var status = document.getElementById('s2-status');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Добавление...';
+    status.className = 'ob-status info';
+    status.textContent = 'Добавление прокси...';
+    status.style.display = 'block';
+    try {
+        await api.post('/proxy/add', { url: url });
+        toast('success', 'Прокси добавлен');
+        nextStep();
+    } catch (e) {
+        status.className = 'ob-status error';
+        status.textContent = e.data?.detail || 'Ошибка добавления';
+        status.style.display = 'block';
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-plus"></i> Добавить';
+    }
+}
+
+// ===== Step 3: Modules =====
+async function loadModules() {
+    var container = document.getElementById('s3-modules');
+    var loading = document.getElementById('s3-loading');
+    var error = document.getElementById('s3-error');
+    var nextBtn = document.getElementById('s3-next');
+    loading.style.display = 'block';
+    container.innerHTML = '';
+    error.style.display = 'none';
+    nextBtn.style.display = 'none';
+    try {
+        var res = await api.get('/subscriptions/modules');
+        var modules = (res.data && res.data.modules) || res.modules || {};
+        container.dataset.loaded = '1';
+        loading.style.display = 'none';
+        var keys = Object.keys(modules);
+        var grid = document.createElement('div');
+        grid.className = 'module-grid';
+        keys.forEach(function(k) {
+            var m = modules[k];
+            selectedModules[k] = true;
+            var card = document.createElement('div');
+            card.className = 'module-card active';
+            card.dataset.module = k;
+            var iconMap = { parsing: 'fa-crosshairs', antiban: 'fa-shield-halved', commenting: 'fa-comments', analytics: 'fa-chart-bar', chatting: 'fa-robot', channels: 'fa-tv', crm: 'fa-users-gear', warmup: 'fa-temperature-high' };
+            var icon = iconMap[k] || 'fa-puzzle-piece';
+            card.innerHTML = '<div class="mc-icon"><i class="fas ' + icon + '"></i></div><div class="mc-info"><div class="mc-name">' + m.name + '</div><div class="mc-desc">' + m.description + '</div></div><div class="mc-toggle"><i class="fas fa-check"></i></div>';
+            card.addEventListener('click', function() {
+                this.classList.toggle('active');
+                var mod = this.dataset.module;
+                selectedModules[mod] = this.classList.contains('active');
+                haptic('light');
+            });
+            grid.appendChild(card);
+        });
+        container.appendChild(grid);
+        nextBtn.style.display = 'block';
+    } catch (e) {
+        loading.style.display = 'none';
+        error.style.display = 'block';
+        toast('error', 'Не удалось загрузить модули');
+    }
+}
+
+// ===== Step 4: Campaign =====
+function selectGoal(el) {
+    document.querySelectorAll('#s4-goals .btn-option').forEach(function(b) { b.classList.remove('active'); });
+    el.classList.add('active');
+    selectedGoal = el.dataset.goal;
+    haptic('light');
+}
+
+async function finishOnboarding() {
+    var name = document.getElementById('s4-name').value.trim() || 'Первая кампания';
+    var channelsText = document.getElementById('s4-channels').value.trim();
+    var targetChannels = channelsText ? channelsText.split('\n').map(function(s) { return s.trim(); }).filter(Boolean) : [];
+    var btn = document.getElementById('s4-launch-btn');
+    var statusEl = document.getElementById('s4-status');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Настройка...';
+    statusEl.className = 'ob-status info';
+    statusEl.textContent = 'Создание кампании...';
+    statusEl.style.display = 'block';
+
+    try {
+        await api.post('/campaigns', { name: name, goal: selectedGoal, target_channels: targetChannels.length ? targetChannels : null, type: 'comments' });
+    } catch (e) {
+        toast('warning', 'Кампания не создана', 'Вы сможете создать её позже');
+    }
+
+    var modKeys = Object.keys(selectedModules);
+    var enabledCount = 0;
+    for (var i = 0; i < modKeys.length; i++) {
+        var k = modKeys[i];
+        if (selectedModules[k]) {
+            try {
+                await api.post('/subscriptions/modules/toggle', { module_id: k, enabled: true });
+                enabledCount++;
+            } catch (e) {}
+        }
+    }
+
+    toast('success', 'Всё готово!', 'Подключено модулей: ' + enabledCount);
+    btn.innerHTML = '<i class="fas fa-check"></i> Запуск...';
+    setTimeout(function() { window.location.href = 'dashboard.html'; }, 800);
+}
+</script>
+</body>
+</html>

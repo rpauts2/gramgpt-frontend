@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="color-scheme" content="light dark">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>GRAMGPT — Ведение канала</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="header animate-in">
+        <h2><i class="fas fa-tv" style="color: var(--primary)"></i> Ведение канала</h2>
+        <a href="index.html" style="color: var(--text-secondary); text-decoration: none; font-size: 14px;">
+            <i class="fas fa-arrow-left"></i> Назад
+        </a>
+    </div>
+
+    <!-- Autopilot Status Banner -->
+    <div class="autopilot-banner animate-in" style="animation-delay: 0.03s">
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <div class="autopilot-icon pulse-glow"><i class="fas fa-robot"></i></div>
+            <div>
+                <div style="font-size: 13px; font-weight: 700;">AI Автопилот <span style="color: var(--success);">АКТИВЕН</span></div>
+                <div style="font-size: 11px; color: var(--text-secondary);">Следующий пост через 2ч 14мин • Тренды обновлены</div>
+            </div>
+        </div>
+        <div class="toggle-on" onclick="toggleAutopilot(this)"></div>
+    </div>
+
+    <!-- Channel Stats -->
+    <div class="stat-row animate-in" style="animation-delay: 0.05s">
+        <div style="display: flex; justify-content: space-between;">
+            <div class="stat-item">
+                <h4>Подписчиков</h4>
+                <div style="color: var(--primary)" id="ch-subs">--</div>
+            </div>
+            <div class="stat-item" style="text-align: center;">
+                <h4>Рост/нед</h4>
+                <div style="color: var(--success)" id="ch-growth">--</div>
+            </div>
+            <div class="stat-item" style="text-align: right;">
+                <h4>ER</h4>
+                <div style="color: var(--warning)" id="ch-er">--</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Channel Selector -->
+    <div class="card animate-in" style="animation-delay: 0.07s">
+        <h4 style="margin-bottom: 12px;">Мои каналы</h4>
+        <div class="channel-selector" id="ch-list">
+            <div class="empty-state"><i class="fas fa-tv"></i><h4>Нет каналов</h4><p>Добавьте каналы для управления</p></div>
+        </div>
+            </div>
+            <div class="channel-option" onclick="selectChannel(this)">
+                <div class="ch-avatar" style="background: linear-gradient(135deg, #e74c3c, #c0392b);">CR</div>
+                <div>
+                    <div style="font-size: 13px; font-weight: 600;">@crypto_daily</div>
+                    <div style="font-size: 10px; color: var(--text-secondary);">5,234 подп.</div>
+                </div>
+            </div>
+            <button class="add-ch-btn" onclick="addChannel()">
+                <i class="fas fa-plus"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- ========== TREND DISCOVERY ========== -->
+    <div class="card animate-in" style="animation-delay: 0.09s">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+            <h4 style="margin: 0;"><i class="fas fa-fire" style="color: #e74c3c;"></i> Тренды сейчас</h4>
+            <div style="display: flex; align-items: center; gap: 6px;">
+                <div class="live-dot"></div>
+                <span style="font-size: 10px; color: var(--success); font-weight: 600;">LIVE</span>
+            </div>
+        </div>
+        <div style="font-size: 10px; color: var(--text-secondary); margin-bottom: 12px;" id="trend-source">AI мониторинг источников</div>
+        <div id="trend-list"></div>
+
+        <button class="btn btn-secondary" style="margin-top: 10px; width: 100%; padding: 10px; font-size: 12px;" onclick="refreshTrends()">
+            <i class="fas fa-rotate"></i> Обновить тренды
+        </button>
+    </div>
+
+    <!-- ========== QUICK CREATE POST ========== -->
+    <div class="card animate-in" style="animation-delay: 0.11s">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+            <h4 style="margin: 0;"><i class="fas fa-pen-to-square" style="color: var(--primary);"></i> Быстрый пост</h4>
+            <span style="font-size: 10px; padding: 3px 8px; background: rgba(0,136,204,0.15); color: var(--primary); border-radius: 6px;">AI-помощь</span>
+        </div>
+
+        <div style="margin-bottom: 12px;">
+            <label class="label">Тема / тренд</label>
+            <input type="text" placeholder="Напр: Bitcoin $150K, обзор рынка..." class="input-field" id="postTopic">
+        </div>
+
+        <div style="margin-bottom: 12px;">
+            <label class="label">Формат поста</label>
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px;">
+                <button class="type-btn active" onclick="selectType(this)">📝 Текст</button>
+                <button class="type-btn" onclick="selectType(this)">🖼 Картинка</button>
+                <button class="type-btn" onclick="selectType(this)">📊 Опрос</button>
+                <button class="type-btn" onclick="selectType(this)">🎬 Видео</button>
+            </div>
+        </div>
+
+        <div style="margin-bottom: 12px;">
+            <label class="label">Тип контента</label>
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;">
+                <button class="type-btn active" onclick="selectType(this)">📊 Аналитика</button>
+                <button class="type-btn" onclick="selectType(this)">📰 Новость</button>
+                <button class="type-btn" onclick="selectType(this)">📚 Обзор</button>
+                <button class="type-btn" onclick="selectType(this)">🎯 Промо</button>
+                <button class="type-btn" onclick="selectType(this)">📋 Дайджест</button>
+                <button class="type-btn" onclick="selectType(this)">❓ Опрос</button>
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+            <div style="flex: 1;">
+                <label class="label">Стиль</label>
+                <select style="width: 100%;">
+                    <option selected>Экспертный</option>
+                    <option>Разговорный</option>
+                    <option>Провокационный</option>
+                    <option>Образовательный</option>
+                </select>
+            </div>
+            <div style="flex: 1;">
+                <label class="label">Длина</label>
+                <select style="width: 100%;">
+                    <option>Короткий</option>
+                    <option selected>Средний</option>
+                    <option>Длинный</option>
+                </select>
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 8px;">
+            <button class="btn" style="flex: 2;" onclick="generatePost()">
+                <i class="fas fa-wand-magic-sparkles"></i> AI Сгенерировать
+            </button>
+            <button class="btn btn-secondary" style="flex: 1;" onclick="manualPost()">
+                <i class="fas fa-pen"></i> Вручную
+            </button>
+        </div>
+    </div>
+
+    <!-- ========== POST PREVIEW ========== -->
+    <div class="card animate-in" style="animation-delay: 0.13s" id="postPreview">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <h4 style="margin: 0;"><i class="fas fa-eye" style="color: var(--primary);"></i> Превью поста</h4>
+            <div style="display: flex; gap: 6px;">
+                <button class="icon-btn" onclick="regeneratePost()"><i class="fas fa-sync-alt"></i></button>
+                <button class="icon-btn" onclick="editPost()"><i class="fas fa-edit"></i></button>
+            </div>
+        </div>
+        <div class="post-preview">
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
+                <div class="ch-avatar" style="width: 28px; height: 28px; font-size: 9px;">GK</div>
+                <div>
+                    <div style="font-size: 12px; font-weight: 600;">@gramgpt_channel</div>
+                    <div style="font-size: 10px; color: var(--text-secondary);">сейчас</div>
+                </div>
+            </div>
+            <div style="font-size: 13px; line-height: 1.7;">
+                <strong>📊 Обзор рынка: ETH 2.0 — что изменилось за месяц</strong><br><br>
+                Ethereum продолжает укреплять позиции после перехода на PoS. Основные метрики:<br><br>
+                ▸ TVL вырос на 23% до $48.2B<br>
+                ▸ Газ стабильно ниже 20 gwei<br>
+                ▸ Количество валидаторов превысило 900K<br><br>
+                Ключевой драйвер роста — рестейкинг через EigenLayer и рост экосистемы L2.<br><br>
+                <em>Что думаете? Делитесь мнением в комментариях 👇</em><br><br>
+                <span style="color: var(--primary);">#ETH #Crypto #DeFi #Аналитика</span>
+            </div>
+        </div>
+        <div style="display: flex; gap: 8px; margin-top: 12px;">
+            <button class="btn" style="flex: 1;" onclick="publishNow()">
+                <i class="fas fa-paper-plane"></i> Опубликовать
+            </button>
+            <button class="btn btn-secondary" style="flex: 1;" onclick="schedulePost()">
+                <i class="fas fa-clock"></i> Запланировать
+            </button>
+        </div>
+    </div>
+
+    <!-- ========== CONTENT CALENDAR ========== -->
+    <div class="card animate-in" style="animation-delay: 0.15s">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+            <h4 style="margin: 0;"><i class="fas fa-calendar-alt" style="color: var(--primary);"></i> Контент-план</h4>
+            <button class="add-btn" onclick="createPost()"><i class="fas fa-plus"></i> Добавить</button>
+        </div>
+
+        <div id="content-plan-list">
+            <div class="empty-state"><i class="fas fa-calendar"></i><h4>Нет контент-плана</h4><p>Контент-план появится после настройки автопилота</p></div>
+        </div>
+    </div>
+
+    <!-- ========== AUTOPILOT SETTINGS ========== -->
+    <div class="card animate-in" style="animation-delay: 0.17s">
+        <h4 style="margin-bottom: 14px;"><i class="fas fa-robot" style="color: var(--primary);"></i> Настройки автопилота</h4>
+
+        <div class="setting-group">
+            <div class="setting-group-title">Контент</div>
+            <div class="setting-item">
+                <div>
+                    <span style="font-size: 13px;">AI авто-генерация</span>
+                    <div style="font-size: 10px; color: var(--text-secondary);">Автоматически создаёт посты</div>
+                </div>
+                <div class="toggle-on"></div>
+            </div>
+            <div class="setting-item">
+                <div>
+                    <span style="font-size: 13px;">Авто-рерайт новостей</span>
+                    <div style="font-size: 10px; color: var(--text-secondary);">Переписывает тренды своими словами</div>
+                </div>
+                <div class="toggle-on"></div>
+            </div>
+            <div class="setting-item">
+                <div>
+                    <span style="font-size: 13px;">Микс форматов</span>
+                    <div style="font-size: 10px; color: var(--text-secondary);">Текст + картинки + опросы + кружочки</div>
+                </div>
+                <div class="toggle-on"></div>
+            </div>
+        </div>
+
+        <div class="setting-group">
+            <div class="setting-group-title">Расписание</div>
+            <div class="setting-item">
+                <span style="font-size: 13px;">Постов в день</span>
+                <select>
+                    <option>1-2</option>
+                    <option>2-3</option>
+                    <option selected>3-5</option>
+                    <option>5-7</option>
+                    <option>7+</option>
+                </select>
+            </div>
+            <div class="setting-item">
+                <span style="font-size: 13px;">Часы активности</span>
+                <span style="font-size: 12px; color: var(--primary); font-weight: 600;">09:00 — 22:00</span>
+            </div>
+            <div class="setting-item">
+                <span style="font-size: 13px;">Выходные</span>
+                <select>
+                    <option selected>Реже (1-2 поста)</option>
+                    <option>Как обычно</option>
+                    <option>Пауза</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="setting-group">
+            <div class="setting-group-title">Источники трендов</div>
+            <div class="setting-item">
+                <div>
+                    <span style="font-size: 13px;">Крипто медиа</span>
+                    <div style="font-size: 10px; color: var(--text-secondary);">CoinDesk, CoinTelegraph, Decrypt</div>
+                </div>
+                <div class="toggle-on"></div>
+            </div>
+            <div class="setting-item">
+                <div>
+                    <span style="font-size: 13px;">Twitter/X</span>
+                    <div style="font-size: 10px; color: var(--text-secondary);">Топ крипто-инфлюенсеры</div>
+                </div>
+                <div class="toggle-on"></div>
+            </div>
+            <div class="setting-item">
+                <div>
+                    <span style="font-size: 13px;">Telegram каналы</span>
+                    <div style="font-size: 10px; color: var(--text-secondary);">247 мониторируемых каналов</div>
+                </div>
+                <div class="toggle-on"></div>
+            </div>
+            <div class="setting-item" style="border-bottom: none;">
+                <div>
+                    <span style="font-size: 13px;">Кросс-постинг</span>
+                    <div style="font-size: 10px; color: var(--text-secondary);">Публикация во все каналы</div>
+                </div>
+                <div class="toggle-off"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== CHANNEL ANALYTICS ========== -->
+    <div class="card animate-in" style="animation-delay: 0.19s">
+        <h4 style="margin-bottom: 12px;"><i class="fas fa-chart-bar" style="color: var(--primary);"></i> Аналитика канала</h4>
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+            <div class="analytics-box">
+                <div style="font-size: 20px; font-weight: 800; color: var(--success);" id="ch-growth-pct">--</div>
+                <div style="font-size: 10px; color: var(--text-secondary);">Рост подписчиков</div>
+                <div class="mini-chart green">▁▂▃▅▆█</div>
+            </div>
+            <div class="analytics-box">
+                <div style="font-size: 20px; font-weight: 800; color: var(--success);" id="ch-er-val">--</div>
+                <div style="font-size: 10px; color: var(--text-secondary);">Engagement Rate</div>
+                <div class="mini-chart green">▃▅▆▅▇█</div>
+            </div>
+            <div class="analytics-box">
+                <div style="font-size: 20px; font-weight: 800; color: var(--warning);" id="ch-avg-views">--</div>
+                <div style="font-size: 10px; color: var(--text-secondary);">Avg. просмотров</div>
+                <div class="mini-chart yellow">▅▃▆▇▅█</div>
+            </div>
+            <div class="analytics-box">
+                <div style="font-size: 20px; font-weight: 800; color: var(--primary);" id="ch-avg-reacts">--</div>
+                <div style="font-size: 10px; color: var(--text-secondary);">Avg. реакций</div>
+                <div class="mini-chart green">▂▃▅▆▇█</div>
+            </div>
+
+        </div>
+
+        <!-- Best Performing Posts -->
+        <div style="margin-top: 14px;">
+            <div style="font-size: 11px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">Лучшие посты за неделю</div>
+            <div id="ch-top-posts"></div>
+        </div>
+    </div>
+
+    <!-- ========== GROWTH TOOLS ========== -->
+    <div class="card animate-in" style="animation-delay: 0.21s">
+        <h4 style="margin-bottom: 12px;"><i class="fas fa-rocket" style="color: var(--primary);"></i> Инструменты роста</h4>
+        <div class="growth-tool" onclick="activateTool('invite')">
+            <div class="growth-icon"><i class="fas fa-user-plus"></i></div>
+            <div style="flex: 1;">
+                <div style="font-size: 13px; font-weight: 600;">Авто-инвайт</div>
+                <div style="font-size: 11px; color: var(--text-secondary);">Приглашение из спарсенной базы</div>
+            </div>
+            <i class="fas fa-chevron-right" style="color: var(--text-secondary); font-size: 12px;"></i>
+        </div>
+        <div class="growth-tool" onclick="activateTool('contest')">
+            <div class="growth-icon" style="background: rgba(243,156,18,0.1);"><i class="fas fa-trophy" style="color: var(--warning);"></i></div>
+            <div style="flex: 1;">
+                <div style="font-size: 13px; font-weight: 600;">AI Конкурсы</div>
+                <div style="font-size: 11px; color: var(--text-secondary);">Генерация и проведение конкурсов</div>
+            </div>
+            <i class="fas fa-chevron-right" style="color: var(--text-secondary); font-size: 12px;"></i>
+        </div>
+        <div class="growth-tool" onclick="activateTool('collab')">
+            <div class="growth-icon" style="background: rgba(155,89,182,0.1);"><i class="fas fa-handshake" style="color: #9b59b6;"></i></div>
+            <div style="flex: 1;">
+                <div style="font-size: 13px; font-weight: 600;">Кросс-промо</div>
+                <div style="font-size: 11px; color: var(--text-secondary);">Поиск каналов для взаимного пиара</div>
+            </div>
+            <i class="fas fa-chevron-right" style="color: var(--text-secondary); font-size: 12px;"></i>
+        </div>
+        <div class="growth-tool" onclick="activateTool('welcome')" style="border-bottom: none;">
+            <div class="growth-icon" style="background: rgba(46,204,113,0.1);"><i class="fas fa-door-open" style="color: var(--success);"></i></div>
+            <div style="flex: 1;">
+                <div style="font-size: 13px; font-weight: 600;">Welcome-бот</div>
+                <div style="font-size: 11px; color: var(--text-secondary);">AI приветствие новых подписчиков</div>
+            </div>
+            <i class="fas fa-chevron-right" style="color: var(--text-secondary); font-size: 12px;"></i>
+        </div>
+    </div>
+
+    <div class="nav-bar animate-in" style="animation-delay: 0.23s">
+        <a href="index.html" class="nav-item"><i class="fas fa-home"></i></a>
+        <a href="campaigns.html" class="nav-item"><i class="fas fa-tasks"></i></a>
+        <a href="channel.html" class="nav-item active"><i class="fas fa-tv"></i></a>
+        <a href="dashboard.html" class="nav-item"><i class="fas fa-chart-pie"></i></a>
+        <a href="settings.html" class="nav-item"><i class="fas fa-cog"></i></a>
+    </div>
+
+    <style>
+        .autopilot-banner { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; background: linear-gradient(135deg, rgba(0,136,204,0.1) 0%, rgba(46,204,113,0.08) 100%); border: 1px solid rgba(0,136,204,0.2); border-radius: 14px; margin-bottom: 16px; }
+        .autopilot-icon { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, var(--primary), var(--accent)); display: flex; align-items: center; justify-content: center; color: white; font-size: 16px; }
+        .pulse-glow { animation: pulseGlow 2s infinite; }
+        @keyframes pulseGlow { 0%, 100% { box-shadow: 0 0 8px rgba(0,210,255,0.3); } 50% { box-shadow: 0 0 20px rgba(0,210,255,0.6); } }
+
+        .live-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--success); animation: livePulse 1.5s infinite; }
+        @keyframes livePulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+        .trend-item { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--border); cursor: pointer; transition: background 0.2s; }
+        .trend-item:active { background: rgba(0,136,204,0.05); border-radius: 8px; }
+        .trend-rank { width: 28px; height: 28px; border-radius: 8px; background: rgba(48,54,61,0.5); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; color: var(--text-secondary); flex-shrink: 0; }
+        .trend-rank.hot { background: rgba(231,76,60,0.15); color: #e74c3c; }
+        .trend-rank.warm { background: rgba(243,156,18,0.15); color: var(--warning); }
+
+        .input-field { width: 100%; padding: 10px 14px; background: rgba(48,54,61,0.4); border: 1px solid var(--border); border-radius: 10px; color: var(--text); font-size: 13px; box-sizing: border-box; }
+        .input-field:focus { outline: none; border-color: var(--primary); }
+        .label { font-size: 12px; color: var(--text-secondary); display: block; margin-bottom: 6px; }
+
+        .toggle-on { width: 44px; height: 24px; background: var(--success); border-radius: 12px; position: relative; cursor: pointer; flex-shrink: 0; }
+        .toggle-on::after { content: ''; width: 20px; height: 20px; background: white; border-radius: 50%; position: absolute; top: 2px; right: 2px; }
+        .toggle-off { width: 44px; height: 24px; background: var(--text-secondary); border-radius: 12px; position: relative; cursor: pointer; flex-shrink: 0; }
+        .toggle-off::after { content: ''; width: 20px; height: 20px; background: white; border-radius: 50%; position: absolute; top: 2px; left: 2px; }
+
+        .add-btn { background: rgba(0,136,204,0.1); border: 1px solid var(--primary); color: var(--primary); font-size: 11px; font-weight: 600; padding: 6px 12px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 4px; }
+
+        .channel-selector { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; }
+        .channel-option { display: flex; align-items: center; gap: 8px; padding: 10px 14px; border: 1px solid var(--border); border-radius: 12px; cursor: pointer; flex-shrink: 0; transition: all 0.2s; }
+        .channel-option.active { border-color: var(--primary); background: rgba(0,136,204,0.08); }
+        .ch-avatar { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: white; background: linear-gradient(135deg, var(--primary), var(--primary)); }
+        .add-ch-btn { width: 54px; border: 1px dashed var(--border); border-radius: 12px; background: none; color: var(--text-secondary); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+
+        .content-day { margin-bottom: 16px; }
+        .day-header { font-size: 11px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; padding-left: 4px; }
+        .post-plan-item { display: flex; align-items: center; gap: 8px; padding: 10px 0; border-bottom: 1px solid rgba(48,54,61,0.3); }
+        .post-plan-item:last-child { border-bottom: none; }
+        .post-time { font-size: 12px; font-weight: 700; color: var(--primary); min-width: 38px; }
+        .post-format-icon { font-size: 12px; color: var(--primary); width: 20px; text-align: center; }
+
+        .status-badge { font-size: 10px; padding: 3px 8px; border-radius: 6px; font-weight: 600; white-space: nowrap; }
+        .status-badge.published { background: rgba(46,204,113,0.15); color: var(--success); }
+        .status-badge.ready { background: rgba(0,136,204,0.15); color: var(--primary); }
+        .status-badge.queued { background: rgba(243,156,18,0.15); color: var(--warning); }
+
+        .type-btn { padding: 8px; border-radius: 8px; border: 1px solid var(--border); background: var(--card-bg); color: var(--text-secondary); font-size: 11px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+        .type-btn.active { border-color: var(--primary); color: var(--primary); background: rgba(0,136,204,0.1); }
+        .type-btn:active { transform: scale(0.96); }
+
+        .post-preview { background: rgba(48,54,61,0.3); border-radius: 12px; padding: 16px; border-left: 3px solid var(--primary); }
+        .icon-btn { background: rgba(48,54,61,0.4); border: 1px solid var(--border); color: var(--text-secondary); width: 32px; height: 32px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 12px; }
+
+        .setting-group { margin-bottom: 16px; }
+        .setting-group-title { font-size: 10px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; padding-left: 4px; }
+        .setting-item { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border); }
+        .setting-item:last-child { border-bottom: none; }
+
+        .analytics-box { background: rgba(48,54,61,0.3); border-radius: 12px; padding: 14px; text-align: center; }
+        .mini-chart { font-size: 14px; margin-top: 6px; letter-spacing: 2px; }
+        .mini-chart.green { color: var(--success); }
+        .mini-chart.yellow { color: var(--warning); }
+
+        .top-post { display: flex; align-items: center; gap: 8px; padding: 8px 0; border-bottom: 1px solid var(--border); }
+
+        .growth-tool { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border); cursor: pointer; }
+        .growth-tool:active { opacity: 0.7; }
+        .growth-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 14px; background: rgba(0,136,204,0.1); color: var(--primary); flex-shrink: 0; }
+
+        select { padding: 8px 12px; background: rgba(48,54,61,0.4); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size: 12px; }
+    </style>
+
+    <script>
+        function selectChannel(el) {
+            document.querySelectorAll('.channel-option').forEach(c => c.classList.remove('active'));
+            el.classList.add('active');
+        }
+        function selectType(btn) {
+            const parent = btn.closest('div');
+            parent.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+        }
+        function toggleAutopilot(el) {
+            if (el.classList.contains('toggle-on')) {
+                el.classList.remove('toggle-on');
+                el.classList.add('toggle-off');
+            } else {
+                el.classList.remove('toggle-off');
+                el.classList.add('toggle-on');
+            }
+        }
+        function addChannel() { toast('info', 'Канал', 'Введите @username или ссылку'); }
+        function createPost() { toast('info', 'Пост', 'Создание нового поста...'); }
+        async function generatePost() {
+            try {
+                const topic = document.getElementById('postTopic')?.value || 'крипто';
+                const r = await api.post('/content/generate', { topic, type: 'post', tone: 'expert' });
+                toast('success', 'Пост сгенерирован', 'AI создал текст');
+            } catch (e) { toast('error', 'Ошибка', e.message); }
+        }
+        function manualPost() { toast('info', 'Редактор', 'Открыть ручной редактор'); }
+        function regeneratePost() { toast('info', 'Перегенерация', 'Создаём новый вариант...'); }
+        function editPost() { toast('info', 'Редактор', 'Редактирование поста'); }
+        function publishNow() { toast('success', 'Опубликовано', 'Пост отправлен в канал'); }
+        function schedulePost() { toast('info', 'Планирование', 'Выберите дату и время'); }
+        function activateTool(tool) { toast('success', tool, 'Инструмент активирован'); }
+        function useTrend(el) { const t = el.querySelector('div:first-child + div > div:first-child'); if (t) document.getElementById('postTopic').value = t.textContent; }
+        function refreshTrends() { toast('info', 'Тренды', 'Обновление из 247 источников...'); }
+    </script>
+<script src='main.js'></script>
+<script>
+    document.addEventListener('DOMContentLoaded', async () => {
+        try {
+            const [statsResp, trendsResp, planResp] = await Promise.all([
+                api.get('/channel/list?limit=5').catch(() => null),
+                api.get('/channel/trends').catch(() => null),
+                api.get('/channel/content-plan').catch(() => null),
+            ]);
+            if (statsResp && statsResp.length) {
+                const total = statsResp.reduce((s, c) => s + (c.subscribers || 0), 0);
+                document.getElementById('ch-subs').textContent = total.toLocaleString();
+                document.getElementById('ch-growth').textContent = '+' + statsResp.length;
+                document.getElementById('ch-er').textContent = (statsResp[0]?.er || '--') + '%';
+                const list = document.getElementById('ch-list');
+                list.innerHTML = statsResp.map((c, i) => '<div class="channel-option ' + (i === 0 ? 'active' : '') + '" onclick="selectChannel(this)"><div class="ch-avatar">' + (c.name ? c.name.substring(0, 2).toUpperCase() : 'CH') + '</div><div><div style="font-size:13px;font-weight:600;">@' + escapeHtml(c.name || 'channel') + '</div><div style="font-size:10px;color:var(--text-secondary);">' + (c.subscribers || 0).toLocaleString() + ' подп.</div></div></div>').join('');
+            }
+            if (statsResp && statsResp[0] && statsResp[0].analytics) {
+                const a = statsResp[0].analytics;
+                document.getElementById('ch-growth-pct').textContent = (a.growth || '--') + '%';
+                document.getElementById('ch-er-val').textContent = (a.er || '--') + '%';
+                document.getElementById('ch-avg-views').textContent = (a.avg_views || '--').toLocaleString();
+                document.getElementById('ch-avg-reacts').textContent = (a.avg_reactions || '--').toLocaleString();
+            }
+            if (statsResp && statsResp[0] && statsResp[0].top_posts) {
+                const medals = ['🏆', '🥈', '🥉'];
+                document.getElementById('ch-top-posts').innerHTML = statsResp[0].top_posts.slice(0, 3).map((p, i) => '<div class="top-post" ' + (i === 2 ? 'style="border-bottom:none;"' : '') + '><div style="font-size:11px;">' + medals[i] + '</div><div style="flex:1;"><div style="font-size:12px;font-weight:600;">' + escapeHtml(p.title || '') + '</div><div style="font-size:10px;color:var(--text-secondary);">' + escapeHtml(p.type || '') + '</div></div><div style="text-align:right;"><div style="font-size:11px;font-weight:700;color:var(--primary);">' + (p.views || 0).toLocaleString() + ' 👁</div><div style="font-size:10px;color:var(--success);">+' + (p.new_subs || 0) + ' подп</div></div></div>').join('');
+            }
+            if (trendsResp && trendsResp.length) {
+                const list = document.getElementById('trend-list');
+                const labels = ['🔥 Hot', '📈 Rising', '📊 Trending', 'New'];
+                const labelColors = ['#e74c3c', 'var(--warning)', 'var(--primary)', 'var(--text-secondary)'];
+                const rankColors = ['hot', 'warm', '', ''];
+                document.getElementById('trend-source').textContent = 'AI мониторит ' + (trendsResp.length * 10) + ' источников • Обновлено только что';
+                list.innerHTML = trendsResp.slice(0, 8).map((t, i) => '<div class="trend-item" onclick="useTrend(this)"><div class="trend-rank ' + (rankColors[i] || '') + '">' + (i + 1) + '</div><div style="flex:1;"><div style="font-size:12px;font-weight:600;">' + escapeHtml(t.title || '') + '</div><div style="font-size:10px;color:var(--text-secondary);">' + escapeHtml(t.source || '') + '</div></div><div style="text-align:right;"><div style="font-size:11px;font-weight:700;color:' + labelColors[i] + ';">' + labels[i] + '</div><div style="font-size:10px;color:var(--text-secondary);">' + (t.time || '—') + '</div></div></div>').join('');
+            }
+            if (planResp && planResp.days) {
+                const planList = document.getElementById('content-plan-list');
+                const statusLabels = { published: 'Опубликован', ready: 'Готов', queued: 'В очереди' };
+                const statusColors = { published: 'var(--success)', ready: 'var(--warning)', queued: 'var(--text-secondary)' };
+                planList.innerHTML = planResp.days.map(day => {
+                    const posts = (day.posts || []).map(p => '<div class="post-plan-item"><div class="post-time">' + escapeHtml(p.time || '') + '</div><div class="post-format-icon" ' + (p.icon_color ? 'style="color:' + p.icon_color + ';"' : '') + '><i class="fas ' + (p.icon || 'fa-pen-fancy') + '"></i></div><div style="flex:1;"><div style="font-size:12px;font-weight:600;">' + escapeHtml(p.title || '') + '</div><div style="font-size:10px;color:var(--text-secondary);">' + escapeHtml(p.meta || '') + '</div></div><span class="status-badge ' + (p.status || 'queued') + '" style="color:' + (statusColors[p.status] || 'var(--text-secondary)') + ';">' + (statusLabels[p.status] || p.status) + '</span></div>').join('');
+                    return '<div class="content-day"><div class="day-header">' + escapeHtml(day.name || '') + '</div>' + posts + '</div>';
+                }).join('');
+            }
+        } catch (e) { console.warn('Channel API error:', e); }
+    });
+    function escapeHtml(str) {
+        var d = document.createElement('div');
+        d.textContent = str;
+        return d.innerHTML;
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TeleBoost — Парсинг Screenshot</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Inter',sans-serif;background:#05050A;color:#EEF2F8;padding:20px;min-height:100vh}
+        .phone{width:375px;margin:0 auto;background:#0A0A1A;border-radius:32px;border:2px solid rgba(0,229,255,0.1);overflow:hidden;box-shadow:0 0 60px rgba(0,229,255,0.08)}
+        .header{padding:16px 20px;display:flex;justify-content:space-between;align-items:center}
+        .header h2{font-size:16px;font-weight:800}
+        .card{margin:0 16px 12px;padding:16px;border-radius:12px;background:rgba(12,15,35,0.55);border:1px solid rgba(0,229,255,0.06)}
+        .card h4{font-size:13px;margin-bottom:12px}
+        .form-label{font-size:10px;color:#8892A8;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;display:block}
+        .input{width:100%;padding:10px 12px;background:rgba(48,54,61,0.4);border:1px solid rgba(0,229,255,0.06);border-radius:8px;color:#EEF2F8;font-size:12px;margin-bottom:10px}
+        .type-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;margin-bottom:12px}
+        .type-btn{padding:8px 4px;border-radius:8px;border:1px solid rgba(0,229,255,0.06);background:transparent;color:#8892A8;font-size:9px;font-weight:600;cursor:pointer;text-align:center}
+        .type-btn.active{border-color:#00E5FF;color:#00E5FF;background:rgba(0,229,255,0.08)}
+        .btn{width:100%;padding:12px;border-radius:10px;border:none;background:linear-gradient(135deg,#00E5FF,#0096B4);color:#05050A;font-weight:700;font-size:13px;cursor:pointer;text-align:center}
+        .result-item{display:flex;align-items:center;gap:10px;padding:10px;border-radius:8px;background:rgba(12,15,35,0.4);border:1px solid rgba(0,229,255,0.04);margin-bottom:6px}
+        .result-avatar{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0}
+        .badge{padding:3px 8px;border-radius:6px;font-size:9px;font-weight:600}
+        .badge-blue{background:rgba(0,229,255,0.1);color:#00E5FF}
+        .badge-green{background:rgba(52,211,153,0.1);color:#34D399}
+        .badge-yellow{background:rgba(245,158,11,0.1);color:#F59E0B}
+        .nav-bar{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:375px;display:flex;justify-content:space-around;padding:12px 0;background:rgba(10,10,26,0.95);border-top:1px solid rgba(0,229,255,0.06)}
+        .nav-item{color:#5A6480;font-size:18px;text-decoration:none;padding:8px}
+    </style>
+</head>
+<body>
+<div class="phone">
+    <div class="header"><h2><i class="fas fa-crosshairs" style="color:#00E5FF"></i> Парсинг</h2><span style="color:#8892A8;font-size:13px"><i class="fas fa-arrow-left"></i></span></div>
+    <div class="card">
+        <h4>Тип парсинга</h4>
+        <div class="type-grid">
+            <div class="type-btn active"><i class="fas fa-users"></i><br>Пользователи</div>
+            <div class="type-btn"><i class="fas fa-broadcast-tower"></i><br>Каналы</div>
+            <div class="type-btn"><i class="fas fa-envelope"></i><br>Сообщения</div>
+            <div class="type-btn"><i class="fas fa-key"></i><br>По ключам</div>
+        </div>
+        <label class="form-label">Целевые каналы / группы</label>
+        <input class="input" value="@crypto_signals" readonly>
+        <label class="form-label">Ключевые слова</label>
+        <input class="input" value="крипто, трейдинг, BTC" readonly>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            <div><label class="form-label">Лимит</label><select class="input" style="margin:0"><option>100</option><option>500</option><option selected>1000</option></select></div>
+            <div><label class="form-label">Период</label><select class="input" style="margin:0"><option>24 часа</option><option selected>7 дней</option><option>30 дней</option></select></div>
+        </div>
+    </div>
+    <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+            <h4 style="margin:0">Результаты</h4>
+            <span class="badge badge-green">2,847 найдено</span>
+        </div>
+        <div class="result-item">
+            <div class="result-avatar" style="background:linear-gradient(135deg,#00E5FF,#0096B4)">АП</div>
+            <div style="flex:1"><div style="font-size:12px;font-weight:600">Алексей Петров</div><div style="font-size:10px;color:#8892A8">@alex_trader • @crypto_signals</div></div>
+            <span class="badge badge-blue">Спарсен</span>
+        </div>
+        <div class="result-item">
+            <div class="result-avatar" style="background:linear-gradient(135deg,#B44AFF,#7C3AED)">МИ</div>
+            <div style="flex:1"><div style="font-size:12px;font-weight:600">Мария Иванова</div><div style="font-size:10px;color:#8892A8">@maria_crypto • @btc_news</div></div>
+            <span class="badge badge-blue">Спарсен</span>
+        </div>
+        <div class="result-item">
+            <div class="result-avatar" style="background:linear-gradient(135deg,#34D399,#059669)">ДК</div>
+            <div style="flex:1"><div style="font-size:12px;font-weight:600">Дмитрий К.</div><div style="font-size:10px;color:#8892A8">@dima_trade • @trading_chat</div></div>
+            <span class="badge badge-blue">Спарсен</span>
+        </div>
+        <div class="result-item">
+            <div class="result-avatar" style="background:linear-gradient(135deg,#F59E0B,#D97706)">ЕС</div>
+            <div style="flex:1"><div style="font-size:12px;font-weight:600">Елена Смирнова</div><div style="font-size:10px;color:#8892A8">@elena_invest • @crypto_signals</div></div>
+            <span class="badge badge-blue">Спарсен</span>
+        </div>
+    </div>
+    <div style="padding:0 16px 16px"><div class="btn"><i class="fas fa-download"></i> Скачать CSV (2,847)</div></div>
+    <div style="height:60px"></div>
+</div>
+<div class="nav-bar">
+    <a href="#" class="nav-item"><i class="fas fa-home"></i></a>
+    <a href="#" class="nav-item"><i class="fas fa-tasks"></i></a>
+    <a href="#" class="nav-item"><i class="fas fa-chart-pie"></i></a>
+    <a href="#" class="nav-item"><i class="fas fa-cog"></i></a>
+</div>
+</body>
+</html>

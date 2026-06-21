@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="color-scheme" content="light dark">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>GRAMGPT — Team</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="header animate-in">
+        <h2><i class="fas fa-users" style="background: linear-gradient(135deg, var(--primary), var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;"></i> Команда</h2>
+        <a href="index.html" style="color: var(--text-secondary); text-decoration: none; font-size: 13px;"><i class="fas fa-arrow-left"></i> Назад</a>
+    </div>
+
+    <!-- Stats -->
+    <div class="metric-grid animate-in" style="animation-delay: 0.03s; margin-bottom: 16px;">
+        <div class="metric-card">
+            <div class="metric-value" id="team-members">0</div>
+            <div class="metric-label">Участников</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-value green" id="team-online">0</div>
+            <div class="metric-label">Online</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-value orange" id="team-actions">0</div>
+            <div class="metric-label">Действий сегодня</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-value purple" id="team-roles">0</div>
+            <div class="metric-label">Роли</div>
+        </div>
+    </div>
+
+    <!-- Invite -->
+    <button class="btn animate-in" style="animation-delay: 0.05s; margin-bottom: 16px;" onclick="inviteMember()">
+        <i class="fas fa-user-plus"></i> Пригласить участника
+    </button>
+
+    <!-- Team Members -->
+    <div class="section-title animate-in" style="animation-delay: 0.07s">Участники</div>
+    <div id="team-members-list"></div>
+
+    <!-- Activity Log -->
+    <div class="section-title animate-in" style="animation-delay: 0.19s">Последняя активность</div>
+    <div class="card animate-in" style="animation-delay: 0.21s;" id="team-activity">
+        <div class="empty-state"><i class="fas fa-users"></i><h4>Нет активности</h4><p>История действий команды появится здесь</p></div>
+    </div>
+
+    <div class="nav-bar">
+        <a href="index.html" class="nav-item"><i class="fas fa-home"></i></a>
+        <a href="campaigns.html" class="nav-item"><i class="fas fa-list"></i></a>
+        <a href="channel.html" class="nav-item"><i class="fas fa-tv"></i></a>
+        <a href="dashboard.html" class="nav-item"><i class="fas fa-chart-line"></i></a>
+        <a href="settings.html" class="nav-item"><i class="fas fa-cog"></i></a>
+    </div>
+<script src='main.js'></script>
+<script>
+    async function inviteMember() {
+        try {
+            const r = await api.post('/team/invite', { role: 'manager' });
+            toast('success', 'Приглашение отправлено', r.link || 'Ссылка скопирована');
+        } catch (e) { toast('error', 'Ошибка', e.message); }
+    }
+    function renderTeamMember(m, i) {
+        const initials = (m.name || '??').substring(0, 2).toUpperCase();
+        const colors = ['var(--primary),var(--accent)', '#9b59b6,#8e44ad', '#2ecc71,#27ae60', '#f39c12,#e67e22', '#e74c3c,#c0392b'];
+        const isOwner = m.role === 'owner';
+        return '<div class="card animate-in" style="padding:14px 16px;' + (m.online ? '' : 'opacity:0.7;') + '"><div style="display:flex;justify-content:space-between;align-items:center;"><div style="display:flex;align-items:center;gap:12px;"><div style="width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,' + colors[i % 5] + ');display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;color:white;">' + initials + '</div><div><div style="font-size:14px;font-weight:600;">' + escapeHtml(m.name || '') + (isOwner ? ' (Владелец)' : '') + '</div><div style="font-size:11px;color:var(--text-secondary);">@' + escapeHtml(m.username || '—') + '</div></div></div><div style="text-align:right;"><span class="status-badge" style="background:' + (isOwner ? 'rgba(0,136,204,0.15)' : 'rgba(46,204,113,0.15)') + ';color:' + (isOwner ? 'var(--primary)' : 'var(--success)') + ';font-size:10px;">' + (isOwner ? '<i class="fas fa-crown"></i> ' : '') + escapeHtml(m.role || 'member') + '</span>' + (m.online ? '<div style="display:flex;align-items:center;gap:4px;margin-top:4px;justify-content:flex-end;"><span class="live-dot"></span><span style="font-size:10px;color:var(--success);">Online</span></div>' : '<div style="font-size:10px;color:var(--text-secondary);margin-top:4px;">Был ' + (m.last_seen || 'давно') + '</div>') + '</div></div>' + (m.modules ? '<div style="display:flex;gap:6px;margin-top:10px;font-size:10px;flex-wrap:wrap;">' + m.modules.map(mod => '<span style="background:rgba(48,54,61,0.6);padding:3px 8px;border-radius:6px;">' + escapeHtml(mod) + '</span>').join('') + '</div>' : '') + '</div>';
+    }
+    document.addEventListener('DOMContentLoaded', async () => {
+        try {
+            const data = await api.get('/team/members');
+            if (data && data.members) {
+                document.getElementById('team-members').textContent = data.members.length;
+                document.getElementById('team-online').textContent = data.members.filter(m => m.online).length;
+                document.getElementById('team-actions').textContent = data.actions_today || 0;
+                document.getElementById('team-roles').textContent = data.role_count || new Set(data.members.map(m => m.role)).size;
+                document.getElementById('team-members-list').innerHTML = data.members.map((m, i) => renderTeamMember(m, i)).join('');
+            }
+            if (data && data.activity) {
+                const dots = { success: 'var(--success)', primary: 'var(--primary)', warning: 'var(--warning)', accent: 'var(--accent)' };
+                document.getElementById('team-activity').innerHTML = data.activity.map(a => '<div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--border);"><div style="width:6px;height:6px;border-radius:50%;background:' + (dots[a.dot_color] || 'var(--primary)') + ';margin-top:5px;flex-shrink:0;"></div><div><div style="font-size:12px;">' + (a.html || escapeHtml(a.text || '')) + '</div><div style="font-size:10px;color:var(--text-secondary);">' + (a.time || '') + '</div></div></div>').join('');
+            }
+        } catch (e) { console.warn('Team API error:', e); }
+    });
+    function escapeHtml(str) {
+        var d = document.createElement('div');
+        d.textContent = str;
+        return d.innerHTML;
+    }
+</script>
+</body>
+</html>

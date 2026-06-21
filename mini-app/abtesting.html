@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="color-scheme" content="light dark">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>GRAMGPT — A/B Тестирование</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="header animate-in">
+        <h2><i class="fas fa-flask" style="color: var(--primary)"></i> A/B Тесты</h2>
+        <a href="index.html" style="color: var(--text-secondary); text-decoration: none; font-size: 14px;">
+            <i class="fas fa-arrow-left"></i> Назад
+        </a>
+    </div>
+
+    <!-- Create Form -->
+    <div class="card animate-in" style="animation-delay: 0.05s" id="create-card">
+        <h4 class="mb-12"><i class="fas fa-plus-circle" style="color: var(--primary)"></i> Создать тест</h4>
+        <div class="form-group">
+            <label class="form-label">Название теста</label>
+            <input type="text" class="form-input" id="test-name" placeholder="A/B тест заголовков">
+        </div>
+        <div class="form-group">
+            <label class="form-label">Описание</label>
+            <input type="text" class="form-input" id="test-desc" placeholder="Сравнение двух вариантов">
+        </div>
+        <div class="flex gap-8">
+            <div class="flex-1">
+                <label class="form-label">Вариант A</label>
+                <input type="text" class="form-input" id="test-var-a" placeholder="Заголовок A">
+            </div>
+            <div class="flex-1">
+                <label class="form-label">Вариант B</label>
+                <input type="text" class="form-input" id="test-var-b" placeholder="Заголовок B">
+            </div>
+        </div>
+        <button class="btn mt-12" onclick="createTest()"><i class="fas fa-flask"></i> Запустить тест</button>
+    </div>
+
+    <!-- Active Tests -->
+    <div class="card animate-in" style="animation-delay: 0.1s">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+            <h4 style="margin: 0;"><i class="fas fa-play-circle" style="color: var(--success);"></i> Активные тесты</h4>
+        </div>
+        <div id="active-tests">
+            <div class="empty-state"><i class="fas fa-flask"></i><h4>Нет активных тестов</h4><p>Создайте A/B тест для оптимизации кампаний</p></div>
+        </div>
+    </div>
+
+    <!-- Completed Tests -->
+    <div class="card animate-in" style="animation-delay: 0.15s">
+        <h4 style="margin-bottom: 12px;"><i class="fas fa-check-circle" style="color: var(--text-secondary);"></i> Завершённые</h4>
+        <div id="completed-tests">
+            <div class="empty-state"><i class="fas fa-check-circle"></i><h4>Нет завершённых тестов</h4><p>Результаты тестов появятся после завершения</p></div>
+        </div>
+    </div>
+
+    <div class="nav-bar animate-in" style="animation-delay: 0.2s">
+        <a href="index.html" class="nav-item"><i class="fas fa-home"></i></a>
+        <a href="campaigns.html" class="nav-item"><i class="fas fa-tasks"></i></a>
+        <a href="channel.html" class="nav-item"><i class="fas fa-tv"></i></a>
+        <a href="dashboard.html" class="nav-item"><i class="fas fa-chart-pie"></i></a>
+        <a href="settings.html" class="nav-item"><i class="fas fa-cog"></i></a>
+    </div>
+
+    <style>
+        .add-btn { background: rgba(0,136,204,0.1); border: 1px solid var(--primary); color: var(--primary); font-size: 11px; font-weight: 600; padding: 6px 12px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 4px; }
+        .test-card { background: rgba(48,54,61,0.2); border: 1px solid var(--border); border-radius: 14px; padding: 16px; }
+        .ab-compare { display: flex; align-items: stretch; gap: 0; }
+        .ab-variant { flex: 1; padding: 10px; background: rgba(48,54,61,0.2); border-radius: 10px; }
+        .ab-label { font-size: 11px; font-weight: 700; color: var(--primary); margin-bottom: 8px; }
+        .ab-metric-row { display: flex; justify-content: space-between; font-size: 11px; padding: 3px 0; }
+        .ab-vs { display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 800; color: var(--text-secondary); padding: 0 8px; }
+        .ab-result { display: flex; align-items: center; gap: 8px; margin-top: 10px; padding: 8px 12px; background: rgba(243,156,18,0.08); border-radius: 8px; font-size: 11px; }
+        .completed-test { display: flex; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border); }
+    </style>
+
+    <script src='main.js'></script>
+    <script>
+        async function createTest() {
+            const name = document.getElementById('test-name').value.trim();
+            if (!name) { toast('warning', 'Введите название', 'Назовите A/B тест'); return; }
+            haptic('medium');
+            try {
+                const r = await api.post('/abtests', {
+                    name: name,
+                    description: document.getElementById('test-desc').value.trim(),
+                    variant_a: document.getElementById('test-var-a').value.trim(),
+                    variant_b: document.getElementById('test-var-b').value.trim(),
+                });
+                toast('success', 'Тест создан', name);
+                document.getElementById('test-name').value = '';
+                document.getElementById('test-desc').value = '';
+                document.getElementById('test-var-a').value = '';
+                document.getElementById('test-var-b').value = '';
+                await loadTests();
+            } catch (e) { toast('error', 'Ошибка', e.message); }
+        }
+
+        async function loadTests() {
+            try {
+                const data = await api.get('/abtests');
+                if (data && data.active && data.active.length) {
+                    document.getElementById('active-tests').innerHTML = data.active.map(function(t, i) {
+                        return '<div class="test-card" style="margin-top:' + (i > 0 ? '12' : '0') + 'px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;"><div style="font-size:13px;font-weight:700;">' + escapeHtml(t.name || 'Test') + '</div><span class="status-badge" style="background:rgba(46,204,113,0.15);color:var(--success);"><span class="live-dot"></span> Активен</span></div><div style="font-size:11px;color:var(--text-secondary);margin-bottom:12px;">' + escapeHtml(t.description || '') + '</div></div>';
+                    }).join('');
+                }
+                if (data && data.completed && data.completed.length) {
+                    document.getElementById('completed-tests').innerHTML = data.completed.map(function(t) {
+                        return '<div class="completed-test"><div style="flex:1;"><div style="font-size:12px;font-weight:600;">' + escapeHtml(t.name || '') + '</div><div style="font-size:10px;color:var(--text-secondary);">' + escapeHtml(t.description || '') + '</div></div><div style="text-align:right;"><div style="font-size:11px;font-weight:600;color:var(--success);">' + escapeHtml(t.result || '') + '</div><div style="font-size:10px;color:var(--text-secondary);">Применён</div></div></div>';
+                    }).join('');
+                }
+            } catch (e) { console.warn('AB test API error:', e); }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadTests);
+        function escapeHtml(str) {
+            var d = document.createElement('div');
+            d.textContent = str;
+            return d.innerHTML;
+        }
+    </script>
+</body>
+</html>

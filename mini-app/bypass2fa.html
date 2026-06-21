@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="color-scheme" content="light dark">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>GRAMGPT — Обход 2FA</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .bypass-card{background:rgba(239,68,68,0.04);border:1px solid rgba(239,68,68,0.15);border-radius:var(--radius);padding:20px;margin-bottom:12px}
+        .bypass-status{display:flex;align-items:center;gap:10px;padding:10px;border-radius:8px;margin-bottom:8px}
+        .bypass-status.safe{background:rgba(46,204,113,0.08);color:var(--success)}
+        .bypass-status.active{background:rgba(0,229,255,0.08);color:var(--primary)}
+    </style>
+</head>
+<body>
+    <div class="header animate-in">
+        <h2><i class="fas fa-key" style="color: var(--warning)"></i> Обход 2FA</h2>
+        <a href="index.html" style="color: var(--text-secondary); text-decoration: none; font-size: 14px;"><i class="fas fa-arrow-left"></i> Назад</a>
+    </div>
+
+    <div class="card animate-in" style="animation-delay: 0.05s;border-color:rgba(245,158,11,0.2)">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+            <i class="fas fa-exclamation-triangle" style="color:var(--warning);font-size:20px"></i>
+            <div>
+                <div style="font-size:14px;font-weight:700;color:var(--warning)">Внимание</div>
+                <div style="font-size:12px;color:var(--text-secondary)">Модуль позволяет обойти 2FA без пароля. Используйте ответственно.</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="stat-row animate-in" style="animation-delay: 0.08s">
+        <div style="display: flex; justify-content: space-between;">
+            <div class="stat-item"><h4>Обработано</h4><div style="color: var(--primary); font-size: 22px; font-weight: 800;" id="bypass-done">0</div></div>
+            <div class="stat-item text-center"><h4>Успешно</h4><div style="color: var(--success); font-size: 22px; font-weight: 800;" id="bypass-success">0</div></div>
+            <div class="stat-item" style="text-align: right"><h4>Ошибок</h4><div style="color: var(--danger); font-size: 22px; font-weight: 800;" id="bypass-errors">0</div></div>
+        </div>
+    </div>
+
+    <div class="card animate-in" style="animation-delay: 0.1s">
+        <h4 style="margin-bottom: 12px;">Аккаунты с 2FA</h4>
+        <div id="bypass-accounts">
+            <div class="empty-state"><i class="fas fa-key"></i><h4>Нет аккаунтов</h4><p>Добавьте аккаунты с активной 2FA</p></div>
+        </div>
+    </div>
+
+    <div class="card animate-in" style="animation-delay: 0.15s">
+        <h4 style="margin-bottom: 12px;">Как это работает</h4>
+        <div class="bypass-status safe"><i class="fas fa-check-circle"></i><div style="flex:1"><div style="font-size:12px;font-weight:600">Шаг 1: Анализ</div><div style="font-size:11px;opacity:0.7">Определение типа 2FA</div></div></div>
+        <div class="bypass-status active"><i class="fas fa-spinner fa-spin"></i><div style="flex:1"><div style="font-size:12px;font-weight:600">Шаг 2: Обход</div><div style="font-size:11px;opacity:0.7">Создание новой сессии</div></div></div>
+        <div class="bypass-status safe"><i class="fas fa-check-circle"></i><div style="flex:1"><div style="font-size:12px;font-weight:600">Шаг 3: Результат</div><div style="font-size:11px;opacity:0.7">Авторизованная сессия</div></div></div>
+    </div>
+
+    <button class="btn animate-in" style="animation-delay: 0.2s;background:var(--warning);color:#000" onclick="startBypass()" id="bypass-start-btn">
+        <i class="fas fa-key"></i> Запустить обход 2FA
+    </button>
+
+    <div class="nav-bar animate-in" style="animation-delay: 0.25s">
+        <a href="index.html" class="nav-item"><i class="fas fa-home"></i></a>
+        <a href="campaigns.html" class="nav-item"><i class="fas fa-tasks"></i></a>
+        <a href="channel.html" class="nav-item"><i class="fas fa-tv"></i></a>
+        <a href="dashboard.html" class="nav-item"><i class="fas fa-chart-pie"></i></a>
+        <a href="settings.html" class="nav-item"><i class="fas fa-cog"></i></a>
+    </div>
+
+    <script src="main.js"></script>
+    <script>
+        async function startBypass() {
+            haptic('medium');
+            try {
+                await api.post('/bypass2fa/start');
+                toast('success', 'Запущено', 'Обход 2FA выполняется...');
+            } catch (e) { toast('error', 'Ошибка', e.message); }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="color-scheme" content="light dark">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Кампании — GRAMGPT</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="header animate-in">
+        <a href="index.html" style="color: inherit; text-decoration: none;"><i class="fas fa-arrow-left"></i></a>
+        <h2>Кампании</h2>
+        <button class="btn-add" onclick="openCampaignModal()">+ Создать</button>
+    </div>
+
+    <div id="campaigns-list" class="animate-in" style="animation-delay: 0.05s">
+        <div class="empty-state">
+            <div class="empty-state-icon"><i class="fas fa-rocket"></i></div>
+            <div class="empty-state-title">Ещё нет кампаний</div>
+            <div class="empty-state-text">Создайте первую — ИИ настроит воронку продаж под вашу нишу</div>
+            <button class="btn" onclick="openCampaignModal()" style="max-width:220px;margin:0 auto">
+                <i class="fas fa-plus"></i> Создать кампанию
+            </button>
+        </div>
+    </div>
+
+    <!-- ===== Campaign Creation Modal ===== -->
+    <dialog id="campaign-modal" class="modal-lg" closedby="any">
+        <div class="modal-header">
+            <div class="modal-title-row">
+                <h3 class="modal-title"><i class="fas fa-magic" style="color:var(--primary)"></i> Новая кампания</h3>
+                <button class="modal-close-btn" onclick="closeCampaignModal()">&times;</button>
+            </div>
+            <p class="modal-subtitle">ИИ настроит стратегию продвижения под вашу цель</p>
+        </div>
+
+            <!-- Tabs -->
+            <div class="campaign-tabs">
+                <button class="campaign-tab active" data-tab="config" onclick="switchTab('config')">
+                    <i class="fas fa-sliders-h"></i> Настройки
+                </button>
+                <button class="campaign-tab" data-tab="prompt" onclick="switchTab('prompt')">
+                    <i class="fas fa-brain"></i> AI Промпт
+                </button>
+                <button class="campaign-tab" data-tab="parsing" onclick="switchTab('parsing')">
+                    <i class="fas fa-search"></i> Парсинг
+                    <span class="tab-tooltip">Ищите каналы прямо здесь</span>
+                </button>
+            </div>
+
+            <!-- Tab: Config -->
+            <div class="campaign-tab-content active" id="tab-config">
+                <div class="form-group">
+                    <label class="form-label">Название кампании</label>
+                    <input class="form-input" id="camp-name" placeholder="Например: Крипта-февраль 2026" value="Новая кампания">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Цель кампании</label>
+                    <div class="btn-option-grid btn-option-grid-4" id="goal-selector">
+                        <button class="btn-option active" data-goal="leads" onclick="selectGoal(this)">
+                            <i class="fas fa-users"></i> Лиды
+                        </button>
+                        <button class="btn-option" data-goal="traffic" onclick="selectGoal(this)">
+                            <i class="fas fa-chart-line"></i> Трафик
+                        </button>
+                        <button class="btn-option" data-goal="engagement" onclick="selectGoal(this)">
+                            <i class="fas fa-heart"></i> Вовлеч.
+                        </button>
+                        <button class="btn-option" data-goal="sales" onclick="selectGoal(this)">
+                            <i class="fas fa-dollar-sign"></i> Продажи
+                        </button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Бюджет на аккаунт (USDT)</label>
+                    <input class="form-input" id="camp-budget" type="number" placeholder="200" value="200">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Целевые каналы (по одному на строку)</label>
+                    <textarea class="form-input" id="camp-channels" rows="3" placeholder="@channel1&#10;@channel2"></textarea>
+                </div>
+                <div class="form-hint" style="margin-bottom:4px">
+                    <i class="fas fa-info-circle"></i> Можно оставить пустым — ИИ подберёт каналы сам
+                </div>
+            </div>
+
+            <!-- Tab: AI Prompt -->
+            <div class="campaign-tab-content" id="tab-prompt">
+                <div class="form-group">
+                    <label class="form-label">Шаблоны промптов</label>
+                    <div class="template-grid" id="template-grid">
+                        <button class="template-card" data-prompt="Ты — эксперт в нише. Пиши развёрнутые, аргументированные комментарии с цифрами и фактами. Стиль: уверенный, профессиональный. Цель: показать глубокую экспертизу и вызвать доверие." onclick="applyTemplate(this)">
+                            <div class="template-icon"><i class="fas fa-graduation-cap"></i></div>
+                            <div class="template-name">Экспертный</div>
+                            <div class="template-desc">Цифры, факты, аргументы</div>
+                        </button>
+                        <button class="template-card" data-prompt="Ты — дружелюбный помощник. Отвечай тепло, поддерживающе, задавай уточняющие вопросы. Стиль: мягкий, эмпатичный. Цель: установить контакт и продолжить диалог." onclick="applyTemplate(this)">
+                            <div class="template-icon"><i class="fas fa-hand-sparkles"></i></div>
+                            <div class="template-name">Поддерживающий</div>
+                            <div class="template-desc">Тёплый, эмпатичный тон</div>
+                        </button>
+                        <button class="template-card" data-prompt="Ты — продавец-консультант. Структурируй ответ как мини-продажу: боль → решение → призыв. Стиль: энергичный, убедительный. Цель: конверсия в личное сообщение." onclick="applyTemplate(this)">
+                            <div class="template-icon"><i class="fas fa-fire"></i></div>
+                            <div class="template-name">Продающий</div>
+                            <div class="template-desc">Боль → решение → CTA</div>
+                        </button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">AI Промпт</label>
+                    <textarea class="form-input" id="camp-prompt" rows="6" placeholder="Опишите стиль и тон комментариев..."></textarea>
+                </div>
+                <div class="form-hint">
+                    <i class="fas fa-lightbulb"></i> Чем детальнее промпт — тем естественнее комментарии
+                </div>
+            </div>
+
+            <!-- Tab: Parsing -->
+            <div class="campaign-tab-content" id="tab-parsing">
+                <div class="parsing-setup">
+                    <div class="parsing-setup-icon"><i class="fas fa-search"></i></div>
+                    <h4 style="margin-bottom:8px">Парсинг каналов</h4>
+                    <p class="text-secondary text-sm" style="margin-bottom:16px">Настройте источник аудитории для кампании</p>
+                    <div class="form-group">
+                        <label class="form-label">Ключевые слова для поиска</label>
+                        <input class="form-input" id="parse-keywords" placeholder="крипта, инвестиции, трейдинг">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Количество участников для сбора</label>
+                        <input class="form-input" id="parse-count" type="number" placeholder="500" value="500">
+                    </div>
+                    <div class="form-group" style="margin-bottom:0">
+                        <label class="form-label">Глубина парсинга</label>
+                        <div class="btn-option-grid btn-option-grid-3">
+                            <button class="btn-option active" onclick="selectParseDepth(this)">Поверхностный</button>
+                            <button class="btn-option" onclick="selectParseDepth(this)">Средний</button>
+                            <button class="btn-option" onclick="selectParseDepth(this)">Глубокий</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeCampaignModal()" style="flex:1">
+                    <i class="fas fa-times"></i> Отмена
+                </button>
+                <button class="btn btn-neon" onclick="startCampaign()" style="flex:2">
+                    <i class="fas fa-rocket"></i> Запустить кампанию
+                </button>
+            </div>
+    </dialog>
+
+    <div class="nav-bar animate-in" style="animation-delay: 0.15s">
+        <a href="index.html" class="nav-item"><i class="fas fa-home"></i></a>
+        <a href="campaigns.html" class="nav-item active"><i class="fas fa-tasks"></i></a>
+        <a href="channel.html" class="nav-item"><i class="fas fa-tv"></i></a>
+        <a href="dashboard.html" class="nav-item"><i class="fas fa-chart-pie"></i></a>
+        <a href="settings.html" class="nav-item"><i class="fas fa-cog"></i></a>
+    </div>
+
+    <script src="main.js"></script>
+    <script>
+        // ===== Modal Controls =====
+        function openCampaignModal() {
+            haptic('medium');
+            document.getElementById('campaign-modal').showModal();
+        }
+        function closeCampaignModal() {
+            document.getElementById('campaign-modal').close();
+        }
+        // ===== Light-dismiss fallback for browsers without closedby =====
+        (function() {
+            var dialog = document.getElementById('campaign-modal');
+            if (!('close' in HTMLDialogElement.prototype)) return;
+            if (!('closedBy' in HTMLDialogElement.prototype)) {
+                dialog.addEventListener('click', function(e) {
+                    if (e.target !== dialog) return;
+                    var rect = dialog.getBoundingClientRect();
+                    var isInside = rect.top <= e.clientY && e.clientY <= rect.bottom &&
+                        rect.left <= e.clientX && e.clientX <= rect.right;
+                    if (!isInside) dialog.close();
+                });
+            }
+        })();
+
+        // ===== Tab Switching =====
+        function switchTab(tabId) {
+            document.querySelectorAll('.campaign-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.campaign-tab-content').forEach(c => c.classList.remove('active'));
+            document.querySelector('[data-tab="' + tabId + '"]').classList.add('active');
+            document.getElementById('tab-' + tabId).classList.add('active');
+        }
+
+        // ===== Goal Selection =====
+        function selectGoal(el) {
+            document.querySelectorAll('#goal-selector .btn-option').forEach(b => b.classList.remove('active'));
+            el.classList.add('active');
+        }
+
+        // ===== Prompt Templates =====
+        function applyTemplate(el) {
+            document.querySelectorAll('.template-card').forEach(t => t.classList.remove('active'));
+            el.classList.add('active');
+            document.getElementById('camp-prompt').value = el.getAttribute('data-prompt');
+            haptic('light');
+        }
+
+        // ===== Parse Depth =====
+        function selectParseDepth(el) {
+            document.querySelectorAll('#tab-parsing .btn-option').forEach(b => b.classList.remove('active'));
+            el.classList.add('active');
+        }
+
+        // ===== Create Campaign =====
+        async function startCampaign() {
+            const name = document.getElementById('camp-name').value || 'Новая кампания';
+            const goalEl = document.querySelector('#goal-selector .btn-option.active');
+            const goal = goalEl ? goalEl.getAttribute('data-goal') : 'leads';
+            const budget = document.getElementById('camp-budget').value || 200;
+            const channels = document.getElementById('camp-channels').value;
+            const prompt = document.getElementById('camp-prompt').value;
+
+            try {
+                const r = await api.post('/campaigns/create', {
+                    name: name,
+                    goal: goal,
+                    budget: parseInt(budget),
+                    channels: channels ? channels.split('\n').map(s => s.trim()).filter(Boolean) : [],
+                    prompt: prompt
+                });
+                toast('success', 'Кампания запущена', 'ID: ' + (r.strategy?.id || r.strategy || 'ok'));
+                closeCampaignModal();
+                loadCampaigns();
+            } catch (e) {
+                toast('error', 'Ошибка', e.message);
+            }
+        }
+
+        // ===== Load Campaigns =====
+        async function loadCampaigns() {
+            try {
+                const data = await api.get('/campaigns/list');
+                const container = document.getElementById('campaigns-list');
+                if (Array.isArray(data) && data.length) {
+                    container.innerHTML = data.map(c =>
+                        '<div class="campaign-item card" style="cursor:pointer">' +
+                            '<div style="flex:1">' +
+                                '<div style="font-weight:600;font-size:14px">' + escapeHtml(c.name || '') + '</div>' +
+                                '<div style="display:flex;gap:12px;margin-top:8px;font-size:11px;color:var(--text-secondary)">' +
+                                    '<span><i class="fas fa-trophy"></i> ROI: ' + (c.roi || '—') + '%</span>' +
+                                    '<span><i class="fas fa-users"></i> Лидов: ' + (c.leads || 0) + '</span>' +
+                                    '<span><i class="fas fa-clock"></i> ' + (c.duration || '—') + '</span>' +
+                                '</div>' +
+                            '</div>' +
+                            '<span class="status-badge ' + (c.status === 'active' ? 'badge-green' : c.status === 'paused' ? 'badge-yellow' : 'badge-blue') + '">' +
+                                '<span class="dot ' + (c.status === 'active' ? 'dot-green' : c.status === 'paused' ? 'dot-yellow' : 'dot-blue') + '"></span> ' +
+                                escapeHtml(c.status || 'Активна') +
+                            '</span>' +
+                        '</div>'
+                    ).join('');
+                } else {
+                    showEmptyState();
+                }
+            } catch (e) {
+                document.getElementById('campaigns-list').innerHTML =
+                    '<div class="empty-state">' +
+                        '<div class="empty-state-icon"><i class="fas fa-exclamation-triangle"></i></div>' +
+                        '<div class="empty-state-title">Ошибка загрузки</div>' +
+                        '<div class="empty-state-text">' + escapeHtml(e.message) + '</div>' +
+                        '<button class="btn btn-secondary" onclick="loadCampaigns()" style="max-width:160px;margin:0 auto">' +
+                            '<i class="fas fa-redo"></i> Повторить' +
+                        '</button>' +
+                    '</div>';
+            }
+        }
+
+        function showEmptyState() {
+            document.getElementById('campaigns-list').innerHTML =
+                '<div class="empty-state">' +
+                    '<div class="empty-state-icon"><i class="fas fa-rocket"></i></div>' +
+                    '<div class="empty-state-title">Ещё нет кампаний</div>' +
+                    '<div class="empty-state-text">Создайте первую — ИИ настроит воронку продаж под вашу нишу</div>' +
+                    '<button class="btn" onclick="openCampaignModal()" style="max-width:220px;margin:0 auto">' +
+                        '<i class="fas fa-plus"></i> Создать кампанию' +
+                    '</button>' +
+                '</div>';
+        }
+
+        document.addEventListener('DOMContentLoaded', loadCampaigns);
+
+        function escapeHtml(str) {
+            var d = document.createElement('div');
+            d.textContent = str;
+            return d.innerHTML;
+        }
+    </script>
+</body>
+</html>
